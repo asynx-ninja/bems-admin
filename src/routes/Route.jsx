@@ -5,7 +5,7 @@ import Announcements from "../pages/Announcements";
 //import AnimationLayout from "../components/global/AnimationLayout";
 import Navbar from "../components/global/Navbar";
 import Inquiries from "../pages/Inquiries";
-import Residents from "../pages/Residents";
+import Residents from "../pages/BarangayTabs/Residents";
 import Information from "../pages/BarangayTabs/information";
 import Settings from "../pages/Settings";
 import Login from "../pages/login/Login";
@@ -14,9 +14,13 @@ import SecurityPin from "../pages/login/SecurityPin";
 import ChangePassword from "../pages/login/ChangePassword";
 import ArchivedAnnouncements from "../pages/ArchivedAnnouncements";
 import ArchivedInquiries from "../pages/ArchivedInquiries";
-import ArchivedResidents from "../pages/ArchiveResidents";
+import ArchivedResidents from "../pages/BarangayTabs/ArchiveResidents";
+import ArchivedServices from "../pages/BarangayTabs/ArchiveServices";
+import ArchivedServiceReq from "../pages/BarangayTabs/ArchiveServiceReq";
+import ArchivedOfficials from "../pages/BarangayTabs/ArchivedOfficials";
 import BarangayMenu from "../pages/BarangayMenu";
 import BarangayInfo from "../pages/BarangayInfo";
+
 
 const pages = [
   {
@@ -28,11 +32,11 @@ const pages = [
     element: <ForgotPassword />,
   },
   {
-    path: "/pin",
+    path: "/pin/:email",
     element: <SecurityPin />,
   },
   {
-    path: "/change",
+    path: "/change/:email",
     element: <ChangePassword />
   },
   {
@@ -81,6 +85,33 @@ const pages = [
     ),
   },
   {
+    path: "/archivedservices",
+    element: (
+      <>
+        <Navbar />
+        <ArchivedServices />
+      </>
+    ),
+  },
+  {
+    path: "/archivedservicesreq",
+    element: (
+      <>
+        <Navbar />
+        <ArchivedServiceReq />
+      </>
+    ),
+  },
+  {
+    path: "/archivedofficials",
+    element: (
+      <>
+        <Navbar />
+        <ArchivedOfficials />
+      </>
+    ),
+  },
+  {
     path: "/barangaymenu",
     element: (
       <>
@@ -98,6 +129,7 @@ const pages = [
       </>
     ),
   },
+  
   {
     path: "/residents",
     element: (

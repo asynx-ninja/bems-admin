@@ -1,15 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import login from "../../assets/login/login.png";
 import montalban_logo from "../../assets/login/montalban-logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
+import API_LINK from "../../config/API";
 const Login = () => {
   const [eye, isEye] = useState(true);
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const type = "Admin";
 
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.get(
+        `${API_LINK}/auth/${username}/${password}/${type}`
+      );
+      setErrorMessage("");
+
+      navigate(`/dashboard/?id=${response.data[0]._id}`);
+    } catch (error) {
+      if (error.response) {
+        setErrorMessage(error.response.data.error);
+      } else if (error.request) {
+        setErrorMessage("The request was made but no response was received");
+      } else {
+        setErrorMessage("Error: " + error.message);
+      }
+    }
+  };
   return (
     <div className='bg-[url("/imgs/login-bg3.jpg")] bg-cover bg-center bg-no-repeat md:px-[3rem] md:py-[3rem] lg:px-[7rem] lg:py-[4rem] h-screen flex sm:flex-col md:flex-row sm:space-y-5 md:space-y-0'>
       <div className="sm:block md:hidden h-[320px] border-[5px] border-t-0 border-[#1C8058] bg-[url('/imgs/login.png)] flex flex-col w-full rounded-b-full overflow-hidden shadow-[0px_4px_4px_rgba(0,0,0,0.51)]">
@@ -80,19 +102,29 @@ const Login = () => {
                 Please confirm if you're not a robot.
               </p>
             </div>
+            {errorMessage && (
+              <div
+                className="bg-red-50 border text-center border-red-200 text-sm text-red-600 rounded-md py-4 mt-2 mb-4"
+                role="alert"
+              >
+                <span className="font-bold ">Warning:</span> {errorMessage}
+              </div>
+            )}
             <div>
               <label
                 htmlFor="input-label-with-helper-text"
                 className="block sm:text-xs lg:text-sm font-medium mb-2"
               >
-                Email address
+                Username
               </label>
               <input
-                type="email"
-                id="input-label-with-helper-text"
+                type="text"
+                name="username"
                 className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                placeholder="you@site.com"
+                placeholder="username"
                 aria-describedby="hs-input-helper-text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
@@ -105,9 +137,11 @@ const Login = () => {
               <div className="relative">
                 <input
                   type={eye ? "password" : "text"}
-                  id="input-label-with-helper-text"
+                  name="username"
                   className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
                   aria-describedby="hs-input-helper-text"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   onClick={() => isEye(!eye)}
@@ -130,7 +164,8 @@ const Login = () => {
                 Forgot password?
               </Link>
               <button
-                onClick={() => navigate("/dashboard", { replace: true })}
+                type="submit"
+                onClick={handleLogin}
                 className="w-full rounded-[12px] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] sm:py-1.5 lg:py-2.5 text-white font-medium text-base"
               >
                 Login

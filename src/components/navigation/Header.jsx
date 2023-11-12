@@ -25,10 +25,10 @@ const Header = () => {
       <img src={logo} alt="" className="h-[40px] md:h-[55px] lg:h-[100px]" />
         <h1 className="sm:hidden md:block tracking-[0.3rem] md:tracking-[0.4rem] lg:tracking-[0.7rem] font-heavy text-sm md:text-xl lg:text-3xl">
           <span className="text-xs md:text-base lg:text-lg">
-            WELCOME NINJA!
+            WELCOME ADMIN!
           </span>{" "}
           <br />
-          BARANGAY SAN JOSE
+          JUAN KARLOS JR.
         </h1>
     </div>
   );

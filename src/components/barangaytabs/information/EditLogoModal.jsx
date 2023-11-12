@@ -7,7 +7,7 @@ function EditLogoModal({ onClose }) {
     <div>
       <button
         type="button"
-        className="text-white w-full justify-center bg-[#196aaf] font-medium rounded-full text-sm m-2 py-2 px-10 text-center inline-flex items-center mr-2"
+        className="text-white w-full justify-center bg-custom-green-button3 font-medium rounded-full text-sm m-2 py-2 px-10 text-center inline-flex items-center mr-2"
         style={{ margin: "10px 0px", padding: "10px 20px" }}
         data-hs-overlay="#hs-edit-logo-modal"
       >
@@ -22,7 +22,7 @@ function EditLogoModal({ onClose }) {
         <div class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 md:px-0 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
           <div class="flex flex-col bg-white shadow-sm ">
             {/* Header */}
-            <div class="bg-[#013D74] overflow-hidden">
+            <div class="bg-[#295141] overflow-hidden">
               <div
                 class="flex justify-between items-center p-5 w-full h-full bg-cover bg-no-repeat transform"
                 style={{ backgroundImage: `url(${bgmodal})` }}

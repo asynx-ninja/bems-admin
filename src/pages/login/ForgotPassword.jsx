@@ -3,13 +3,61 @@ import login from "../../assets/login/login.png";
 import montalban_logo from "../../assets/login/montalban-logo.png";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API_LINK from "../../config/API";
+import axios from "axios";
 
 const ForgotPassword = () => {
-  const [eye, isEye] = useState(true);
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [response, setResponse] = useState({
+    success: false,
+    error: false,
+    message: "",
+  });
 
-  const handleForgot = () => {
-    navigate("/pin", { replace: true });
+  const handleOnSubmit = async () => {
+    if (!email) {
+      setResponse({
+        success: false,
+        error: true,
+        message: "Please insert an Email Address",
+      });
+
+      return;
+    }
+
+    try {
+      const res = await axios.patch(`${API_LINK}/auth/send_pin/${email}`);
+      const encodedEmail = btoa(email);
+      console.log('Response data:', res.data); // Log the response data
+
+      if (res.status === 200) {
+        console.log('User type:', res.data.type); // Log the user type
+        console.log(res.data.message)
+        if (res.data.type === 'Admin') {
+          setResponse({
+            success: true,
+            error: false,
+            message: res.data.message,
+          });
+
+          setTimeout(navigate(`/pin/${encodedEmail}`), 3000);
+        } else {
+          setResponse({
+            success: false,
+            error: true,
+            message: error.response.data.error,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error.message); // Log the error message
+      setResponse({
+        success: false,
+        error: true,
+        message:error.response.data.error,
+      });
+    }
   };
 
   return (
@@ -33,7 +81,7 @@ const ForgotPassword = () => {
               src={montalban_logo}
               className="absolute bottom-4 left-5 z-50 w-8/12"
               alt=""
-              srcset=""
+              srcSet=""
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -65,8 +113,8 @@ const ForgotPassword = () => {
                   y2="253.5"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop stop-color="white" />
-                  <stop offset="1" stop-color="#DCDCDC" />
+                  <stop stopColor="white" />
+                  <stop offset="1" stopColor="#DCDCDC" />
                 </linearGradient>
               </defs>
             </svg>
@@ -83,6 +131,24 @@ const ForgotPassword = () => {
                 this account.
               </p>
             </div>
+            <div >
+              {response.success ? (
+                <div className="w-[100%] bg-green-400 rounded-md mb-[10px] flex">
+                  <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
+                    {response.message}
+                  </p>
+                </div>
+              ) : null}
+
+
+              {response.error ? (
+                <div className="w-[100%] bg-red-500 rounded-md mb-[10px] flex">
+                  <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
+                    {response.message}
+                  </p>
+                </div>
+              ) : null}
+            </div>
             <div>
               <label
                 htmlFor="input-label-with-helper-text"
@@ -92,6 +158,7 @@ const ForgotPassword = () => {
               </label>
               <input
                 type="email"
+                onChange={(e) => setEmail(e.target.value)}
                 id="input-label-with-helper-text"
                 className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
                 placeholder="you@site.com"
@@ -101,7 +168,7 @@ const ForgotPassword = () => {
 
             <div className="flex flex-col w-full space-y-3">
               <button
-                onClick={handleForgot}
+                onClick={handleOnSubmit}
                 className="w-full rounded-[12px] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] sm:py-1.5 lg:py-2.5 text-white font-medium text-base"
               >
                 Proceed
@@ -111,11 +178,11 @@ const ForgotPassword = () => {
           <div className="hs-tooltip sm:hidden md:inline-block">
             <button
               type="button"
-              class="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
+              className="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
             >
               ?
               <span
-                class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                 role="tooltip"
               >
                 Tooltip on top

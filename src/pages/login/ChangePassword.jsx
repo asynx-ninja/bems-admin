@@ -1,18 +1,83 @@
 import React from "react";
 import login from "../../assets/login/login.png";
 import montalban_logo from "../../assets/login/montalban-logo.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import API_LINK from "../../config/API";
+import axios from "axios";
 const ChangePassword = () => {
-  const navigate = useNavigate();
   const [eye1, isEye1] = useState(true);
   const [eye2, isEye2] = useState(true);
 
-  const handleSubmit = () => {
-    navigate("/", { replace: true });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const client_email = atob(location.pathname.split("/")[2]);
+  const [password, setPassword] = useState({
+    enter: "",
+    reenter: "",
+  });
+  const [response, setResponse] = useState({
+    success: false,
+    error: false,
+    message: "",
+  });
+  const [credential, setCredential] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [passwordShown, setPasswordShown] = useState(false);
+  const [repasswordShown, setRePasswordShown] = useState(false);
+  const togglePassword = () => {
+    setPasswordShown(!passwordShown);
+  };
+  const RetogglePassword = () => {
+    setRePasswordShown(!repasswordShown);
+  };
+
+  const handleOnChange = (e) => {
+    setPassword((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+    setCredential({
+      email: client_email,
+      password: password.enter,
+    });
+  };
+
+  const handleOnSubmit = async () => {
+    try {
+      if (password.enter !== password.reenter) {
+        setResponse({
+          success: false,
+          error: true,
+          message: "Password does not Match! Please Try Again",
+        });
+      } else {
+        await axios.patch(`${API_LINK}/auth/pass/`, credential, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        setResponse({
+          success: true,
+          error: false,
+          message: "Password Change Successfully!",
+        });
+
+        setTimeout(navigate("/"), 3000);
+      }
+    } catch (error) {
+      setResponse({
+        success: false,
+        error: true,
+        message: "Error: Please Try Again",
+      });
+      console.log(error);
+    }
   };
 
   return (
@@ -36,7 +101,7 @@ const ChangePassword = () => {
               src={montalban_logo}
               className="absolute bottom-4 left-5 z-50 w-8/12"
               alt=""
-              srcset=""
+              srcSet=""
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -68,8 +133,8 @@ const ChangePassword = () => {
                   y2="253.5"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop stop-color="white" />
-                  <stop offset="1" stop-color="#DCDCDC" />
+                  <stop stopColor="white" />
+                  <stop offset="1" stopColor="#DCDCDC" />
                 </linearGradient>
               </defs>
             </svg>
@@ -86,6 +151,22 @@ const ChangePassword = () => {
               </p>
             </div>
             <div>
+              {response.success ? (
+                <div className="w-[100%] bg-green-400 rounded-md mt-[10px] flex">
+                  <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
+                    {response.message}
+                  </p>
+                </div>
+              ) : null}
+              {response.error ? (
+                <div className="w-[100%] bg-red-500 rounded-md mt-[10px] flex">
+                  <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
+                    {response.message}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+            <div>
               <label
                 htmlFor="input-label-with-helper-text"
                 className="block sm:text-xs md:text-sm font-medium mb-2"
@@ -94,8 +175,9 @@ const ChangePassword = () => {
               </label>
               <div className="relative">
                 <input
+                  name="enter"
+                  onChange={handleOnChange}
                   type={eye1 ? "password" : "text"}
-                  id="input-label-with-helper-text"
                   className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
                   aria-describedby="hs-input-helper-text"
                 />
@@ -120,8 +202,9 @@ const ChangePassword = () => {
               </label>
               <div className="relative">
                 <input
+                  name="reenter"
+                  onChange={handleOnChange}
                   type={eye2 ? "password" : "text"}
-                  id="input-label-with-helper-text"
                   className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
                   aria-describedby="hs-input-helper-text"
                 />
@@ -139,7 +222,8 @@ const ChangePassword = () => {
             </div>
             <div className="flex flex-col w-full space-y-3">
               <button
-                onClick={handleSubmit}
+                type="button"
+                onClick={handleOnSubmit}
                 className="w-full rounded-[12px] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] sm:py-1.5 lg:py-2.5 text-white font-medium text-base"
               >
                 Save Password
@@ -149,11 +233,11 @@ const ChangePassword = () => {
           <div className="hs-tooltip sm:hidden md:inline-block">
             <button
               type="button"
-              class="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
+              className="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
             >
               ?
               <span
-                class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                 role="tooltip"
               >
                 Tooltip on top

@@ -74,7 +74,7 @@ const Sidebar = () => {
                 } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#013D74] to-[#3248a4]`}
               >
                 <ImBullhorn size={15} />
-                Announcements
+                Municipality Announcements
               </Link>
             </li>
             <li>
@@ -94,30 +94,9 @@ const Sidebar = () => {
                 } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#013D74] to-[#3248a4]`}
               >
                 <FaRegNoteSticky size={15} />
-                Inquiries
+                Municipality Inquiries
               </Link>
             </li>
-            <li>
-              <Link
-                to="/residents"
-                onClick={() => {
-                  window.innerWidth >= 320 && window.innerWidth <= 1023
-                    ? document
-                        .getQuerySelector("[data-hs-overlay-backdrop-template]")
-                        .remove()
-                    : null;
-                }}
-                className={`${
-                  currentPath === "/residents"
-                    ? "bg-gradient-to-r from-[#013D74] to-[#3248a4] text-[#EFC586]"
-                    : null
-                } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#013D74] to-[#3248a4]`}
-              >
-                <BsPeopleFill size={15} />
-                Residents
-              </Link>
-            </li>
-      
             <li>
             <Link
                   to="/barangaymenu"

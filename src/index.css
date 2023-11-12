@@ -33,7 +33,11 @@
   background: #EFC586;
   border-radius: 5px;
 }
-
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 /* Handle on hover
 ::-webkit-scrollbar-thumb:hover {
   background: #fff;

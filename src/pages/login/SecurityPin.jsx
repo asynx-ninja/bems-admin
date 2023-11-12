@@ -1,50 +1,97 @@
 import React from "react";
 import login from "../../assets/login/login.png";
 import montalban_logo from "../../assets/login/montalban-logo.png";
-import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import useCountdown from "../../hooks/useCountdown";
+import axios from "axios";
+import API_LINK from "../../config/API";
 
-const SecurityPin = ({numberOfDigits = 4}) => {
-   const { remainingSeconds, isCountdownRunning, startCountdown } =
-     useCountdown(30);
+const SecurityPin = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const email = atob(location.pathname.split("/")[2]);
+  const { remainingSeconds, isCountdownRunning, startCountdown } =
+    useCountdown(30);
+  const [code, setCode] = useState("");
+  const inputRefs = useRef([]);
+  const setInputRef = (index, element) => {
+    inputRefs.current[index] = element;
+  };
+  const [response, setResponse] = useState({
+    success: false,
+    error: false,
+    message: "",
+  });
 
-   const [pin, setPin] = useState(new Array(numberOfDigits).fill(""));
-   const inputRefs = useRef([]);
-   const navigate = useNavigate();
+  // This handleOnChange will get the code inputted by the user
+  const handleOnChange = (event, index) => {
+    // Only allow one digit
+    if (event.target.value.length > 1) {
+      return;
+    }
 
-   useEffect(() => {}, []);
+    // Set the code
+    setCode((prevState) => {
+      const newState =
+        prevState.substring(0, index) +
+        event.target.value +
+        prevState.substring(index + 1);
+      return newState;
+    });
 
-   const handleInputChange = (index, event) => {
-     const newPin = [...pin];
-     newPin[index] = event.target.value;
-     setPin(newPin);
+    // Move the focus to the next input element if there is one
+    if (inputRefs.current[index + 1]) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
 
-     if (event.target.value && index < numberOfDigits - 1) {
-       inputRefs.current[index + 1].focus();
-     }
-   };
+  const handleBackspaceAndEnter = (e, index) => {
+    if (e.key === "Backspace" && !e.target.value && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+    if (e.key === "Enter" && e.target.value && index < numberOfDigits - 1) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
 
-   const handleBackspaceAndEnter = (e, index) => {
-     if (e.key === "Backspace" && !e.target.value && index > 0) {
-       inputRefs.current[index - 1].focus();
-     }
-     if (e.key === "Enter" && e.target.value && index < numberOfDigits - 1) {
-       inputRefs.current[index + 1].focus();
-     }
-   };
+  const handleOnSubmit = async () => {
+    try {
+      const res = await axios.get(
+        `${API_LINK}/auth/check_pin/${email}/${code}`
+      );
+      const encodedEmail = btoa(email);
 
-   const handleSubmit = (event) => {
-     event.preventDefault();
+      if (res.status === 200) {
+        setResponse({
+          success: true,
+          error: false,
+          message: "Success!",
+        });
 
-     // if (otp.join("") !== "" && otp.join("") !== correctOTP) {
-     //   console.log("❌ Wrong OTP Please Check Again");
-     // } else {
-     //   console.log("nays one nigga");
-     // }
+        setTimeout(navigate(`/change/${encodedEmail}`), 3000);
+      }
+    } catch (error) {
+      setResponse({
+        success: false,
+        error: true,
+        message: "Incorrect Code! Please Try Again",
+      });
+      console.log(error);
+    }
+  };
 
-     navigate("/change", { replace: true });
-   };
+  const handleOnResend = async () => {
+    try {
+      const res = await axios.get(`${API_LINK}/auth/send_pin/${email}`);
+
+      if (res.status === 200) {
+        startCountdown();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className='bg-[url("/imgs/login-bg3.jpg")] bg-cover bg-center bg-no-repeat md:px-[3rem] md:py-[3rem] lg:px-[7rem] lg:py-[4rem] h-screen flex sm:flex-col md:flex-row sm:space-y-5 md:space-y-0'>
@@ -116,15 +163,32 @@ const SecurityPin = ({numberOfDigits = 4}) => {
                 Kindly check your email to look thru 4-digit code
               </p>
             </div>
+            <div>
+              {response.success ? (
+                <div className="w-[100%] bg-green-400 rounded-md mt-[10px] flex">
+                  <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
+                    {response.message}
+                  </p>
+                </div>
+              ) : null}
+              {response.error ? (
+                <div className="w-[100%] bg-red-500 rounded-md mt-[10px] flex">
+                  <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
+                    {response.message}
+                  </p>
+                </div>
+              ) : null}
+            </div>
             <div className="flex sm:h-[6rem] md:h-[8rem] sm:space-x-2 lg:space-x-3 xl:space-x-4 ">
-              {pin.map((digit, index) => (
+              {[...Array(4)].map((_, index) => (
                 <input
                   key={index}
-                  value={digit}
-                  maxLength={1}
-                  onChange={(e) => handleInputChange(index, e)}
+                  type="number"
+                  maxLength="1"
+                  ref={(el) => setInputRef(index, el)}
+                  value={code.charAt(index)}
+                  onChange={(event) => handleOnChange(event, index)}
                   onKeyUp={(e) => handleBackspaceAndEnter(e, index)}
-                  ref={(reference) => (inputRefs.current[index] = reference)}
                   id="input-label-with-helper-text"
                   className="text-center font-medium sm:text-4xl md:text-5xl py-3 px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
                   aria-describedby="hs-input-helper-text"
@@ -133,13 +197,14 @@ const SecurityPin = ({numberOfDigits = 4}) => {
             </div>
             <div className="flex flex-col w-full space-y-3">
               <button
-                onClick={handleSubmit}
+                type="button"
+                onClick={handleOnSubmit}
                 className="w-full rounded-[12px] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] sm:py-1.5 lg:py-2.5 text-white font-medium text-base"
               >
                 Proceed
               </button>
               <button
-                onClick={startCountdown}
+                onClick={handleOnResend}
                 className="text-center text-sm text-gray-500 hover:text-red-400"
               >
                 Didn't receive code? Resend OTP{" "}

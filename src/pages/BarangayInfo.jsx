@@ -1,28 +1,35 @@
 import React from "react";
 import { useEffect } from "react";
-import Information from "./BarangayTabs/Information";
+import Information from "./BarangayTabs/information";
 import Profit from "../pages/BarangayTabs/Profit";
 import Services from "../pages/BarangayTabs/Services";
 import ServiceRequest from "../pages/BarangayTabs/ServiceRequests";
 import Officials from "./BarangayTabs/Officials";
 import ArchivedOfficials from "./BarangayTabs/ArchivedOfficials";
+import Residents from "./BarangayTabs/Residents";
+import Inquiries from "./Inquiries";
+
 function BarangayDetails() {
   useEffect(() => {
     document.title = "Barangay Information | Barangay E-Services Management";
   }, []);
 
   return (
-    <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:mr-6 lg:h-[full] border rounded-lg">
-      <div className="w-full flex items-center justify-center ">
-        <h1 className="text-black text-3xl py-2 px-5 font-heavy ">
-          BARANGAY INFORMATION
+    <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:mr-6 lg:h-full border rounded-lg bg-white shadow-lg">
+      <div className="w-full flex items-center justify-center bg-[#013D74] rounded-t-lg">
+        <h1 className="text-white lg:text-3xl py-2 px-5 font-heavy ">
+          BARANGAY SAN JOSE INFORMATION
         </h1>
       </div>
-      <div class="border-b border-gray-200 px-4 dark:border-gray-700 overflow-x-auto">
-        <nav class="flex space-x-2" aria-label="Tabs" role="tablist">
+      <div className="px-4 py-4 overflow-x-scroll items-center flex bg-gray-100">
+        <nav
+          className="flex space-x-4 justify-center items-center mx-auto"
+          aria-label="Tabs"
+          role="tablist"
+        >
           <button
             type="button"
-            class="hs-tab-active:font-semibold hs-tab-active:border-blue-600 hs-tab-active:text-blue-600 py-4 px-5 inline-flex items-center gap-2 border-b-[3px] border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-slate-400 active"
+            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74] active"
             id="basic-tabs-item-1"
             data-hs-tab="#basic-tabs-1"
             aria-controls="basic-tabs-1"
@@ -32,8 +39,8 @@ function BarangayDetails() {
           </button>
           <button
             type="button"
-            class="hs-tab-active:font-semibold hs-tab-active:border-blue-600 hs-tab-active:text-blue-600 py-4 px-5 inline-flex items-center gap-2 border-b-[3px] border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-slate-400 active"
-            id="basic-tabs-item-2"
+            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
+            id="basic-tabs-item-1"
             data-hs-tab="#basic-tabs-2"
             aria-controls="basic-tabs-2"
             role="tab"
@@ -42,8 +49,8 @@ function BarangayDetails() {
           </button>
           <button
             type="button"
-            class="hs-tab-active:font-semibold hs-tab-active:border-blue-600 hs-tab-active:text-blue-600 py-4 px-5 inline-flex items-center gap-2 border-b-[3px] border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-slate-400"
-            id="basic-tabs-item-3"
+            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
+            id="basic-tabs-item-1"
             data-hs-tab="#basic-tabs-3"
             aria-controls="basic-tabs-3"
             role="tab"
@@ -52,8 +59,8 @@ function BarangayDetails() {
           </button>
           <button
             type="button"
-            class="hs-tab-active:font-semibold hs-tab-active:border-blue-600 hs-tab-active:text-blue-600 py-4 px-5 inline-flex items-center gap-2 border-b-[3px] border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-slate-400"
-            id="basic-tabs-item-4"
+            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
+            id="basic-tabs-item-1"
             data-hs-tab="#basic-tabs-4"
             aria-controls="basic-tabs-4"
             role="tab"
@@ -62,10 +69,21 @@ function BarangayDetails() {
           </button>
           <button
             type="button"
-            class="hs-tab-active:font-semibold hs-tab-active:border-blue-600 hs-tab-active:text-blue-600 py-4 px-5 inline-flex items-center gap-2 border-b-[3px] border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-slate-400"
-            id="basic-tabs-item-5"
+            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
+            id="basic-tabs-item-1"
             data-hs-tab="#basic-tabs-5"
             aria-controls="basic-tabs-5"
+            role="tab"
+          >
+            Residents
+          </button>
+        
+          <button
+            type="button"
+            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
+            id="basic-tabs-item-1"
+            data-hs-tab="#basic-tabs-6"
+            aria-controls="basic-tabs-6"
             role="tab"
           >
             Profits
@@ -73,7 +91,7 @@ function BarangayDetails() {
         </nav>
       </div>
 
-      <div class="mt-3 p-4">
+      <div className="mt-3 py-4 px-4">
         <div
           id="basic-tabs-1"
           role="tabpanel"
@@ -83,7 +101,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-2"
-          class="hidden"
+          className="hidden"
           role="tabpanel"
           aria-labelledby="basic-tabs-item-2"
         >
@@ -91,7 +109,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-3"
-          class="hidden"
+          className="hidden"
           role="tabpanel"
           aria-labelledby="basic-tabs-item-3"
         >
@@ -99,7 +117,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-4"
-          class="hidden"
+          className="hidden"
           role="tabpanel"
           aria-labelledby="basic-tabs-item-4"
         >
@@ -107,19 +125,19 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-5"
-          class="hidden"
+          className="hidden"
+          role="tabpanel"
+          aria-labelledby="basic-tabs-item-5"
+        >
+          <Residents />
+        </div>
+        <div
+          id="basic-tabs-6"
+          className="hidden"
           role="tabpanel"
           aria-labelledby="basic-tabs-item-5"
         >
           <Profit />
-        </div>
-        <div
-          id="basic-tabs-6"
-          class="hidden"
-          role="tabpanel"
-          aria-labelledby="basic-tabs-item-6"
-        >
-          <ArchivedOfficials />
         </div>
       </div>
     </div>

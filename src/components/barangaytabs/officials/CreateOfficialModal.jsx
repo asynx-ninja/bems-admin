@@ -6,7 +6,7 @@ import { IoIosAdd } from "react-icons/io";
 function CreateOfficialModal({ onClose }) {
   return (
     <div>
-      <button
+      {/* <button
         type="button"
         className="text-white w-full justify-center bg-[#013D74] font-medium rounded-full text-sm m-2 py-2 px-10 text-center inline-flex items-center mr-2"
         style={{ margin: "10px 0px", padding: "10px 20px" }}
@@ -16,7 +16,7 @@ function CreateOfficialModal({ onClose }) {
           size={24} // You can adjust the size as needed
           style={{ color: "#ffffff" }}
         />
-      </button>
+      </button> */}
 
       <div
         id="hs-create-official-modal"
