@@ -277,12 +277,18 @@ const Settings = () => {
   return (
     <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:mr-6 lg:h-full border rounded-lg bg-white shadow-lg">
       <div className="flex flex-col w-full ">
-
         <div className="relative w-full">
-          <img className="h-[230px] w-full object-cover" src={banner} alt="" />
-          <div className="absolute top-[50%] transform -translate-y-1/2 flex justify-center w-full">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gray-900 opacity-40"></div>
+            <img
+              className="h-[230px] w-full object-cover"
+              src={banner}
+              alt=""
+            />
+          </div>
+          <div className="absolute md:top-[56%] lg:top-[55%] transform -translate-y-1/2 flex justify-center w-full">
             <div className="flex flex-col items-center">
-              <div className="relative w-40 h-40">
+              <div className="relative lg:w-40 lg:h-40 sm:w-32 md:w-36">
                 <label
                   htmlFor="file_input"
                   onClick={handleAdd}
@@ -301,37 +307,41 @@ const Settings = () => {
                   className="hidden"
                 />
                 <img
-                  id="pfp"
-                  className="w-full h-full rounded-full object-cover border-[5px] border-[#295141] "
+                  // id="pfp"
+                  src={defaultPFP}
+                  className="w-full h-full rounded-full object-cover border-[5px] border-[#013D74] "
                 />
               </div>
-              <h6 className="font-bold mt-2">
+              <h6 className="font-bold mt-2 lg:text-normal">
                 {/* {userData.firstName} {userData.lastName} */}
                 DR. KENSHI TAKAHASHI
               </h6>
-              <p className="text-[12px] leading-[10px]">{userData.username}</p>
+
+              <p className="text-sm lg:text-[14px] py-2 leading-[10px]">@dwaynesenpai</p>
             </div>
           </div>
-          <div className="flex flex-col bg-white text-black justify-center mx-auto rounded-md p-4 mt-24 lg:w-11/12 items-center">
-          <div className="border-b-[2px] w-full text-center mb-2 border-b-gray-200">
-            <h6 className="font-bold mb-2">Socials</h6>
+          <div className="flex flex-col bg-white text-black justify-center items-center mx-auto rounded-md sm:mt-28 lg:p-4 mt-28 lg:w-11/12 text-center">
+            <div className="border-b-[2px] w-full mb-2 border-b-gray-200">
+              <h6 className="font-bold mb-2 uppercase text-normal sm:text-sm">
+                Socials
+              </h6>
             </div>
-            <div className="grid grid-cols-4 gap-5">
-              <div className="flex items-center">
-                <FaFacebook />
-                <p className="text-sm ml-2">francisco.pogi</p>
+            <div className="lg:flex sm:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-center items-center mx-auto ">
+              <div className="flex justify-center">
+                <FaFacebook className="text-sm sm:text-lg" />
+                <p className="text-xs ml-2 lg:text-sm">francisco.pogi</p>
               </div>
-              <div className="flex items-center">
-                <FaTwitter />
-                <p className="text-sm ml-2">@francisco_pogi</p>
+              <div className="flex justify-center">
+                <FaTwitter className="text-sm sm:text-lg" />
+                <p className="text-xs ml-2 lg:text-sm">@francisco_pogi</p>
               </div>
-              <div className="flex items-center">
-                <FaInstagram />
-                <p className="text-sm ml-2">francisco.pogi</p>
+              <div className="flex justify-center">
+                <FaInstagram className="text-sm sm:text-lg" />
+                <p className="text-xs ml-2 lg:text-sm">francisco.pogi</p>
               </div>
-              <div className="flex items-center">
-                <FaEnvelope />
-                <p className="text-sm ml-2">francisco.pogi</p>
+              <div className="flex justify-center">
+                <FaEnvelope className="text-sm sm:text-lg" />
+                <p className="text-xs ml-2 lg:text-sm">francisco.pogi</p>
               </div>
             </div>
           </div>
@@ -344,8 +354,8 @@ const Settings = () => {
                 onClick={handleOnActive}
                 className={
                   activeButton.personal
-                    ? "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-[#013D74] text-white font-medium"
-                    : "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-white text-black font-medium hover:bg-[#013D74] hover:text-white"
+                    ? "sm:text-[14px] md:text-[15px] h-[50px] px-[10px] rounded-md bg-[#013D74] text-white font-medium"
+                    : "sm:text-[14px] md:text-[15px] h-[50px] px-[10px] rounded-md bg-white text-black font-medium hover:bg-[#013D74] hover:text-white"
                 }
               >
                 Personal Info
@@ -355,8 +365,8 @@ const Settings = () => {
                 onClick={handleOnActive}
                 className={
                   activeButton.credential
-                    ? "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-[#013D74] text-white font-medium"
-                    : "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-white text-black font-medium hover:bg-[#013D74] hover:text-white"
+                    ? "sm:text-[14px] md:text-[15px] h-[50px] px-[10px] rounded-md bg-[#013D74] text-white font-medium"
+                    : "sm:text-[14px] md:text-[15px] h-[50px] px-[10px] rounded-md bg-white text-black font-medium hover:bg-[#013D74] hover:text-white"
                 }
               >
                 Account Info
@@ -364,12 +374,12 @@ const Settings = () => {
             </div>
 
             {activeButton.personal ? (
-              <div>
-                <div className="h-full w-full shadow-lg  pb-[30px]">
+              <div className=" ">
+                <div className="h-full lg:w-full shadow-lg  mx-auto w-11/12 sm:shadow-none  pb-[30px]">
                   {/* PERSONAL DATA */}
 
                   <div>
-                    <div className="w-full border-b-[2px] border-black mb-5">
+                    <div className="w-full border-b-[2px]  border-black mb-5">
                       <h6 className="font-bold">PERSONAL DATA</h6>
                     </div>
                     <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
