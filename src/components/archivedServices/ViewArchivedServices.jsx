@@ -1,8 +1,8 @@
 import React from "react";
 import { useState } from "react";
-import bgmodal from "../../../assets/modals/bg-modal2.png";
+import bgmodal from "../../assets/modals/bg-modal2.png";
 import { AiOutlineSend } from "react-icons/ai";
-import EditDropbox from "./EditDropbox";
+import EditDropbox from "../../components/barangaytabs/services/EditDropbox";
 
 function RevisionServiceModal({ onClose }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -26,7 +26,7 @@ function RevisionServiceModal({ onClose }) {
   return (
     <div>
       <div
-        id="hs-tab-revision-modal"
+        id="hs-view-archived-service-modal"
         className="hs-overlay hidden fixed top-0 left-0 z-[80] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center "
       >
         {/* Modal */}
@@ -39,10 +39,10 @@ function RevisionServiceModal({ onClose }) {
                 className="py-5 px-3 flex justify-between items-center overflow-hidden rounded-t-2xl"
               >
                 <h3
-                  className="font-bold text-white mx-auto md:text-xl text-center"
+                  className="font-bold text-white mx-auto md:text-xl uppercase text-center"
                   style={{ letterSpacing: "0.3em" }}
                 >
-                  SERVICE INFORMATION
+                  Archived SERVICE INFORMATION
                 </h3>
               </div>
             </div>
@@ -89,7 +89,7 @@ function RevisionServiceModal({ onClose }) {
                   </div>
 
                   {/* Request Information */}
-                  <div className="relative mt-4 mr-6 ml-3 p-5 pb-6 lg:py-3 xl:py-3 xxxl:py-10 flex flex-col lg:w-1/3 h-full bg-zinc-100 rounded-lg sm:w-[21.8rem] sm:md:mr-0 sm:md:-ml-0 mx-auto md:w-[30rem]">
+                  <div className="relative mt-4 mr-6 ml-3 p-5 pb-6 lg:py-3 xl:py-3 xxxl:py-10  flex flex-col lg:w-1/3 h-full bg-zinc-100 sm:md:mr-0 sm:md:ml-0 rounded-lg md:w-[29.8rem] sm:w-[21.8rem]">
                     <h1
                       className="font-medium mb-1 text-black text-xs"
                       style={{ letterSpacing: "0.1em" }}
@@ -187,6 +187,7 @@ function RevisionServiceModal({ onClose }) {
                     rows="4"
                     className="block p-2.5 w-full h-40 text-sm text-gray-900 rounded-lg bg-gray-100 resize-none"
                     placeholder="Enter response..."
+                    readOnly
                   ></textarea>
 
                   {/* <div className="flex flex-col items-center justify-center w-full">
@@ -240,6 +241,7 @@ function RevisionServiceModal({ onClose }) {
                           <select
                             id="civilStatus"
                             name="status"
+                            disabled
                             className="w-full mt-3 p-2 border font-light border-gray-300 rounded"
                           >
                             <option value="Approved">Approved</option>
@@ -261,18 +263,11 @@ function RevisionServiceModal({ onClose }) {
             <div className="flex justify-end items-center gap-x-2 py-3 px-6 dark:border-gray-700">
               <button
                 type="button"
-                className="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md borde text-sm font-base bg-[#013D74] text-white shadow-sm align-middle"
-                data-hs-overlay="#hs-tab-revision-modal"
-              >
-                SEND
-              </button>
-              <button
-                type="button"
                 className="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md border text-sm font-base bg-custom-red-button text-white shadow-sm align-middle"
-                data-hs-overlay="#hs-tab-revision-modal"
+                data-hs-overlay="#hs-view-archived-service-modal"
                 onClick={clearSelectedFiles} // Add onClick event handler
               >
-                CANCEL
+                CLOSE
               </button>
             </div>
           </div>

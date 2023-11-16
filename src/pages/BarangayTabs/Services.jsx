@@ -10,8 +10,9 @@ import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { FaArchive, FaPlus } from "react-icons/fa";
 import { MdRestartAlt } from "react-icons/md";
 import ReactPaginate from "react-paginate";
-
-
+import CreateServiceModal from "../../components/barangaytabs/services/CreateServiceModal";
+import ReplyServiceModal from "../../components/barangaytabs/services/ReplyServiceModal";
+import GenerateReportsModal from "../../components/barangaytabs/services/GenerateReportsModal";
 function Services() {
   const [selectedItems, setSelectedItems] = useState([]);
   const checkboxHandler = (e) => {
@@ -130,7 +131,7 @@ function Services() {
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
-                    data-hs-overlay="#hs-create-service-modal "
+                    data-hs-overlay="#hs-create-service-modal"
                     className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#396288] to-[#013D74] w-full text-white font-medium text-sm  text-center inline-flex items-center "
                   >
                     <FaPlus size={24} style={{ color: "#ffffff" }} />
@@ -255,7 +256,7 @@ function Services() {
                     </span>
                   </button>
                 </div>
-                <div className="hs-tooltip inline-block w-full">
+                {/* <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
                     data-hs-overlay="#hs-archive-services-modal"
@@ -269,7 +270,7 @@ function Services() {
                       Archive Selected Services
                     </span>
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -351,14 +352,7 @@ function Services() {
                     <div className="flex justify-center space-x-1 sm:space-x-none">
                       <button
                         type="button"
-                        data-hs-overlay="#hs-view-request-modal"
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-modal-status"
+                        data-hs-overlay="#hs-tab-revision-modal"
                         className="text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
                       >
                         <FiEdit size={24} style={{ color: "#ffffff" }} />
@@ -387,6 +381,9 @@ function Services() {
             renderOnZeroPageCount={null}
           />
         </div>
+        <CreateServiceModal />
+        <ReplyServiceModal/>
+        <GenerateReportsModal/>
       </div>
      
     </div>

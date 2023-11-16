@@ -1,7 +1,5 @@
 import React from "react";
-import ViewRequestModal from "../../components/barangaytabs/requests/ViewRequestModal";
-import ReplyServiceModal from "../../components/barangaytabs/requests/ReplyServiceModal";
-import RequestApprovalModal from "../../components/barangaytabs/requests/RequestApprovalModal";
+import ViewServiceReqModal from "../../components/barangaytabs/requests/ViewServiceReqModal";
 import { useState, useEffect } from "react";
 import { BsPrinter } from "react-icons/bs";
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
@@ -10,7 +8,7 @@ import { FaArchive } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { FaTrashRestore } from "react-icons/fa";
-import Breadcrumb from "../../components/archivedServiceReq/Breadcrumb";
+import Breadcrumb from "../../components/barangaytabs/requests/Breadcrumb";
 function ArchiveServiceRequests() {
   const [selectedItems, setSelectedItems] = useState([]);
   useEffect(() => {
@@ -171,7 +169,7 @@ function ArchiveServiceRequests() {
                         </span>
                       </button>
                     </div>
-                    <div className="hs-tooltip inline-block w-full">
+                    {/* <div className="hs-tooltip inline-block w-full">
                       <button
                         type="button"
                         data-hs-overlay="#hs-modal-restoreInquiry"
@@ -188,7 +186,7 @@ function ArchiveServiceRequests() {
                           Restore Selected Service Request
                         </span>
                       </button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -323,7 +321,7 @@ function ArchiveServiceRequests() {
               </div>
           </div>
         </div>
-        <RequestApprovalModal />
+        <ViewServiceReqModal />
       </div>
     </>
   );

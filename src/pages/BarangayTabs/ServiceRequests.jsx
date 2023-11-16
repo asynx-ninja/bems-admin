@@ -1,7 +1,4 @@
 import React from "react";
-import ViewRequestModal from "../../components/barangaytabs/requests/ViewRequestModal";
-import ReplyServiceModal from "../../components/barangaytabs/requests/ReplyServiceModal";
-import RequestApprovalModal from "../../components/barangaytabs/requests/RequestApprovalModal";
 import { useState, useEffect } from "react";
 import { BsPrinter } from "react-icons/bs";
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
@@ -9,6 +6,8 @@ import { AiOutlineSend } from "react-icons/ai";
 import { FaArchive } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
+import ViewServiceReqModal from "../../components/barangaytabs/requests/ViewServiceReqModal";
+
 function ServiceRequests() {
   const [selectedItems, setSelectedItems] = useState([]);
   useEffect(() => {
@@ -187,7 +186,7 @@ function ServiceRequests() {
                     </span>
                   </button>
                 </div>
-                <div className="hs-tooltip inline-block w-full">
+                {/* <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
                     data-hs-overlay="#hs-archive-requests-modal"
@@ -201,7 +200,7 @@ function ServiceRequests() {
                       Archive Selected Requests
                     </span>
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -302,6 +301,14 @@ function ServiceRequests() {
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center space-x-1 sm:space-x-none">
+                      {/* <button
+                        type="button"
+                        data-hs-overlay="#hs-view-request-modal"
+                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                      >
+                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
+                      </button> */}
+
                       <button
                         type="button"
                         data-hs-overlay="#hs-view-request-modal"
@@ -309,21 +316,12 @@ function ServiceRequests() {
                       >
                         <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
                       </button>
-
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-reply-modal"
-                        className="text-white bg-custom-red-button font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineSend size={24} style={{ color: "#ffffff" }} />
-                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        
         </div>
         <div className="md:py-4 md:px-4 bg-[#013D74] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
@@ -343,7 +341,8 @@ function ServiceRequests() {
           />
         </div>
       </div>
-      <RequestApprovalModal />
+
+      <ViewServiceReqModal />
     </div>
   );
 }

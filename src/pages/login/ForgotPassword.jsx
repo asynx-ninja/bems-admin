@@ -14,6 +14,7 @@ const ForgotPassword = () => {
     error: false,
     message: "",
   });
+  const type = "Admin";
 
   const handleOnSubmit = async () => {
     if (!email) {
@@ -27,18 +28,20 @@ const ForgotPassword = () => {
     }
 
     try {
-      const res = await axios.patch(`${API_LINK}/auth/send_pin/${email}`);
+      const res = await axios.patch(`${API_LINK}/auth/send_pin/${email}`, {
+        type,
+      });
       const encodedEmail = btoa(email);
-      console.log('Response data:', res.data); // Log the response data
+      console.log("Response data:", res.data); // Log the response data
 
       if (res.status === 200) {
-        console.log('User type:', res.data.type); // Log the user type
-        console.log(res.data.message)
-        if (res.data.type === 'Admin') {
+        console.log("User type:", res.data.type); // Log the user type
+        console.log(res.data.message);
+        if (res.data.type === "Admin") {
           setResponse({
             success: true,
             error: false,
-            message: res.data.message,
+            message: "Code sent successfully pleas check your email",
           });
 
           setTimeout(navigate(`/pin/${encodedEmail}`), 3000);
@@ -51,11 +54,11 @@ const ForgotPassword = () => {
         }
       }
     } catch (error) {
-      console.error('Error:', error.message); // Log the error message
+      console.error("Error:", error.message); // Log the error message
       setResponse({
         success: false,
         error: true,
-        message:error.response.data.error,
+        message: error.response.data.error,
       });
     }
   };
@@ -131,7 +134,7 @@ const ForgotPassword = () => {
                 this account.
               </p>
             </div>
-            <div >
+            <div>
               {response.success ? (
                 <div className="w-[100%] bg-green-400 rounded-md mb-[10px] flex">
                   <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
@@ -139,7 +142,6 @@ const ForgotPassword = () => {
                   </p>
                 </div>
               ) : null}
-
 
               {response.error ? (
                 <div className="w-[100%] bg-red-500 rounded-md mb-[10px] flex">

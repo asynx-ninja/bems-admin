@@ -1,6 +1,6 @@
 import React from "react";
 import { FaTrashRestore } from "react-icons/fa";
-import Breadrumbs from "../components/archivedInquiries/Breadcrumbs";
+import Breadrumbs from "../components/inquiries/Breadcrumbs";
 import RestoreInq from "../components/inquiries/RestoreInquiries";
 import ViewMessage from "../components/inquiries/ViewMessage";
 import GenerateReportsModal from "../components/inquiries/GenerateReportsModal";
@@ -283,23 +283,23 @@ const ArchivedInquiries = () => {
               ))}
             </tbody>
           </table>
-          <div className="md:py-4 md:px-4 bg-[#013D74] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
-            <span className="font-medium text-white sm:text-xs text-sm">
-              Showing 1 out of 15 pages
-            </span>
-            <ReactPaginate
-              breakLabel="..."
-              nextLabel=">>"
-              onPageChange={() => {}}
-              pageRangeDisplayed={3}
-              pageCount={15}
-              previousLabel="<<"
-              className="flex space-x-3 text-white font-bold "
-              activeClassName="text-yellow-500"
-              disabledLinkClassName="text-gray-300"
-              renderOnZeroPageCount={null}
-            />
-          </div>
+        </div>
+        <div className="md:py-4 md:px-4 bg-[#013D74] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
+          <span className="font-medium text-white sm:text-xs text-sm">
+            Showing 1 out of 15 pages
+          </span>
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel=">>"
+            onPageChange={() => {}}
+            pageRangeDisplayed={3}
+            pageCount={15}
+            previousLabel="<<"
+            className="flex space-x-3 text-white font-bold "
+            activeClassName="text-yellow-500"
+            disabledLinkClassName="text-gray-300"
+            renderOnZeroPageCount={null}
+          />
         </div>
       </div>
       <RestoreInq />

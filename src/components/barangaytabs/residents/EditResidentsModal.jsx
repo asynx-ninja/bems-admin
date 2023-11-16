@@ -1,6 +1,6 @@
 import React from "react";
-import bgmodal from "../../assets/modals/bg-modal2.png";
-import officialimage from "../../assets/sample/official.jpg";
+import bgmodal from "../../../assets/modals/bg-modal2.png";
+import officialimage from "../../../assets/sample/official.jpg";
 
 function EditResidentModal() {
   return (

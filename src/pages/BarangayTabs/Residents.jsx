@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { FiEdit } from "react-icons/fi";
 import { AiOutlineEye, AiOutlineStop } from "react-icons/ai";
 import { FaPlus, FaArchive } from "react-icons/fa";
-import AddResident from "../../components/residents/AddResidentModal";
-import EditResident from "../../components/residents/EditResidentsModal";
-import ArchiveResident from "../../components/residents/ArchiveResidentModal";
+import AddResident from "../../components/barangaytabs/residents/AddResidentModal";
+import EditResident from "../../components/barangaytabs/residents/EditResidentsModal";
+import ArchiveResident from "../../components/barangaytabs/residents/ArchiveResidentModal";
 import { useState, useEffect } from "react";
 import { BsPrinter } from "react-icons/bs";
 import ReactPaginate from "react-paginate";
@@ -73,7 +73,7 @@ const Residents = () => {
           </div>
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">
             <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
-              <div className="w-full rounded-lg flex justify-center">
+              {/* <div className="w-full rounded-lg flex justify-center">
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
@@ -92,7 +92,7 @@ const Residents = () => {
                     </span>
                   </button>
                 </div>
-              </div>
+              </div> */}
               <div className="w-full rounded-lg ">
                 <Link to="/archivedresidents">
                   <div className="hs-tooltip inline-block w-full">
@@ -202,7 +202,7 @@ const Residents = () => {
                     </span>
                   </button>
                 </div>
-                <div className="hs-tooltip inline-block w-full">
+                {/* <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
                     data-hs-overlay="#hs-modal-archiveResident"
@@ -216,7 +216,7 @@ const Residents = () => {
                       Archived Selected Residents
                     </span>
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -308,7 +308,7 @@ const Residents = () => {
                       >
                         <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
                       </button>
-                      <button
+                      {/* <button
                         type="button"
                         data-hs-overlay="#hs-modal-statusResident"
                         onClick={() =>
@@ -320,7 +320,7 @@ const Residents = () => {
                         className="text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
                       >
                         <FiEdit size={24} style={{ color: "#ffffff" }} />
-                      </button>
+                      </button> */}
                     </div>
                   </td>
                 </tr>

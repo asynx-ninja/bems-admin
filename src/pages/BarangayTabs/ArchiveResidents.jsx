@@ -1,7 +1,7 @@
 import React from "react";
 import { FaTrashRestore } from "react-icons/fa";
-import RestoreRes from "../../components/residents/RestoreResidentModal";
-import Breadcrumb from "../../components/archivedResidents/Breadcrumb";
+import RestoreRes from "../../components/barangaytabs/residents/RestoreResidentModal";
+import Breadcrumb from "../../components/barangaytabs/residents/Breadcrumb";
 import { useState, useEffect } from "react";
 import { BsPrinter } from "react-icons/bs";
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
@@ -156,7 +156,7 @@ const ArchivedResidents = () => {
                     </span>
                   </button>
                 </div>
-                <div className="hs-tooltip inline-block w-full">
+                {/* <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
                     data-hs-overlay="#hs-modal-restoreInquiry"
@@ -170,7 +170,7 @@ const ArchivedResidents = () => {
                       Restore Selected Residents
                     </span>
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

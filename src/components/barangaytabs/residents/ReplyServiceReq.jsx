@@ -1,48 +1,29 @@
 import React from "react";
-import bgmodal from "../../../assets/modals/bg-modal2.png";
-import { AiOutlineSend } from "react-icons/ai";
 
-function ReplyServiceModal({ onClose }) {
+function ReplyServiceReqModal({ onClose }) {
   return (
     <div>
-      <button
-        type="button"
-        className="text-white bg-custom-red-button font-medium rounded-full text-sm m-2 py-2 px-10 text-center inline-flex items-center mr-2"
-        style={{ margin: "10px 0px", padding: "10px 20px" }}
-        data-hs-overlay="#hs-reply-modal"
-      >
-        <AiOutlineSend
-          size={24} // You can adjust the size as needed
-          style={{ color: "#ffffff" }}
-        />
-      </button>
-
       <div
         id="hs-reply-modal"
-        class="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center"
+        className="hs-overlay hidden fixed top-0 left-0 z-[80] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center "
       >
         {/* Modal */}
-        <div class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 md:px-0 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-          <div class="flex flex-col w-full lg:w-[700px] xl:w-[800px] bg-white shadow-sm overflow-y-auto lg:ml-11 xl:ml-0 ">
+        <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-full">
+          <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto">
             {/* Header */}
-            <div class="bg-[#013D74] overflow-hidden">
-              <div
-                class="flex justify-between items-center p-5 w-full h-full bg-cover bg-no-repeat transform"
-                style={{ backgroundImage: `url(${bgmodal})` }}
+            <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#396288] to-[#013D74] overflow-hidden rounded-t-2xl">
+              <h3
+                className="font-bold text-white mx-auto md:text-xl text-center"
+                style={{ letterSpacing: "0.3em" }}
               >
-                <h3
-                  class="font-base text-white mx-auto text-xs md:text-lg lg:text-xl"
-                  style={{ letterSpacing: "0.3em" }}
-                >
-                  REPLY TO REQUESTED SERVICE
-                </h3>
-              </div>
+                REPLY TO REQUESTED SERVICES
+              </h3>
             </div>
 
             {/* Modal Details */}
-            <div>
+            <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-screen">
               <div className="flex flex-col">
-                <div className="flex flex-col-reverse lg:flex-row border mb-1 pb-5">
+                <div className="flex flex-col-reverse lg:flex-row mb-1 pb-5">
                   {/* Service Description */}
                   <div class="relative lg:mt-4 p-5 lg:p-3 lg:ml-2 pb-6 overflow-y-auto flex flex-col w-full lg:w-2/3 h-full rounded-lg">
                     <h1
@@ -130,7 +111,32 @@ function ReplyServiceModal({ onClose }) {
                     />
                   </div>
                 </div>
-
+                <div className=" w-full px-5 py-2">
+                  <form>
+                    <div className="flex flex-col lg:flex-row">
+                      <div className="w-full">
+                        <div className="mb-4 ">
+                          <label
+                            for="civilStatus"
+                            className="block text-sm font-medium text-black"
+                          >
+                            STATUS OF SERVICES
+                          </label>
+                          <select
+                            id="civilStatus"
+                            name="status"
+                            className="w-full mt-3 p-2 border font-light border-gray-300 rounded"
+                            disabled
+                          >
+                            <option value="Approved">Approved</option>
+                            <option value="Disapproved">Disapproved</option>
+                            <option value="Pending">Pending</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
                 {/* Response */}
                 <div className="w-full px-5">
                   <h1
@@ -173,4 +179,4 @@ function ReplyServiceModal({ onClose }) {
   );
 }
 
-export default ReplyServiceModal;
+export default ReplyServiceReqModal;

@@ -9,11 +9,9 @@ import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { FaArchive, FaPlus } from "react-icons/fa";
 import { MdRestartAlt } from "react-icons/md";
 import ReactPaginate from "react-paginate";
-import ServiceApprovalModal from "../../components/barangaytabs/services/ServiceApprovalModal";
-import ServiceDeclineModal from "../../components/barangaytabs/services/ServiceDeclineModal";
-import RevisionServiceModal from "../../components/barangaytabs/services/ReplyServiceModal";
 import Breadcrumb from "../../components/archivedServices/Breadcrumb";
 import { FaTrashRestore } from "react-icons/fa";
+import ViewArchivedServices from "../../components/archivedServices/ViewArchivedServices";
 
 function ArchiveServices() {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -219,7 +217,7 @@ function ArchiveServices() {
                     </span>
                   </button>
                 </div>
-                <div className="hs-tooltip inline-block w-full">
+                {/* <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
                     data-hs-overlay="#hs-modal-restoreInquiry"
@@ -233,7 +231,7 @@ function ArchiveServices() {
                       Restore Selected Services
                     </span>
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -315,7 +313,7 @@ function ArchiveServices() {
                     <div className="flex justify-center space-x-1 sm:space-x-none">
                       <button
                         type="button"
-                        data-hs-overlay="#hs-view-request-modal"
+                        data-hs-overlay="#hs-view-archived-service-modal"
                         className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
                       >
                         <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
@@ -347,8 +345,9 @@ function ArchiveServices() {
           </div>
       </div>
       </div>
-      <ServiceApprovalModal />
-      <ServiceDeclineModal />
+      {/* <ServiceApprovalModal />
+      <ServiceDeclineModal /> */}
+      <ViewArchivedServices/>
     </div>
   );
 };

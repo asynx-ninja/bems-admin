@@ -1,7 +1,7 @@
 import React from "react";
 import { FaTrashRestore } from "react-icons/fa";
 import imgSrc from "/imgs/bg-header.png";
-import Breadcrumbs from "../components/archivedAnnouncement/Breadcrumbs";
+import Breadcrumbs from "../components/announcement/Breadcrumbs";
 import Restore from "../components/announcement/RestoreAnnouncementModal";
 import GenerateReportsModal from "../components/announcement/GenerateReportsModal";
 import { useEffect, useState } from "react";
