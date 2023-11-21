@@ -1,26 +1,45 @@
 import React from "react";
+
 import { Link } from "react-router-dom";
-import { FiEdit } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { FaArchive, FaPlus } from "react-icons/fa";
 import { BsPrinter } from "react-icons/bs";
+
+import ReactPaginate from "react-paginate";
+import axios from "axios";
+import API_LINK from "../config/API";
+
 import ArchiveModal from "../components/announcement/ArchiveAnnouncementModal";
 import AddModal from "../components/announcement/AddAnnouncementModal";
-import GenerateReportsModal from "../components/announcement/GenerateReportsModal";
-import EditModal from "../components/announcement/EditAnnouncementModal";
-import imgSrc from "/imgs/bg-header.png";
-import { useState, useEffect } from "react";
-import ReactPaginate from "react-paginate";
-const Announcement = () => {
-  useEffect(() => {
-    document.title = "Announcement | Barangay E-Services Management";
-  }, []);
+import ManageAnnouncementModal from "../components/announcement/ManageAnnouncementModal";
 
+
+const Announcement = () => {
   const [selectedItems, setSelectedItems] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const brgy = "MUNISIPYO";
+  const [announcement, setAnnouncement] = useState([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const response = await axios.get(
+        `${API_LINK}/announcement/?brgy=${brgy}&archived=false`
+      );
+      if (response.status === 200) setAnnouncements(response.data);
+      else setAnnouncements([]);
+    };
+
+    fetch();
+  }, []);
 
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
-    let value = parseInt(e.target.value);
+    let value = e.target.value;
 
     if (isSelected) {
       setSelectedItems([...selectedItems, value]);
@@ -34,11 +53,11 @@ const Announcement = () => {
   };
 
   const checkAllHandler = () => {
-    if (tableData.length === selectedItems.length) {
+    if (announcements.length === selectedItems.length) {
       setSelectedItems([]);
     } else {
-      const postIds = tableData.map((item) => {
-        return item.id;
+      const postIds = announcements.map((item) => {
+        return item._id;
       });
 
       setSelectedItems(postIds);
@@ -49,24 +68,26 @@ const Announcement = () => {
     "event id",
     "title",
     "details",
-    "file",
     "date",
     "# of attendees",
-    "event place",
     "actions",
   ];
-  const tableData = [
-    {
-      id: 1,
-      imageSrc: imgSrc,
-      title: "Libreng Tuli",
-      details: "TUTULIIN O YUNG TITE MONG SUPOT KINANG INA MONG HAYUP KA",
-      file: "Tite.docs",
-      date: "10 Jan 2023",
-    },
-  ];
+
+  useEffect(() => {
+    document.title = "Announcement | Barangay E-Services Management";
+  }, []);
+
+  const handleView = (item) => {
+    setAnnouncement(item);
+  };
+
+  const dateFormat = (date) => {
+    const eventdate = date === undefined ? "" : date.substr(0, 10);
+    return eventdate;
+  };
+
   return (
-    <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem]  lg:mt-8 lg:mr-6">
+    <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:mr-6">
       <div>
         <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#396288] to-[#013D74] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
@@ -100,7 +121,7 @@ const Announcement = () => {
                 </div>
               </div>
               <div className="w-full rounded-lg ">
-                <Link to="/archivedannoucements">
+                <Link to={`/archivedannoucements/?id=${id}&brgy=${brgy}&archived=true`}>
                   <div className="hs-tooltip inline-block w-full">
                     <button
                       type="button"
@@ -123,6 +144,7 @@ const Announcement = () => {
             </div>
           </div>
         </div>
+
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
             <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
@@ -194,7 +216,7 @@ const Announcement = () => {
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
-                    data-hs-overlay="#hs-generate-reports-modal"
+                    data-hs-overlay="#hs-modal-archive"
                     className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
                   >
                     <BsPrinter size={24} style={{ color: "#ffffff" }} />
@@ -225,6 +247,7 @@ const Announcement = () => {
             </div>
           </div>
         </div>
+
         <div className="overflow-auto sm:overflow-x-auto lg:h-[710px] xl:h-[700px] xxl:h-[700px] xxxl:h-[640px]">
           <table className="w-full ">
             <thead className="bg-[#013D74] sticky top-0">
@@ -251,14 +274,14 @@ const Announcement = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {tableData.map((item, index) => (
+              {announcements.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <input
                         type="checkbox"
-                        checked={selectedItems.includes(item.id)}
-                        value={item.id}
+                        checked={selectedItems.includes(item._id)}
+                        value={item._id}
                         onChange={checkboxHandler}
                         id=""
                       />
@@ -266,48 +289,34 @@ const Announcement = () => {
                   </td>
                   <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                      BRGY-SANJOSE-E-123456789-11
+                      {item.event_id}
                     </span>
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {tableData[0].title}
+                        {item.title}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {tableData[0].details}
+                        {item.details}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {tableData[0].file}
+                      {dateFormat(item.date) || ""}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {tableData[0].date}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        24
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                        Kantutan St.
+                      {item.attendees.length}
                       </span>
                     </div>
                   </td>
@@ -315,17 +324,11 @@ const Announcement = () => {
                     <div className="flex justify-center space-x-1 sm:space-x-none">
                       <button
                         type="button"
-                        data-hs-overlay="#hs-modal-viewAnnouncement"
+                        data-hs-overlay="#hs-modal-editAnnouncement"
+                        onClick={() => handleView({ ...item })}
                         className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
                       >
                         <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-modal-edit"
-                        className="text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <FiEdit size={24} style={{ color: "#ffffff" }} />
                       </button>
                     </div>
                   </td>
@@ -351,11 +354,10 @@ const Announcement = () => {
             renderOnZeroPageCount={null}
           />
         </div>
+        <AddModal brgy={brgy}/>
+        <ArchiveModal selectedItems={selectedItems} />
+        <ManageAnnouncementModal announcement={announcement} setAnnouncement={setAnnouncement}/>
       </div>
-      <ArchiveModal />
-      <AddModal />
-      <EditModal />
-      <GenerateReportsModal />
     </div>
   );
 };

@@ -5,8 +5,8 @@ import Announcements from "../pages/Announcements";
 //import AnimationLayout from "../components/global/AnimationLayout";
 import Navbar from "../components/global/Navbar";
 import Inquiries from "../pages/Inquiries";
-import Residents from "../pages/BarangayTabs/Residents";
-import Information from "../pages/BarangayTabs/information";
+import Residents from "../pages/BarangayTabs/BrgyResidents";
+import Information from "../pages/BarangayTabs/Brgyinformation";
 import Settings from "../pages/Settings";
 import Login from "../pages/login/Login";
 import ForgotPassword from "../pages/login/ForgotPassword";
@@ -14,13 +14,14 @@ import SecurityPin from "../pages/login/SecurityPin";
 import ChangePassword from "../pages/login/ChangePassword";
 import ArchivedAnnouncements from "../pages/ArchivedAnnouncements";
 import ArchivedInquiries from "../pages/ArchivedInquiries";
-import ArchivedResidents from "../pages/BarangayTabs/ArchiveResidents";
-import ArchivedServices from "../pages/BarangayTabs/ArchiveServices";
-import ArchivedServiceReq from "../pages/BarangayTabs/ArchiveServiceReq";
-import ArchivedOfficials from "../pages/BarangayTabs/ArchivedOfficials";
+import ArchivedResidents from "../pages/BarangayTabs/BrgyArchivedResidents";
+import ArchivedServices from "../pages/BarangayTabs/BrgyArchivedServices";
+import ArchivedServiceReq from "../pages/BarangayTabs/BrgyArchivedServiceReq";
+import ArchivedOfficials from "../pages/BarangayTabs/BrgyArchivedOfficials";
 import BarangayMenu from "../pages/BarangayMenu";
 import BarangayInfo from "../pages/BarangayInfo";
-
+import BrgyArchivedAnnouncement from "../pages/BarangayTabs/BrgyArchivedAnnouncement";
+import BrgyArchivedInquiries from "../pages/BarangayTabs/BrgyArchivedInquiries";
 
 const pages = [
   {
@@ -40,11 +41,29 @@ const pages = [
     element: <ChangePassword />
   },
   {
-    path: "/dashboard",
+    path: "/dashboard/",
     element: (
       <>
         <Navbar />
         <Dashboard />
+      </>
+    ),
+  },
+  {
+    path: "/brgyarchivedinquiries",
+    element: (
+      <>
+        <Navbar />
+        <BrgyArchivedInquiries />
+      </>
+    ),
+  },
+  {
+    path: "/brgyarchivedannoucements",
+    element: (
+      <>
+        <Navbar />
+        <BrgyArchivedAnnouncement />
       </>
     ),
   },

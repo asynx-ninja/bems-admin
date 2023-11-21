@@ -1,17 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
-import defaultPFP from "../assets/sample/official.jpg";
+import defaultPFP from "../assets/sample-image/default-pfp.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import {
+  FaCamera,
   FaFacebook,
+  FaEnvelope,
+  FaPhone,
   FaTwitter,
   FaInstagram,
-  FaEnvelope,
-  FaCamera,
 } from "react-icons/fa";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import API_LINK from "../config/API";
-import banner from "../assets/sample/official.jpg";
+import banner from "../assets/image/1.png";
+import OccupationList from "../components/occupations/OccupationList";
 
 const Settings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,12 +49,30 @@ const Settings = () => {
   });
   const [newpasswordShown, setNewPasswordShown] = useState(false);
   const [oldpasswordShown, setOldPasswordShown] = useState(false);
+  const [changePass, setChangePass] = useState(false);
   const toggleOldPassword = (e) => {
     setOldPasswordShown(!oldpasswordShown);
   };
   const toggleNewPassword = (e) => {
     setNewPasswordShown(!newpasswordShown);
   };
+  const [passwordStrengthError, setPasswordStrengthError] = useState(false);
+  const [passwordStrengthSuccess, setPasswordStrengthSuccess] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [userSocials, setUserSocials] = useState({
+    facebook: {
+      name: "",
+      link: "",
+    },
+    instagram: {
+      name: "",
+      link: "",
+    },
+    twitter: {
+      name: "",
+      link: "",
+    },
+  });
 
   const handleFileChange = (e) => {
     e.preventDefault();
@@ -72,6 +92,7 @@ const Settings = () => {
         const res = await axios.get(`${API_LINK}/users/specific/${id}`);
         if (res.status === 200) {
           setUserData(res.data[0]);
+          console.log(res.data[0].profile.link)
           setUserAddress({
             street: res.data[0].address.street,
             brgy: res.data[0].address.brgy,
@@ -81,6 +102,20 @@ const Settings = () => {
             username: res.data[0].username,
             oldPass: "",
             newPass: "",
+          });
+          setUserSocials({
+            facebook: {
+              name: res.data[0].socials.facebook.name,
+              link: res.data[0].socials.facebook.link,
+            },
+            instagram: {
+              name: res.data[0].socials.instagram.name,
+              link: res.data[0].socials.instagram.link,
+            },
+            twitter: {
+              name: res.data[0].socials.twitter.name,
+              link: res.data[0].socials.twitter.link,
+            },
           });
           var pfpSrc = document.getElementById("pfp");
           pfpSrc.src =
@@ -117,9 +152,43 @@ const Settings = () => {
       ...prev,
       [field]: value,
     }));
+
+    if (field === "newPass") {
+      const password = value;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
+      const symbolRegex = /[@$!%*?&]/;
+
+      if (!passwordRegex.test(password) || !symbolRegex.test(password)) {
+        setPasswordStrengthError(true);
+        setPasswordStrengthSuccess(false);
+      } else {
+        setPasswordStrengthError(false);
+        setPasswordStrengthSuccess(true);
+      }
+      // Check if passwords match
+
+      let strength = 0;
+      if (password.length >= 8) strength++;
+      if (/[A-Z]/.test(password)) strength++;
+      if (/[a-z]/.test(password)) strength++;
+      if (/\d/.test(password)) strength++;
+      setPasswordStrength(strength * 25);
+    }
   };
 
-  const saveChanges = async () => {
+  const handleUserSocials = (social, subsocial, value) => {
+    setUserSocials({
+      ...userSocials,
+      [social]: {
+        ...userSocials[social],
+        [subsocial]: value,
+      },
+    });
+  };
+
+  // console.log(userSocials)
+
+  const saveChanges = async (e) => {
     const obj = {
       firstName: userData.firstName,
       middleName: userData.middleName,
@@ -143,6 +212,11 @@ const Settings = () => {
       isHead: userData.isHead,
       username: userData.username,
       profile: userData.profile,
+      socials: {
+        facebook: userSocials.facebook,
+        instagram: userSocials.instagram,
+        twitter: userSocials.twitter,
+      },
     };
 
     try {
@@ -175,12 +249,17 @@ const Settings = () => {
       }
 
       if (response.status === 200) {
-        console.log("Update successful:", response.data);
+        console.log("Update successful:", response);
         setUserData(response.data);
         setUserAddress({
           street: response.data.address.street,
           brgy: response.data.address.brgy,
           city: response.data.address.city,
+        });
+        setUserSocials({
+          facebook: response.data.socials.facebook,
+          instagram: response.data.socials.instagram,
+          twitter: response.data.socials.twitter,
         });
         setEditButton(true);
       } else {
@@ -271,8 +350,6 @@ const Settings = () => {
       setEditButton(true);
     }
   };
-  const [showSocials, setShowSocials] = useState(false);
-  console.log(userData);
 
   return (
     <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:mr-6 lg:h-full border rounded-lg bg-white shadow-lg">
@@ -292,7 +369,12 @@ const Settings = () => {
                 <label
                   htmlFor="file_input"
                   onClick={handleAdd}
-                  className="absolute inset-0 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity hover:bg-[#295141] hover:bg-opacity-60 "
+                  className={
+                  editButton
+                  ? "hidden"
+                  : "absolute inset-0 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity hover:bg-[#295141] hover:bg-opacity-60 "
+              }
+               
                 >
                   <FaCamera size={32} style={{ color: "#ffffff" }} />
                 </label>
@@ -307,17 +389,17 @@ const Settings = () => {
                   className="hidden"
                 />
                 <img
-                  // id="pfp"
-                  src={defaultPFP}
+                  id="pfp"
                   className="w-full h-full rounded-full object-cover border-[5px] border-[#013D74] "
                 />
               </div>
               <h6 className="font-bold mt-2 lg:text-normal">
-                {/* {userData.firstName} {userData.lastName} */}
-                DR. KENSHI TAKAHASHI
+                {userData.firstName} {userData.lastName}
               </h6>
 
-              <p className="text-sm lg:text-[14px] py-2 leading-[10px]">@dwaynesenpai</p>
+              <p className="text-sm lg:text-[14px] py-2 leading-[10px]">
+                {userData.username}
+              </p>
             </div>
           </div>
           <div className="flex flex-col bg-white text-black justify-center items-center mx-auto rounded-md sm:mt-28 lg:p-4 mt-28 lg:w-11/12 text-center">
@@ -329,33 +411,34 @@ const Settings = () => {
             <div className="lg:flex sm:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-center items-center mx-auto ">
               <div className="flex justify-center">
                 <FaFacebook className="text-sm sm:text-lg" />
-                <p className="text-xs ml-2 lg:text-sm">francisco.pogi</p>
+                <p className="text-xs ml-2 lg:text-sm">@sana_mina</p>
               </div>
               <div className="flex justify-center">
                 <FaTwitter className="text-sm sm:text-lg" />
-                <p className="text-xs ml-2 lg:text-sm">@francisco_pogi</p>
+                <p className="text-xs ml-2 lg:text-sm">@sana_mina</p>
               </div>
               <div className="flex justify-center">
                 <FaInstagram className="text-sm sm:text-lg" />
-                <p className="text-xs ml-2 lg:text-sm">francisco.pogi</p>
+                <p className="text-xs ml-2 lg:text-sm">@sana_mina</p>
               </div>
               <div className="flex justify-center">
                 <FaEnvelope className="text-sm sm:text-lg" />
-                <p className="text-xs ml-2 lg:text-sm">francisco.pogi</p>
+                <p className="text-xs ml-2 lg:text-sm">@sana_mina</p>
               </div>
             </div>
           </div>
         </div>
-        <div className="flex sm:flex-col-reverse lg:flex-row-reverse sm:px-[5px] px-[20px] justify-center mb-[20px] ">
-          <div className="flex flex-col sm:w-full lg:w-11/12 mx-auto overflow-y-auto">
+
+        <div className="flex sm:flex-col-reverse lg:flex-row-reverse sm:px-[5px] px-[20px] justify-center mb-[20px]">
+          <div className="flex flex-col sm:w-full lg:w-11/12 mx-auto">
             <div className="flex gap-[10px] my-5 pb-[10px] border-b-[2px] border-b-gray-200 px-[10px]">
               <button
                 name="personal"
                 onClick={handleOnActive}
                 className={
                   activeButton.personal
-                    ? "sm:text-[14px] md:text-[15px] h-[50px] px-[10px] rounded-md bg-[#013D74] text-white font-medium"
-                    : "sm:text-[14px] md:text-[15px] h-[50px] px-[10px] rounded-md bg-white text-black font-medium hover:bg-[#013D74] hover:text-white"
+                    ? "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-[#013D74] text-white font-medium"
+                    : "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-white text-black font-medium transition-all ease-in-out hover:bg-[#013D74]  hover:text-white"
                 }
               >
                 Personal Info
@@ -365,456 +448,632 @@ const Settings = () => {
                 onClick={handleOnActive}
                 className={
                   activeButton.credential
-                    ? "sm:text-[14px] md:text-[15px] h-[50px] px-[10px] rounded-md bg-[#013D74] text-white font-medium"
-                    : "sm:text-[14px] md:text-[15px] h-[50px] px-[10px] rounded-md bg-white text-black font-medium hover:bg-[#013D74] hover:text-white"
+                    ? "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-[#013D74]  text-white font-medium"
+                    : "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-white text-black font-medium transition-all ease-in-out hover:bg-[#013D74]  hover:text-white"
                 }
               >
                 Account Info
               </button>
             </div>
 
-            {activeButton.personal ? (
-              <div className=" ">
-                <div className="h-full lg:w-full shadow-lg  mx-auto w-11/12 sm:shadow-none  pb-[30px]">
-                  {/* PERSONAL DATA */}
+            <div className={activeButton.personal ? "block" : "hidden"}>
+              <div className="h-full w-full px-4 lg:px-0 pb-[30px]">
+                {/* PERSONAL DATA */}
 
-                  <div>
-                    <div className="w-full border-b-[2px]  border-black mb-5">
-                      <h6 className="font-bold">PERSONAL DATA</h6>
+                <div>
+                  <div className="w-full border-b-[2px] border-black mb-5">
+                    <h6 className="font-bold">PERSONAL DATA</h6>
+                  </div>
+                  <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3 px-4">
+                    <div>
+                      <label
+                        htmlFor="fistName"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        First name
+                      </label>
+                      <input
+                        disabled={editButton}
+                        type="text"
+                        id="firstname"
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="First name"
+                        value={userData.firstName || ""}
+                        onChange={(e) =>
+                          handleUserDataChange("firstName", e.target.value)
+                        }
+                      />
                     </div>
-                    <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
-                      <div>
-                        <label
-                          htmlFor="input-label-with-helper-text"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          First name
-                        </label>
-                        <input
-                          disabled={editButton}
-                          id="input-label-with-helper-text"
-                          className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          placeholder="First name"
-                          aria-describedby="hs-input-helper-text"
-                          value={userData.firstName || ""}
-                          onChange={(e) =>
-                            handleUserDataChange("firstName", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="input-label-with-helper-text"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Middle name
-                        </label>
-                        <input
-                          disabled={editButton}
-                          id="input-label-with-helper-text"
-                          className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          placeholder="Middle name"
-                          aria-describedby="hs-input-helper-text"
-                          value={userData.middleName || ""}
-                          onChange={(e) =>
-                            handleUserDataChange("middleName", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="input-label-with-helper-text"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Last name
-                        </label>
-                        <input
-                          disabled={editButton}
-                          id="input-label-with-helper-text"
-                          className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          placeholder="Last name"
-                          aria-describedby="hs-input-helper-text"
-                          value={userData.lastName || ""}
-                          onChange={(e) =>
-                            handleUserDataChange("lastName", e.target.value)
-                          }
-                        />
-                      </div>
+                    <div>
+                      <label
+                        htmlFor="middleName"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Middle name
+                      </label>
+                      <input
+                        disabled={editButton}
+                        type="text"
+                        id="middleName"
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="First name"
+                        value={userData.middleName || ""}
+                        onChange={(e) =>
+                          handleUserDataChange("middleName", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="lastName"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Last name
+                      </label>
+                      <input
+                        disabled={editButton}
+                        id="lastName"
+                        type="text"
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="Last name"
+                        aria-describedby="hs-input-helper-text"
+                        value={userData.lastName || ""}
+                        onChange={(e) =>
+                          handleUserDataChange("lastName", e.target.value)
+                        }
+                      />
+                    </div>
 
-                      <div>
-                        <label
-                          htmlFor="input-label-with-helper-text"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Suffix
+                    <div>
+                      <label
+                        htmlFor="suffix"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Suffix
+                      </label>
+                      <input
+                        disabled={editButton}
+                        id="suffix"
+                        type="text"
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="Suffix"
+                        aria-describedby="hs-input-helper-text"
+                        value={userData.suffix || ""}
+                        onChange={(e) =>
+                          handleUserDataChange("suffix", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="gender"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Gender
+                      </label>
+                      <select
+                        disabled={editButton}
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="Suffix"
+                        aria-describedby="hs-input-helper-text"
+                        id="gender"
+                        name="gender"
+                        value={userData.sex || ""}
+                        onChange={(e) =>
+                          handleUserDataChange("sex", e.target.value)
+                        }
+                      >
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="birthday"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Birthday
+                      </label>
+                      <input
+                        type="date"
+                        disabled={editButton}
+                        id="birthday"
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="Birthday"
+                        aria-describedby="hs-input-helper-text"
+                        value={birthdayFormat(userData.birthday) || ""}
+                        onChange={(e) =>
+                          handleUserDataChange("birthday", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="age"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Age
+                      </label>
+                      <input
+                        type="number"
+                        disabled={editButton}
+                        readOnly
+                        id="age"
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="Suffix"
+                        aria-describedby="hs-input-helper-text"
+                        value={calculateAge(userData.birthday) || ""}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="phone"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Phone number
+                      </label>
+                      <input
+                        type="text"
+                        disabled={editButton}
+                        id="phone"
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="#"
+                        aria-describedby="hs-input-helper-text"
+                        value={userData.contact || ""}
+                        onChange={(e) =>
+                          handleUserDataChange("contact", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="email"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Email
+                      </label>
+                      <input
+                        disabled={editButton}
+                        type="email"
+                        id="email"
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="you@example.com"
+                        aria-describedby="hs-input-helper-text"
+                        value={userData.email || ""}
+                        onChange={(e) =>
+                          handleUserDataChange("email", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* ADDRESS DETAILS */}
+
+                <div>
+                  <div className="w-full border-b-[2px] border-black my-5">
+                    <h6 className="font-bold">ADDRESS DETAILS</h6>
+                  </div>
+                  <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3 px-4">
+                    <div>
+                      <label
+                        htmlFor="street"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Street
+                      </label>
+                      <input
+                        type="text"
+                        disabled={editButton}
+                        id="street"
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                        placeholder="Street"
+                        aria-describedby="hs-input-helper-text"
+                        value={userAddress.street || ""}
+                        onChange={(e) =>
+                          handleUserChangeAdd("street", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="brgy"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Barangay
+                      </label>
+                      <select
+                        disabled={editButton}
+                        id="brgy"
+                        name="brgy"
+                        value={userAddress.brgy || ""}
+                        onChange={(e) =>
+                          handleUserChangeAdd("brgy", e.target.value)
+                        }
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                      >
+                        <option selected>{userAddress.brgy}</option>
+                        <option>Balite</option>
+                        <option>Burgos</option>
+                        <option>Geronimo</option>
+                        <option>Macabud</option>
+                        <option>Manggahan</option>
+                        <option>Mascap</option>
+                        <option>Puray</option>
+                        <option>Rosario</option>
+                        <option>San Isidro</option>
+                        <option>San Jose</option>
+                        <option>San Rafael</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="city"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        City
+                      </label>
+                      <select
+                        id="city"
+                        name="city"
+                        disabled={editButton}
+                        readOnly
+                        value={userAddress.city || ""}
+                        onChange={(e) =>
+                          handleUserChangeAdd("city", e.target.value)
+                        }
+                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                      >
+                        <option selected>Montalban</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* OTHER PERSONAL DATA */}
+
+                <div>
+                  <div className="w-full border-b-[2px] border-black my-5">
+                    <h6 className="font-bold">OTHER PERSONAL DATA</h6>
+                  </div>
+                  <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3 px-4">
+                    <div>
+                      <label
+                        htmlFor="occupation"
+                        className="block sm:text-xs lg:text-sm font-medium mb-2"
+                      >
+                        Occupation
+                      </label>
+                      <div className="relative z-0 w-full mb-3 group">
+                        <OccupationList
+                          handleUserDataChange={handleUserDataChange}
+                          occupation={userData.occ}
+                          editButton={editButton}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block sm:text-xs lg:text-sm font-medium mb-2">
+                        * Head of the Family?
+                      </label>
+                      <div className="flex items-center">
+                        <input
+                          className="shrink-0 mt-0.5 border-gray-200 rounded-full text-green-500 focus:ring-green-500"
+                          disabled={editButton}
+                          id="isHeadYes"
+                          name="isHead"
+                          type="radio"
+                          value={1}
+                          checked={userData.isHead}
+                          onChange={(e) => handleUserDataChange("isHead", true)}
+                        />
+                        <label htmlFor="male" className="ml-2">
+                          Yes
+                        </label>
+                        <input
+                          className="ml-4 shrink-0 mt-0.5 border-gray-200 rounded-full text-green-500 focus:ring-green-500"
+                          disabled={editButton}
+                          id="isHeadNo"
+                          name="isHead"
+                          type="radio"
+                          value={0}
+                          checked={!userData.isHead}
+                          onChange={(e) =>
+                            handleUserDataChange("isHead", false)
+                          }
+                        />
+                        <label className="ml-2">No</label>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block sm:text-xs lg:text-sm font-medium mb-2">
+                        * Registered Voter
+                      </label>
+                      <div className="flex items-center">
+                        <input
+                          className="shrink-0 mt-0.5 border-gray-200 rounded-full text-green-500 focus:ring-green-500"
+                          disabled={editButton}
+                          id="isVoterYes"
+                          name="isVoter"
+                          type="radio"
+                          value={1}
+                          checked={userData.isVoter}
+                          onChange={(e) =>
+                            handleUserDataChange("isVoter", true)
+                          }
+                        />
+                        <label htmlFor="male" className="ml-2">
+                          Yes
                         </label>
                         <input
                           disabled={editButton}
-                          id="input-label-with-helper-text"
-                          className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          placeholder="Suffix"
-                          aria-describedby="hs-input-helper-text"
-                          value={userData.suffix || ""}
+                          className="ml-4 shrink-0 mt-0.5 border-gray-200 rounded-full text-green-500 focus:ring-green-500"
+                          id="isVoterNo"
+                          name="isVoter"
+                          type="radio"
+                          value={0}
+                          checked={!userData.isVoter}
                           onChange={(e) =>
-                            handleUserDataChange("suffix", e.target.value)
+                            handleUserDataChange("isVoter", false)
                           }
                         />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="gender"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Gender
-                        </label>
-                        <select
-                          disabled={editButton}
-                          id="gender"
-                          name="gender"
-                          className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          value={userData.sex || ""}
-                          onChange={(e) =>
-                            handleUserDataChange("sex", e.target.value)
-                          }
-                        >
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="input-label-with-helper-text"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Birthday
-                        </label>
-                        <input
-                          type="date"
-                          disabled={editButton}
-                          id="input-label-with-helper-text"
-                          className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          placeholder="Birthday"
-                          aria-describedby="hs-input-helper-text"
-                          value={birthdayFormat(userData.birthday) || ""}
-                          onChange={(e) =>
-                            handleUserDataChange("birthday", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="input-label-with-helper-text"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Age
-                        </label>
-                        <input
-                          disabled={editButton}
-                          readOnly
-                          id="input-label-with-helper-text"
-                          className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          placeholder="Suffix"
-                          aria-describedby="hs-input-helper-text"
-                          value={calculateAge(userData.birthday) || ""}
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="input-label-with-helper-text"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Phone number
-                        </label>
-                        <input
-                          disabled={editButton}
-                          id="input-label-with-helper-text"
-                          className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          placeholder="#"
-                          aria-describedby="hs-input-helper-text"
-                          value={userData.contact || ""}
-                          onChange={(e) =>
-                            handleUserDataChange("contact", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="input-label-with-helper-text"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Email
-                        </label>
-                        <input
-                          disabled={editButton}
-                          type="email"
-                          id="input-label-with-helper-text"
-                          className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          placeholder="you@example.com"
-                          aria-describedby="hs-input-helper-text"
-                          value={userData.email || ""}
-                          onChange={(e) =>
-                            handleUserDataChange("email", e.target.value)
-                          }
-                        />
+                        <label className="ml-2">No</label>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* ADDRESS DETAILS */}
+                {/* SOCIALS */}
 
-                  <div>
-                    <div className="w-full border-b-[2px] border-black my-5">
-                      <h6 className="font-bold">ADDRESS DETAILS</h6>
-                    </div>
-                    <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
-                      <div>
-                        <label
-                          htmlFor="input-label-with-helper-text"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Street
-                        </label>
-                        <input
-                          disabled={editButton}
-                          id="input-label-with-helper-text"
-                          className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                          placeholder="Street"
-                          aria-describedby="hs-input-helper-text"
-                          value={userAddress.street || ""}
-                          onChange={(e) =>
-                            handleUserChangeAdd("street", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="brgy"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          Barangay
-                        </label>
-                        <select
-                          disabled={editButton}
-                          id="brgy"
-                          name="brgy"
-                          value={userAddress.brgy || ""}
-                          onChange={(e) =>
-                            handleUserChangeAdd("brgy", e.target.value)
-                          }
-                          className="py-3 px-4 block w-full text-black border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-white dark:border-gray-700"
-                        >
-                          <option selected>{userAddress.brgy}</option>
-                          <option>Balite</option>
-                          <option>Burgos</option>
-                          <option>Geronimo</option>
-                          <option>Macabud</option>
-                          <option>Manggahan</option>
-                          <option>Mascap</option>
-                          <option>Puray</option>
-                          <option>Rosario</option>
-                          <option>San Isidro</option>
-                          <option>San Jose</option>
-                          <option>San Rafael</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="city"
-                          className="block sm:text-xs lg:text-sm font-medium mb-2"
-                        >
-                          City
-                        </label>
-                        <select
-                          id="city"
-                          name="city"
-                          disabled={editButton}
-                          readOnly
-                          value={userAddress.city || ""}
-                          onChange={(e) =>
-                            handleUserChangeAdd("city", e.target.value)
-                          }
-                          className="py-3 px-4 block w-full text-black border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-white dark:border-gray-700"
-                        >
-                          <option selected>Montalban</option>
-                        </select>
-                      </div>
-                    </div>
+                <div className={editButton ? "hidden" : "block"}>
+                  <div className="w-full border-b-[2px] border-black my-5">
+                    <h6 className="font-bold">SOCIALS</h6>
                   </div>
-
-                  {/* OTHER PERSONAL DATA */}
-
-                  <div>
-                    <div className="w-full border-b-[2px] border-black my-5">
-                      <h6 className="font-bold">OTHER PERSONAL DATA</h6>
-                    </div>
-                    <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
+                  <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
+                    <div className="flex flex-col gap-3 p-2">
                       <div>
                         <label
-                          htmlFor="input-label-with-helper-text"
+                          htmlFor="facebook-name"
                           className="block sm:text-xs lg:text-sm font-medium mb-2"
                         >
-                          Occupation
+                          Facebook Name
                         </label>
                         <input
+                          id="facebook-name"
+                          type="text"
+                          value={userSocials.facebook.name || ""}
                           disabled={editButton}
-                          id="input-label-with-helper-text"
-                          className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
+                          onChange={(e) => {
+                            handleUserSocials(
+                              "facebook",
+                              "name",
+                              e.target.value
+                            );
+                          }}
+                          className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
                           aria-describedby="hs-input-helper-text"
-                          value={userData.occupation || ""}
-                          onChange={(e) =>
-                            handleUserDataChange("occupation", e.target.value)
-                          }
+                          placeholder="Enter your Facebook Link"
                         />
                       </div>
                       <div>
-                        <label className="block sm:text-xs lg:text-sm font-medium mb-2">
-                          * Head of the Family?
+                        <label
+                          htmlFor="facebook-link"
+                          className="block sm:text-xs lg:text-sm font-medium mb-2"
+                        >
+                          Facebook Link
                         </label>
-                        <div className="flex items-center">
-                          <input
-                            disabled={editButton}
-                            id="isHeadYes"
-                            name="isHead"
-                            type="radio"
-                            value={1}
-                            checked={userData.isHead}
-                            onChange={(e) =>
-                              handleUserDataChange("isHead", true)
-                            }
-                          />
-                          <label htmlFor="male" className="ml-2">
-                            Yes
-                          </label>
-                          <input
-                            disabled={editButton}
-                            id="isHeadNo"
-                            name="isHead"
-                            type="radio"
-                            className="ml-4"
-                            value={0}
-                            checked={!userData.isHead}
-                            onChange={(e) =>
-                              handleUserDataChange("isHead", false)
-                            }
-                          />
-                          <label className="ml-2">No</label>
-                        </div>
+                        <input
+                          type="text"
+                          id="facebook-name"
+                          value={userSocials.facebook.link || ""}
+                          disabled={editButton}
+                          onChange={(e) => {
+                            handleUserSocials(
+                              "facebook",
+                              "link",
+                              e.target.value
+                            );
+                          }}
+                          className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                          aria-describedby="hs-input-helper-text"
+                          placeholder="Enter your Facebook Link"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-3 p-2 sm:border-[0px] sm:border-t-[1px] sm:border-b-[1px] md:border-t-[0px] md:border-b-[0px] md:border-l-[1px] md:border-r-[1px] border-green-300">
+                      <div>
+                        <label
+                          htmlFor="instagram-name"
+                          className="block sm:text-xs lg:text-sm font-medium mb-2"
+                        >
+                          Instagram Name
+                        </label>
+                        <input
+                          id="instagram-name"
+                          type="text"
+                          value={userSocials.instagram.name || ""}
+                          disabled={editButton}
+                          onChange={(e) => {
+                            handleUserSocials(
+                              "instagram",
+                              "name",
+                              e.target.value
+                            );
+                          }}
+                          className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                          aria-describedby="hs-input-helper-text"
+                          placeholder="Enter your Facebook Link"
+                        />
                       </div>
                       <div>
-                        <label className="block sm:text-xs lg:text-sm font-medium mb-2">
-                          * Registered Voter
+                        <label
+                          htmlFor="instagram-link"
+                          className="block sm:text-xs lg:text-sm font-medium mb-2"
+                        >
+                          Instagram Link
                         </label>
-                        <div className="flex items-center">
-                          <input
-                            disabled={editButton}
-                            id="isVoterYes"
-                            name="isVoter"
-                            type="radio"
-                            value={1}
-                            checked={userData.isVoter}
-                            onChange={(e) =>
-                              handleUserDataChange("isVoter", true)
-                            }
-                          />
-                          <label htmlFor="male" className="ml-2">
-                            Yes
-                          </label>
-                          <input
-                            disabled={editButton}
-                            className="ml-4"
-                            id="isVoterNo"
-                            name="isVoter"
-                            type="radio"
-                            value={0}
-                            checked={!userData.isVoter}
-                            onChange={(e) =>
-                              handleUserDataChange("isVoter", false)
-                            }
-                          />
-                          <label className="ml-2">No</label>
-                        </div>
+                        <input
+                          id="instagram-link"
+                          type="text"
+                          value={userSocials.instagram.link || ""}
+                          disabled={editButton}
+                          onChange={(e) => {
+                            handleUserSocials(
+                              "instagram",
+                              "link",
+                              e.target.value
+                            );
+                          }}
+                          className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                          aria-describedby="hs-input-helper-text"
+                          placeholder="Enter your Facebook Link"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-3 p-2">
+                      <div>
+                        <label
+                          htmlFor="twitter-name"
+                          className="block sm:text-xs lg:text-sm font-medium mb-2"
+                        >
+                          Twitter Name
+                        </label>
+                        <input
+                          id="twitter-name"
+                          type="text"
+                          value={userSocials.twitter.name || ""}
+                          disabled={editButton}
+                          onChange={(e) => {
+                            handleUserSocials(
+                              "twitter",
+                              "name",
+                              e.target.value
+                            );
+                          }}
+                          className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                          aria-describedby="hs-input-helper-text"
+                          placeholder="Enter your Facebook Link"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="facebook"
+                          className="block sm:text-xs lg:text-sm font-medium mb-2"
+                        >
+                          Twitter Link
+                        </label>
+                        <input
+                          type="text"
+                          value={userSocials.twitter.link || ""}
+                          disabled={editButton}
+                          onChange={(e) => {
+                            handleUserSocials(
+                              "twitter",
+                              "link",
+                              e.target.value
+                            );
+                          }}
+                          className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                          aria-describedby="hs-input-helper-text"
+                          placeholder="Enter your Facebook Link"
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="shadow-lg  pb-[30px]">
-                <div className="flex flex-col w-[80%] justify-center mx-auto gap-4">
-                  {message.display ? (
-                    <div>
-                      {message.success ? (
-                        <div className="w-[100%] bg-green-400 rounded-md flex">
-                          <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
-                            {message.message}
-                          </p>
-                        </div>
-                      ) : null}
-                      {message.error ? (
-                        <div className="w-[100%] bg-red-500 rounded-md flex">
-                          <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
-                            {message.message}
-                          </p>
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : null}
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor="input-label-with-helper-text"
-                      className="block sm:text-xs lg:text-sm font-medium mb-2"
-                    >
-                      Username
-                    </label>
-                    <input
-                      disabled={editButton}
-                      id="input-label-with-helper-text"
-                      className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                      placeholder="username"
-                      aria-describedby="hs-input-helper-text"
-                      value={userCred.username || ""}
-                      onChange={(e) =>
-                        handleUserChangeCred("username", e.target.value)
-                      }
-                    />
+            </div>
+            <div
+              className={
+                activeButton.credential
+                  ? "shadow-lg px-[30px] pb-[30px]"
+                  : "hidden"
+              }
+            >
+              <div className="flex flex-col w-[80%] justify-center mx-auto gap-4">
+                <div className={message.display ? "block" : "hidden"}>
+                  <div
+                    className={
+                      message.success
+                        ? "w-[100%] bg-green-400 rounded-md flex"
+                        : "hidden"
+                    }
+                  >
+                    <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
+                      {message.message}
+                    </p>
                   </div>
+                  <div
+                    className={
+                      message.error
+                        ? "w-[100%] bg-red-500 rounded-md flex"
+                        : "hidden"
+                    }
+                  >
+                    <p className="py-[10px] text-[12px] px-[20px] text-white font-medium">
+                      {message.message}
+                    </p>
+                  </div>
+                </div>
+                <div className={!changePass ? "flex flex-col" : "hidden"}>
+                  <label
+                    htmlFor="username"
+                    className="block sm:text-xs lg:text-sm font-medium mb-2"
+                  >
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    disabled={editButton}
+                    id="username"
+                    className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                    placeholder="username"
+                    aria-describedby="hs-input-helper-text"
+                    value={userCred.username || ""}
+                    onChange={(e) =>
+                      handleUserChangeCred("username", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="relative z-0">
+                  <label
+                    htmlFor="oldpass"
+                    className="block sm:text-xs lg:text-sm font-medium mb-2"
+                  >
+                    Enter your old password
+                  </label>
+                  <input
+                    type={oldpasswordShown ? "text" : "password"}
+                    disabled={editButton}
+                    id="oldpass"
+                    className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                    placeholder="password"
+                    aria-describedby="hs-input-helper-text"
+                    onChange={(e) =>
+                      handleUserChangeCred("oldPass", e.target.value)
+                    }
+                  />
+                  <button
+                    name="old"
+                    type="button"
+                    onClick={toggleOldPassword}
+                    className="absolute right-2 sm:top-5 lg:top-7 p-2.5 mt-1 text-sm font-medium text-white"
+                  >
+                    {oldpasswordShown ? (
+                      <AiOutlineEye style={{ color: "green" }} size={20} />
+                    ) : (
+                      <AiOutlineEyeInvisible
+                        style={{ color: "green" }}
+                        size={20}
+                      />
+                    )}
+                  </button>
+                </div>
+                <div className={changePass ? "flex flex-col" : "hidden"}>
                   <div className="relative z-0">
                     <label
-                      htmlFor="input-label-with-helper-text"
-                      className="block sm:text-xs lg:text-sm font-medium mb-2"
-                    >
-                      Enter your old password
-                    </label>
-                    <input
-                      type={oldpasswordShown ? "text" : "password"}
-                      disabled={editButton}
-                      id="input-label-with-helper-text"
-                      className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
-                      placeholder="password"
-                      aria-describedby="hs-input-helper-text"
-                      onChange={(e) =>
-                        handleUserChangeCred("oldPass", e.target.value)
-                      }
-                    />
-                    <button
-                      name="old"
-                      type="button"
-                      onClick={toggleOldPassword}
-                      className="absolute right-2 sm:top-5 lg:top-7 p-2.5 mt-1 text-sm font-medium text-white"
-                    >
-                      {oldpasswordShown ? (
-                        <AiOutlineEye style={{ color: "green" }} size={20} />
-                      ) : (
-                        <AiOutlineEyeInvisible
-                          style={{ color: "green" }}
-                          size={20}
-                        />
-                      )}
-                    </button>
-                  </div>
-                  <div className="relative z-0">
-                    <label
-                      htmlFor="input-label-with-helper-text"
+                      htmlFor="newpass"
                       className="block sm:text-xs lg:text-sm font-medium mb-2"
                     >
                       Enter your new password
@@ -823,8 +1082,8 @@ const Settings = () => {
                       type={newpasswordShown ? "text" : "password"}
                       disabled={editButton}
                       readOnly={userCred.oldPass === ""}
-                      id="input-label-with-helper-text"
-                      className="w-full sm:py-2 sm:px-3 lg:py-3 lg:px-4 block border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
+                      id="newpass"
+                      className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
                       placeholder="password"
                       aria-describedby="hs-input-helper-text"
                       onChange={(e) =>
@@ -847,9 +1106,75 @@ const Settings = () => {
                       )}
                     </button>
                   </div>
+                  <div>
+                    {userCred.newPass && (
+                      <div className="flex w-full h-1.5 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700">
+                        <div
+                          className={`flex flex-col justify-center overflow-hidden ${
+                            passwordStrength < 25
+                              ? "bg-red-500"
+                              : passwordStrength < 50
+                              ? "bg-yellow-500"
+                              : passwordStrength < 75
+                              ? "bg-amber-500"
+                              : passwordStrength < 100
+                              ? "bg-blue-500"
+                              : "bg-green-500"
+                          }`}
+                          role="progressbar"
+                          style={{ width: `${passwordStrength}%` }}
+                          aria-valuenow={passwordStrength}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        />
+                      </div>
+                    )}
+                    {passwordStrengthSuccess && (
+                      <div
+                        className="bg-green-50 border border-green-200 text-sm text-green-600 rounded-md p-4 mt-2"
+                        role="alert"
+                      >
+                        <span className="font-bold">Sucess:</span> Password is
+                        already strong
+                      </div>
+                    )}
+                    {passwordStrengthError && passwordStrength < 100 && (
+                      <div
+                        className="bg-orange-50 border border-orange-200 text-sm text-orange-600 rounded-md p-4 mt-2"
+                        role="alert"
+                      >
+                        <span className="font-bold">Warning:</span> Password
+                        must contain at least 8 characters, one uppercase
+                        letter, one lowercase letter, one number, and one
+                        special character
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className={editButton ? "hidden" : "mx-auto"}>
+                  <button
+                    className={
+                      changePass
+                        ? "bg-custom-green-button text-white mx-auto w-[200px] font-medium px-[20px] py-[5px] rounded-md"
+                        : "hidden"
+                    }
+                    onClick={() => setChangePass(!changePass)}
+                  >
+                    Change Username
+                  </button>
+                  <button
+                    className={
+                      changePass
+                        ? "hidden"
+                        : "bg-custom-green-button text-white mx-auto w-[200px] font-medium px-[20px] py-[5px] rounded-md"
+                    }
+                    onClick={() => setChangePass(!changePass)}
+                  >
+                    Change Password
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>

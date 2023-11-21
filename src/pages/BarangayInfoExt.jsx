@@ -81,7 +81,7 @@ function ArchiveServiceRequests() {
               className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-2xl xxxl:text-3xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
-              ARCHIVED OFFICIALS
+              ARCHIVED OFFICIAL
             </h1>
           </div>
         </div>

@@ -30,7 +30,7 @@ export default {
         'custom-grey': '#D9D9D9',
         'custom-blue': '#4891FF',
         'custom-green-button': '#268F26',
-        'custom-yellow ': '#EDAB00',
+        'custom-yellow': '#EDAB00',
         'custom-gold': '#D3B574',
         'custom-gold1': '#FFCF67',
         'custom-red1': '#FF2828',

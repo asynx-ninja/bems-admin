@@ -1,24 +1,31 @@
 import React from "react";
 import { useEffect } from "react";
-import Information from "./BarangayTabs/information";
+import Information from "./BarangayTabs/Brgyinformation";
 import Profit from "../pages/BarangayTabs/Profit";
-import Services from "../pages/BarangayTabs/Services";
-import ServiceRequest from "../pages/BarangayTabs/ServiceRequests";
-import Officials from "./BarangayTabs/Officials";
-import ArchivedOfficials from "./BarangayTabs/ArchivedOfficials";
-import Residents from "./BarangayTabs/Residents";
-import Inquiries from "./Inquiries";
+import Services from "./BarangayTabs/BrgyServices";
+import ServiceRequest from "./BarangayTabs/BrgyServiceRequests";
+import Officials from "./BarangayTabs/BrgyOfficials";
+import ArchivedOfficials from "./BarangayTabs/BrgyArchivedOfficials";
+import Residents from "./BarangayTabs/BrgyResidents";
+import Inquiries from "./BarangayTabs/BrgyInquiries";
+import { useParams, useSearchParams } from "react-router-dom";
+import Announcement from "./BarangayTabs/BrgyAnnouncements";
 
 function BarangayDetails() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const brgy = searchParams.get("brgy");
+  console.log("SAASA", id);
+
   useEffect(() => {
-    document.title = "Barangay Information | Barangay E-Services Management";
+    document.title = `Barangay ${brgy} Information | Barangay E-Services Management`;
   }, []);
 
   return (
     <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:mr-6 lg:h-full border rounded-lg bg-white shadow-lg">
       <div className="w-full flex items-center justify-center bg-[#013D74] rounded-t-lg">
         <h1 className="text-white lg:text-3xl py-2 px-5 font-heavy ">
-          BARANGAY SAN JOSE INFORMATION
+          BARANGAY {brgy ? brgy.toUpperCase() : ""} INFORMATION
         </h1>
       </div>
       <div className="px-4 py-4 overflow-x-scroll items-center flex bg-gray-100">
@@ -77,13 +84,32 @@ function BarangayDetails() {
           >
             Residents
           </button>
-        
           <button
             type="button"
             className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
             id="basic-tabs-item-1"
             data-hs-tab="#basic-tabs-6"
             aria-controls="basic-tabs-6"
+            role="tab"
+          >
+            Announcements
+          </button>{" "}
+          <button
+            type="button"
+            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
+            id="basic-tabs-item-1"
+            data-hs-tab="#basic-tabs-7"
+            aria-controls="basic-tabs-7"
+            role="tab"
+          >
+            Inquiries
+          </button>
+          <button
+            type="button"
+            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
+            id="basic-tabs-item-1"
+            data-hs-tab="#basic-tabs-8"
+            aria-controls="basic-tabs-8"
             role="tab"
           >
             Profits
@@ -97,7 +123,7 @@ function BarangayDetails() {
           role="tabpanel"
           aria-labelledby="basic-tabs-item-1"
         >
-          <Information />
+          <Information brgy={brgy} id={id} />
         </div>
         <div
           id="basic-tabs-2"
@@ -105,7 +131,7 @@ function BarangayDetails() {
           role="tabpanel"
           aria-labelledby="basic-tabs-item-2"
         >
-          <Officials />
+          <Officials brgy={brgy} id={id} />
         </div>
         <div
           id="basic-tabs-3"
@@ -113,7 +139,7 @@ function BarangayDetails() {
           role="tabpanel"
           aria-labelledby="basic-tabs-item-3"
         >
-          <Services />
+          <Services brgy={brgy} id={id} />
         </div>
         <div
           id="basic-tabs-4"
@@ -121,7 +147,7 @@ function BarangayDetails() {
           role="tabpanel"
           aria-labelledby="basic-tabs-item-4"
         >
-          <ServiceRequest />
+          <ServiceRequest brgy={brgy} id={id} />
         </div>
         <div
           id="basic-tabs-5"
@@ -129,15 +155,31 @@ function BarangayDetails() {
           role="tabpanel"
           aria-labelledby="basic-tabs-item-5"
         >
-          <Residents />
+          <Residents brgy={brgy} id={id} />
         </div>
         <div
           id="basic-tabs-6"
           className="hidden"
           role="tabpanel"
-          aria-labelledby="basic-tabs-item-5"
+          aria-labelledby="basic-tabs-item-6"
         >
-          <Profit />
+          <Announcement brgy={brgy} id={id} />
+        </div>
+        <div
+          id="basic-tabs-7"
+          className="hidden"
+          role="tabpanel"
+          aria-labelledby="basic-tabs-item-7"
+        >
+          <Inquiries brgy={brgy} id={id} />
+        </div>
+        <div
+          id="basic-tabs-8"
+          className="hidden"
+          role="tabpanel"
+          aria-labelledby="basic-tabs-item-8"
+        >
+          <Profit brgy={brgy} id={id} />
         </div>
       </div>
     </div>

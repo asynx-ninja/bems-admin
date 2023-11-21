@@ -1,9 +1,30 @@
 import React, { useState, useEffect, useMediaQuery } from "react";
 import logo from "../../assets/header/montalban-logo.png";
 import { FaBars } from "react-icons/fa";
-
+import API_LINK from "../../config/API";
+import axios from "axios";
+import { useSearchParams } from "react-router-dom";
 const Header = () => {
   const [screen, isScreen] = useState(true);
+  const [userData, setUserData] = useState({})
+  const [searchParams, setSearchParams] = useSearchParams()
+  const id = searchParams.get("id")
+  
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const res = await axios.get(`${API_LINK}/users/specific/${id}`);
+        if (res.status === 200) {
+          setUserData(res.data[0]);
+        } else {
+          setError("Invalid username or password");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetch()
+  }, [id])
 
   useEffect(() => {
     return window.innerWidth >= 320 && window.innerWidth <= 1023
@@ -28,7 +49,7 @@ const Header = () => {
             WELCOME ADMIN!
           </span>{" "}
           <br />
-          JUAN KARLOS JR.
+          {userData.firstName} {userData.lastName}
         </h1>
     </div>
   );
