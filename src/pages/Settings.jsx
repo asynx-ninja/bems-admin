@@ -92,7 +92,7 @@ const Settings = () => {
         const res = await axios.get(`${API_LINK}/users/specific/${id}`);
         if (res.status === 200) {
           setUserData(res.data[0]);
-          console.log(res.data[0].profile.link)
+          console.log(res.data[0].profile.link);
           setUserAddress({
             street: res.data[0].address.street,
             brgy: res.data[0].address.brgy,
@@ -352,8 +352,9 @@ const Settings = () => {
   };
 
   return (
-    <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:mr-6 lg:h-full border rounded-lg bg-white shadow-lg">
-      <div className="flex flex-col w-full ">
+
+      <div className="mx-4 mt-[10rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+        <div className="flex flex-col">
         <div className="relative w-full">
           <div className="relative">
             <div className="absolute inset-0 bg-gray-900 opacity-40"></div>
@@ -370,11 +371,10 @@ const Settings = () => {
                   htmlFor="file_input"
                   onClick={handleAdd}
                   className={
-                  editButton
-                  ? "hidden"
-                  : "absolute inset-0 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity hover:bg-[#295141] hover:bg-opacity-60 "
-              }
-               
+                    editButton
+                      ? "hidden"
+                      : "absolute inset-0 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity hover:bg-[#295141] hover:bg-opacity-60 "
+                  }
                 >
                   <FaCamera size={32} style={{ color: "#ffffff" }} />
                 </label>
@@ -388,43 +388,60 @@ const Settings = () => {
                   multiple="multiple"
                   className="hidden"
                 />
-                <img
-                  id="pfp"
-                  className="w-full h-full rounded-full object-cover border-[5px] border-[#013D74] "
-                />
+                <div className="lg:w-full lg:h-full w-[130px] h-[130px] lg:mt-0 mt-8 flex mx-auto justify-center overflow-hidden rounded-full object-cover border-[5px] border-[#295141]">
+                  <img
+                    id="pfp"
+                    className="w-full h-full object-cover"
+                    alt="Profile"
+                  />
+                </div>
               </div>
               <h6 className="font-bold mt-2 lg:text-normal">
                 {userData.firstName} {userData.lastName}
               </h6>
-
               <p className="text-sm lg:text-[14px] py-2 leading-[10px]">
                 {userData.username}
               </p>
             </div>
           </div>
-          <div className="flex flex-col bg-white text-black justify-center items-center mx-auto rounded-md sm:mt-28 lg:p-4 mt-28 lg:w-11/12 text-center">
+
+          <div className="flex flex-col bg-white lg:py-0 py-4 text-black justify-center items-center mx-auto rounded-md mt-28 lg:p-4 lg:mt-28 lg:w-11/12 text-center">
             <div className="border-b-[2px] w-full mb-2 border-b-gray-200">
               <h6 className="font-bold mb-2 uppercase text-normal sm:text-sm">
                 Socials
               </h6>
             </div>
-            <div className="lg:flex sm:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-center items-center mx-auto ">
-              <div className="flex justify-center">
-                <FaFacebook className="text-sm sm:text-lg" />
-                <p className="text-xs ml-2 lg:text-sm">@sana_mina</p>
-              </div>
-              <div className="flex justify-center">
-                <FaTwitter className="text-sm sm:text-lg" />
-                <p className="text-xs ml-2 lg:text-sm">@sana_mina</p>
-              </div>
-              <div className="flex justify-center">
-                <FaInstagram className="text-sm sm:text-lg" />
-                <p className="text-xs ml-2 lg:text-sm">@sana_mina</p>
-              </div>
-              <div className="flex justify-center">
-                <FaEnvelope className="text-sm sm:text-lg" />
-                <p className="text-xs ml-2 lg:text-sm">@sana_mina</p>
-              </div>
+            <div className="lg:flex sm:grid lg:px-0 px-8 lg:py-0 py-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-center items-center mx-auto">
+              {userSocials.facebook && userSocials.facebook.name && (
+                <button className="flex justify-center gap-2 items-center bg-white rounded-md p-2 hover:bg-[#295141] hover:text-white  transition-all ease-in-out duration-300">
+                <FaFacebook />
+                <p className='text-left ml-2 truncate lg:text-[14px] text-[12px]'>{userSocials.facebook.name}</p>
+              </button>
+              )}
+              {userSocials.twitter && userSocials.twitter.name && (
+                 <button className="flex justify-center gap-2 items-center bg-white rounded-md p-2 hover:bg-[#295141] hover:text-white  transition-all ease-in-out duration-300">
+                 <FaTwitter />
+                 <p className='text-left ml-2 truncate lg:text-[14px] text-[12px]'>{userSocials.twitter.name}</p>
+               </button>
+              )}
+              {userSocials.instagram && userSocials.instagram.name && (
+                <button className="flex justify-center gap-2 items-center bg-white rounded-md p-2 hover:bg-[#295141] hover:text-white  transition-all ease-in-out duration-300">
+                <FaInstagram />
+                <p className='text-left ml-2 truncate lg:text-[14px] text-[12px]'>{userSocials.instagram.name}</p>
+              </button>
+              )}
+              {userData.contact && (
+                <button className="flex justify-center gap-2 items-center bg-white rounded-md p-2 hover:bg-[#295141] hover:text-white  transition-all ease-in-out duration-300">
+                <FaPhone />
+                <p className='text-left ml-2 truncate lg:text-[14px] text-[12px]'>{userData.contact}</p>
+              </button>
+              )}
+              {userData.email && (
+                <button className="flex justify-center gap-2 items-center bg-white rounded-md p-2  hover:bg-[#295141] hover:text-white  transition-all ease-in-out duration-300">
+                <FaEnvelope />
+                <p className='text-left ml-2 truncate lg:text-[14px] text-[12px]'>{userData.email}</p>
+              </button>
+              )}
             </div>
           </div>
         </div>
@@ -437,8 +454,8 @@ const Settings = () => {
                 onClick={handleOnActive}
                 className={
                   activeButton.personal
-                    ? "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-[#013D74] text-white font-medium"
-                    : "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-white text-black font-medium transition-all ease-in-out hover:bg-[#013D74]  hover:text-white"
+                    ? "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-[#295141] text-white font-medium"
+                    : "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-white text-black font-medium transition-all ease-in-out hover:bg-[#295141]  hover:text-white"
                 }
               >
                 Personal Info
@@ -448,8 +465,8 @@ const Settings = () => {
                 onClick={handleOnActive}
                 className={
                   activeButton.credential
-                    ? "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-[#013D74]  text-white font-medium"
-                    : "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-white text-black font-medium transition-all ease-in-out hover:bg-[#013D74]  hover:text-white"
+                    ? "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-[#295141]  text-white font-medium"
+                    : "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-white text-black font-medium transition-all ease-in-out hover:bg-[#295141]  hover:text-white"
                 }
               >
                 Account Info

@@ -22,7 +22,10 @@ import BarangayMenu from "../pages/BarangayMenu";
 import BarangayInfo from "../pages/BarangayInfo";
 import BrgyArchivedAnnouncement from "../pages/BarangayTabs/BrgyArchivedAnnouncement";
 import BrgyArchivedInquiries from "../pages/BarangayTabs/BrgyArchivedInquiries";
-
+import AccountManagement from "../pages/AccountManagement";
+import ArchivedAccountManagement from "../pages/ArchivedAccountManagement";
+import MunicipalityOffcials from "../pages/MunicipalityOffcials";
+import ArchivedMunicipalityOfficials from "../pages/ArchivedMunicipalityOfficials";
 const pages = [
   {
     path: "/",
@@ -38,152 +41,88 @@ const pages = [
   },
   {
     path: "/change/:email",
-    element: <ChangePassword />
+    element: <ChangePassword />,
   },
   {
-    path: "/dashboard/",
-    element: (
-      <>
-        <Navbar />
-        <Dashboard />
-      </>
-    ),
+    path: "/dashboard",
+    element: <Navbar comp={<Dashboard />} />,
   },
-  {
-    path: "/brgyarchivedinquiries",
-    element: (
-      <>
-        <Navbar />
-        <BrgyArchivedInquiries />
-      </>
-    ),
-  },
-  {
-    path: "/brgyarchivedannoucements",
-    element: (
-      <>
-        <Navbar />
-        <BrgyArchivedAnnouncement />
-      </>
-    ),
-  },
+
   {
     path: "/announcements",
-    element: (
-      <>
-        <Navbar />
-        <Announcements />
-      </>
-    ),
+    element: <Navbar comp={<Announcements />} />,
   },
   {
     path: "/archivedannoucements",
-    element: (
-      <>
-        <Navbar />
-        <ArchivedAnnouncements />
-      </>
-    ),
+    element: <Navbar comp={<ArchivedAnnouncements />} />,
   },
   {
     path: "/archivedinquiries",
-    element: (
-      <>
-        <Navbar />
-        <ArchivedInquiries />
-      </>
-    ),
+    element: <Navbar comp={<ArchivedInquiries />} />,
   },
   {
     path: "/inquiries",
-    element: (
-      <>
-        <Navbar />
-        <Inquiries />
-      </>
-    ),
+    element: <Navbar comp={<Inquiries />} />,
   },
   {
-    path: "/archivedservices",
-    element: (
-      <>
-        <Navbar />
-        <ArchivedServices />
-      </>
-    ),
+    path: "/archivedinquiries",
+    element: <Navbar comp={<ArchivedInquiries/>} />,
   },
   {
-    path: "/archivedservicesreq",
-    element: (
-      <>
-        <Navbar />
-        <ArchivedServiceReq />
-      </>
-    ),
+    path: "/municipalityofficials",
+    element: <Navbar comp={<MunicipalityOffcials />} />,
   },
   {
-    path: "/archivedofficials",
-    element: (
-      <>
-        <Navbar />
-        <ArchivedOfficials />
-      </>
-    ),
+    path: "/archivedmunicipalityofficials",
+    element: <Navbar comp={<ArchivedMunicipalityOfficials />} />,
+  },
+  {
+    path: "/accountmanagement",
+    element: <Navbar comp={<AccountManagement />} />,
+  },
+  {
+    path: "/archivedaccountmanagement",
+    element: <Navbar comp={<ArchivedAccountManagement />} />,
+  },
+  {
+    path: "/brgyarchivedservices",
+    element: <Navbar comp={<ArchivedServices />} />,
+  },
+  {
+    path: "/brgyarchivedservicesreq",
+    element: <Navbar comp={<ArchivedServiceReq />} />,
+  },
+  {
+    path: "/brgyarchivedofficials",
+    element: <Navbar comp={<ArchivedOfficials />} />,
   },
   {
     path: "/barangaymenu",
-    element: (
-      <>
-        <Navbar />
-        <BarangayMenu />
-      </>
-    ),
+    element: <Navbar comp={<BarangayMenu />} />,
   },
   {
     path: "/barangayinformation",
-    element: (
-      <>
-        <Navbar />
-        <BarangayInfo />
-      </>
-    ),
-  },
-  
-  {
-    path: "/residents",
-    element: (
-      <>
-        <Navbar />
-        <Residents />
-      </>
-    ),
+    element: <Navbar comp={<BarangayInfo />} />,
   },
   {
-    path: "/archivedresidents",
-    element: (
-      <>
-        <Navbar />
-        <ArchivedResidents />
-      </>
-    ),
+    path: "/brgyarchivedinquiries",
+    element: <Navbar comp={<BrgyArchivedInquiries />} />,
   },
   {
-    path: "/info",
-    element: (
-      <>
-        <Navbar />
-        <Information />
-      </>
-    ),
+    path: "/brgyarchivedannoucements",
+    element: <Navbar comp={<BrgyArchivedAnnouncement />} />,
+  },
+  {
+    path: "/brgyarchivedresidents",
+    element: <Navbar comp={<ArchivedResidents />} />,
+  },
+  {
+    path: "/brgyinfo",
+    element: <Navbar comp={<Information />} />,
   },
   {
     path: "/settings",
-    element: (
-      <>
-        <Navbar />
-        <Settings />
-      </>
-    ),
+    element: <Navbar comp={<Settings />} />,
   },
 ];
 

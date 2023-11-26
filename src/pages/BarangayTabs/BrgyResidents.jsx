@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { FaArchive, FaPlus, FaTrash, FaUserCircle } from "react-icons/fa";
 import { BsPrinter } from "react-icons/bs";
@@ -19,6 +19,61 @@ const Residents = () => {
   const brgy = searchParams.get("brgy");
   const [user, setUser] = useState({});
   const [status, setStatus] = useState({});
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortBy, setSortBy] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const sortedAndFilteredUsers = useMemo(() => {
+    let filteredUsers = [...users];
+
+    // Filter by status
+    if (statusFilter !== "all") {
+      filteredUsers = filteredUsers.filter(
+        (user) => user.isApproved === statusFilter
+      );
+    }
+
+    // Filter by search query
+    if (searchQuery.trim() !== "") {
+      const searchLowerCase = searchQuery.toLowerCase();
+      filteredUsers = filteredUsers.filter((user) =>
+        `${user.firstName} ${user.middleName} ${user.lastName}`
+          .toLowerCase()
+          .includes(searchLowerCase)
+      );
+    }
+
+    // Sort
+    filteredUsers.sort((a, b) => {
+      const nameA =
+        `${a.firstName} ${a.middleName} ${a.lastName}`.toUpperCase();
+      const nameB =
+        `${b.firstName} ${b.middleName} ${b.lastName}`.toUpperCase();
+
+      if (sortOrder === "asc") {
+        return nameA.localeCompare(nameB);
+      } else {
+        return nameB.localeCompare(nameA);
+      }
+    });
+
+    return filteredUsers;
+  }, [users, sortOrder, statusFilter, searchQuery]);
+
+  const handleSort = (sortByValue) => {
+    setSortBy(sortByValue);
+    // If you want to reset the status filter when sorting, uncomment the line below
+    setStatusFilter('all');
+  };
+
+  const handleStatusFilter = (status) => {
+    setStatusFilter(status);
+  };
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   useEffect(() => {
     const fetch = async () => {
@@ -61,7 +116,7 @@ const Residents = () => {
       <div>
         {/* Header */}
         <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
-          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#396288] to-[#013D74] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
+          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
               className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-2xl xxxl:text-3xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
@@ -71,33 +126,13 @@ const Residents = () => {
           </div>
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">
             <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
-              {/* <div className="w-full rounded-lg flex justify-center">
-                <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-modal-addResident"
-                    className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm  text-center inline-flex items-center "
-                  >
-                    <FaPlus size={24} style={{ color: "#ffffff" }} />
-                    <span className="sm:block md:hidden sm:pl-5">
-                      Add Residents
-                    </span>
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Add Residents
-                    </span>
-                  </button>
-                </div>
-              </div> */}
               <div className="w-full rounded-lg ">
-                <Link to={`/archivedresidents/?id=${id}&brgy=${brgy}`}>
+                <Link to={`/brgyarchivedresidents/?id=${id}&brgy=${brgy}`}>
                   <div className="hs-tooltip inline-block w-full">
                     <button
                       type="button"
                       data-hs-overlay="#hs-modal-add"
-                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#396288] to-[#013D74] w-full text-white font-medium text-sm text-center inline-flex items-center"
+                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm text-center inline-flex items-center"
                     >
                       <FaArchive size={24} style={{ color: "#ffffff" }} />
                       <span className="sm:block md:hidden sm:pl-5">
@@ -123,11 +158,13 @@ const Residents = () => {
               <button
                 id="hs-dropdown"
                 type="button"
-                className="bg-[#013D74] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md font-medium shadow-sm align-middle transition-all text-sm"
               >
                 SORT BY
                 <svg
-                  className="hs-dropdown-open:rotate-180 w-2.5 h-2.5 text-white"
+                  className={`hs-dropdown-open:rotate-180 w-2.5 h-2.5 text-white ${
+                    sortOrder === "desc" && "rotate-180"
+                  }`}
                   width="16"
                   height="16"
                   viewBox="0 0 16 16"
@@ -141,22 +178,35 @@ const Residents = () => {
                     strokeLinecap="round"
                   />
                 </svg>
+                {sortBy && (
+                  <span className="text-xs font-normal ml-2">
+                    {sortOrder === "asc" ? "ASC" : "DESC"}
+                  </span>
+                )}
               </button>
-              <ul
-                className="bg-[#013D74] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-md rounded-lg p-2 "
-                aria-labelledby="hs-dropdown"
-              >
-                <li className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#013D74] to-[#396288] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ">
-                  USER ID
-                </li>
-                <li className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#013D74] to-[#396288] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ">
+              <ul className="bg-[#295141] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10 shadow-md rounded-lg p-2">
+                <li
+                  className={`font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ${
+                    sortBy === "name" && "font-bold"
+                  }`}
+                  onClick={() => handleSort("name")}
+                >
                   NAME
+                </li>
+                <li
+                  className={`font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ${
+                    sortBy === "status" && "font-bold"
+                  }`}
+                  onClick={() => handleSort("status")}
+                >
+                  STATUS
                 </li>
               </ul>
             </div>
+
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
               <div className="flex flex-row w-full md:mr-2">
-                <button className=" bg-[#013D74] p-3 rounded-l-md">
+                <button className="bg-[#295141] p-3 rounded-l-md">
                   <div className="w-full overflow-hidden">
                     <svg
                       className="h-3.5 w-3.5 text-white"
@@ -180,8 +230,10 @@ const Residents = () => {
                   type="text"
                   name="hs-table-with-pagination-search"
                   id="hs-table-with-pagination-search"
-                  className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500 "
+                  className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Search for items"
+                  value={searchQuery}
+                  onChange={handleSearch}
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
@@ -200,30 +252,15 @@ const Residents = () => {
                     </span>
                   </button>
                 </div>
-                {/* <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-modal-archiveResident"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md  bg-pink-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <AiOutlineStop size={24} style={{ color: "#ffffff" }} />
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Archived Selected Residents
-                    </span>
-                  </button>
-                </div> */}
               </div>
             </div>
           </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-auto sm:overflow-x-auto lg:h-[710px] xl:h-[700px] xxl:h-[700px] xxxl:h-[640px]">
+        <div className="overflow-y-auto sm:overflow-x-auto h-[calc(100vh_-_270px)] xxxl:h-[calc(100vh_-_286px)]">
           <table className="w-full ">
-            <thead className="bg-[#013D74] sticky top-0">
+            <thead className="bg-[#295141] sticky top-0">
               <tr className="">
                 {tableHeader.map((item, idx) => (
                   <th
@@ -237,12 +274,12 @@ const Residents = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {users.map((item, index) => (
+              {sortedAndFilteredUsers.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
                   <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2">
                       <div className="px-2 sm:px-6 py-2">
-                        {item.profile.link ? (
+                      {item.profile && item.profile.link ? (
                           <img
                             src={item.profile.link}
                             alt="Profile"
@@ -261,11 +298,11 @@ const Residents = () => {
                   </td>
                   <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                      {item.firstName +
+                      {item.lastName +
                         " " +
-                        item.middleName +
-                        " " +
-                        item.lastName}
+                        item.firstName +
+                        "," +
+                        item.middleName}
                     </span>
                   </td>
                   <td className="px-6 py-3">
@@ -330,7 +367,7 @@ const Residents = () => {
           </table>
         </div>
       </div>
-      <div className="md:py-4 md:px-4 bg-[#013D74] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
+      <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
         <span className="font-medium text-white sm:text-xs text-sm">
           Showing 1 out of 15 pages
         </span>

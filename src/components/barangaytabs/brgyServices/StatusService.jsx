@@ -8,7 +8,7 @@ function StatusResident({ status, setStatus }) {
       e.preventDefault();
 
       const response = await axios.patch(
-        `${API_LINK}/users/status/${status.id}`,
+        `${API_LINK}/services/status/${status.id}`,
         {
           isApproved: status.status,
         },
@@ -70,19 +70,19 @@ function StatusResident({ status, setStatus }) {
                           value={status.status}
                         >
                           <option
-                            value="Registered"
+                            value="Approved"
                           >
-                            REGISTERED
+                            APPROVED
+                          </option>
+                          <option
+                            value="Disapproved"
+                          >
+                            DISAPPROVED
                           </option>
                           <option
                             value="Pending"
                           >
                             PENDING
-                          </option>
-                          <option
-                            value="Denied"
-                          >
-                            DENIED
                           </option>
                         </select>
                       </div>

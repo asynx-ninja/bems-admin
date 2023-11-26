@@ -10,9 +10,9 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:mr-6">
+    <div className="mx-4 my-4 mt-[10rem] lg:mt-4">
       <StatisticsDashboard />
-      <div className='w-full flex flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0'>
+      <div className="w-full flex flex-col lg:flex-col lg:space-x-4 space-y-4 lg:space-y-6">
         <SubPendingRequest />
         <EventsCalendar />
       </div>

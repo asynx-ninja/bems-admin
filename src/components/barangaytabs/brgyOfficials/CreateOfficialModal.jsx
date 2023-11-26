@@ -1,287 +1,308 @@
 import React from "react";
-import bgmodal from "../../../assets/modals/bg-modal2.png";
-import officialimage from "../../../assets/sample/official.jpg";
-import { IoIosAdd } from "react-icons/io";
+import { useState, useEffect } from "react";
+import { CiImageOn } from "react-icons/ci";
+import API_LINK from "../../../config/API";
+import axios from "axios";
 
-function CreateOfficialModal({ onClose }) {
+function CreateOfficialModal({ brgy }) {
+  const [official, setOfficial] = useState({
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    suffix: "",
+    position: "",
+    fromYear: "",
+    toYear: "",
+    brgy: brgy,
+  });
+
+  const [pfp, setPfp] = useState();
+
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append("file", pfp);
+
+      const obj = {
+        firstName: official.firstName,
+        middleName: official.middleName,
+        lastName: official.lastName,
+        suffix: official.suffix,
+        position: official.position,
+        fromYear: official.fromYear,
+        toYear: official.toYear,
+      };
+
+      formData.append("official", JSON.stringify(obj));
+
+      const result = await axios.post(
+        `${API_LINK}/brgyofficial/?brgy=${brgy}`,
+        formData
+      );
+
+      if (result.status === 200) {
+        console.log("Official added successfully!");
+        setOfficial({
+          name: "",
+          position: "",
+          fromYear: "",
+          toYear: "",
+          brgy: "",
+        });
+        setPfp(null);
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("Error adding official:", err);
+    }
+  };
+
+  const handlePfpChange = (e) => {
+    setPfp(e.target.files[0]);
+
+    var output = document.getElementById("add_pfp");
+    output.src = URL.createObjectURL(e.target.files[0]);
+    output.onload = function () {
+      URL.revokeObjectURL(output.src); // free memory
+    };
+  };
+
   return (
     <div>
-      {/* <button
-        type="button"
-        className="text-white w-full justify-center bg-[#013D74] font-medium rounded-full text-sm m-2 py-2 px-10 text-center inline-flex items-center mr-2"
-        style={{ margin: "10px 0px", padding: "10px 20px" }}
-        data-hs-overlay="#hs-create-official-modal"
-      >
-        <IoIosAdd
-          size={24} // You can adjust the size as needed
-          style={{ color: "#ffffff" }}
-        />
-      </button> */}
-
       <div
         id="hs-create-official-modal"
-        class="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center lg:ml-10 xxl:ml-0"
+        className="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center lg:ml-10 xxl:ml-0"
       >
         {/* Modal */}
-        <div class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 md:px-0 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-          <div class="flex flex-col w-full lg:w-[700px] bg-white shadow-sm overflow-y-auto">
+        <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
+          <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
             {/* Header */}
-            <div class="bg-[#013D74] overflow-hidden">
-              <div
-                class="flex justify-between items-center px-3 py-5 md:p-5 w-full h-full bg-cover bg-no-repeat transform"
-                style={{ backgroundImage: `url(${bgmodal})` }}
+            <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] overflow-hidden rounded-t-2xl">
+              <h3
+                className="font-bold text-white mx-auto md:text-xl text-center"
+                style={{ letterSpacing: "0.3em" }}
               >
-                <h3
-                  class="font-base text-white mx-auto md:text-xl"
-                  style={{ letterSpacing: "0.3em" }}
-                >
-                  CREATE NEW OFFICIAL
-                </h3>
-              </div>
+                CREATE BARANGAY OFFICIAL
+              </h3>
             </div>
 
-            {/* Modal Details */}
-            <div>
+            <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
               <div className="flex flex-col">
-                <div className="flex flex-col lg:flex-row border mb-1">
+                <div className="flex flex-col lg:flex-row mb-1">
                   {/* Service Description */}
-                  <div class="relative mt-4 lg:ml-6 overflow-y-auto flex flex-col w-full lg:w-1/2">
+                  <div className="relative mt-4 flex flex-col w-full lg:w-1/2">
                     {/* Modal Images */}
-                    <div class="relative w-full overflow-y-auto">
-                      <div className="relative w-full"></div>
-                      <div>
+                    <div className="relative w-full overflow-y-auto">
+                      <div className="relative w-full border rounded-t-xl">
                         <img
-                          src={officialimage}
-                          alt=""
-                          className="h-32 w-32 md:h-52 md:w-52 lg:h-60 lg:w-60 mx-auto rounded-lg"
+                          className={`${
+                            pfp ? "" : "hidden"
+                          } w-[250px] h-[250px] md:w-full md:h-[350px] lg:w-full lg:h-[250px] rounded-t-xl object-cover`}
+                          id="add_pfp"
+                          alt="Current profile photo"
+                        />{" "}
+                        <CiImageOn
+                          size={250}
+                          className={`${!pfp ? "" : "hidden"} mx-auto`}
                         />
                       </div>
                     </div>
 
                     <input
-                      class="block mt-5 w-64 md:w-96 mx-auto lg:w-full text-sm text-black rounded-lg cursor-pointer bg-gray-100 "
-                      id="file_input"
+                      className="block p-2 mb-2 w-full  mx-auto lg:w-full text-sm text-black rounded-b-xl cursor-pointer bg-gray-100 "
                       type="file"
+                      onChange={handlePfpChange}
+                      name="pfp"
+                      accept="image/*"
+                      value={!pfp ? "" : pfp.originalname}
                     />
                   </div>
 
                   {/* Request Information */}
-                  <div class="relative mt-4 p-4 lg:mx-6 p-2 pb-6 overflow-y-auto flex flex-col w-full lg:w-1/2 h-full rounded-lg">
+                  <div className="relative mt-2 lg:mx-6 pb-6 overflow-y-auto flex flex-col w-full lg:w-1/2 h-full rounded-lg space-y-2">
+                    <b className="border-solid border-0 border-black/50 border-b-2  uppercase font-medium text-lg md:text-lg">
+                      Personal Informations
+                    </b>
                     <h1
-                      class="font-medium mb-1 text-black text-sm"
+                      className="font-medium mb-1 text-black text-sm"
                       style={{ letterSpacing: "0.1em" }}
                     >
-                      NAME OF THE OFFICIAL
+                      FIRST NAME
                     </h1>
                     <input
-                      type="search"
-                      id="search-dropdown"
-                      className="block w-full p-1 text-sm text-black bg-gray-200 rounded-lg"
+                      type="text"
+                      id="firstName"
+                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
                       placeholder=""
+                      value={official.firstName}
+                      onChange={(e) =>
+                        setOfficial({ ...official, firstName: e.target.value })
+                      }
                     />
+
                     <h1
-                      class="font-medium mb-1 mt-3 text-black text-sm"
+                      className="font-medium mb-1 text-black text-sm"
                       style={{ letterSpacing: "0.1em" }}
                     >
-                      BACKGROUND OVERVIEW
+                      MIDDLE NAME
                     </h1>
-                    <textarea
-                      id="message"
-                      rows="4"
-                      class="block p-2.5 w-full h-48 text-sm text-gray-900 rounded-lg bg-gray-100 resize-none "
-                      placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Felis bibendum ut tristique et egestas quis ipsum suspendisse. Lorem ipsum dolor sit amet, cons adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Felis bibendum ut tristique et egestas quis ipsum suspendisse."
-                    ></textarea>
+                    <input
+                      type="text"
+                      id="middleName"
+                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      placeholder=""
+                      value={official.middleName}
+                      onChange={(e) =>
+                        setOfficial({ ...official, middleName: e.target.value })
+                      }
+                    />
+
+                    <h1
+                      className="font-medium mb-1 text-black text-sm"
+                      style={{ letterSpacing: "0.1em" }}
+                    >
+                      SUFFIX
+                    </h1>
+                    <input
+                      type="text"
+                      id="suffix"
+                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      placeholder=""
+                      value={official.suffix}
+                      onChange={(e) =>
+                        setOfficial({ ...official, suffix: e.target.value })
+                      }
+                    />
+
+                    <h1
+                      className="font-medium mb-1 text-black text-sm"
+                      style={{ letterSpacing: "0.1em" }}
+                    >
+                      LAST NAME
+                    </h1>
+                    <input
+                      type="text"
+                      id="lastName"
+                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      placeholder=""
+                      value={official.lastName}
+                      onChange={(e) =>
+                        setOfficial({ ...official, lastName: e.target.value })
+                      }
+                    />
                   </div>
                 </div>
 
                 {/* Other info */}
-                <div class="relative mt-5 mx-6 overflow-y-auto flex flex-col md:flex-row md:space-x-3">
+                <b className="border-solid border-0 border-black/50 border-b-2 uppercase font-medium text-lg md:text-lg mt-1">
+                  Government Information
+                </b>
+                <div className="relative mt-5  overflow-y-auto flex flex-col space-y-4">
                   {/* Position and Service Rendered */}
-                  <div className="w-full lg:w-1/2">
+                  <div className="w-full">
                     <h1
-                      class="font-base text-black mx-auto text-sm"
+                      className="font-bold text-black mx-auto text-sm"
                       style={{ letterSpacing: "0.1em" }}
                     >
                       POSITION
                     </h1>
-                    <input
-                      type="search"
-                      id="search-dropdown"
-                      className="block w-full mt-2 p-1 text-sm text-gray-900 bg-gray-100 rounded-lg"
-                      placeholder=""
+                    <select
+                      id="position"
+                      className="shadow border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      onChange={(e) =>
+                        setOfficial({ ...official, position: e.target.value })
+                      }
+                      value={official.position}
                       required
-                    />
+                    >
+                      <option value="" disabled>
+                        -- Select Position --
+                      </option>
+                      <option value="Barangay Chairman">
+                        Barangay Chairman
+                      </option>
+                      <option value="Barangay Kagawad">Barangay Kagawad</option>
+                      <option value="SK Chairman">SK Chairman</option>
+                      <option value="SK Kagawad">SK Kagawad</option>
+                    </select>
                   </div>
-                  <div className="w-full lg:w-1/2 sm:mt-2 md:mt-0">
+                  <div className="w-full mt-2">
                     <h1
-                      class="font-base text-black mx-auto text-sm"
+                      className="font-bold text-black mx-auto text-sm"
                       style={{ letterSpacing: "0.1em" }}
                     >
                       SERVICE RENDERED
                     </h1>
 
-                     {/* Date 1*/}
-                    <div class="hs-dropdown relative inline-flex mr-2">
-                      <button
-                        id="hs-dropdown-basic"
-                        type="button"
-                        class="hs-dropdown-toggle py-1 px-2 lg:px-4 inline-flex justify-center items-center gap-2 rounded-md border font-base bg-white text-black shadow-sm align-middle"
-                      >
-                        START
-                        <svg
-                          class="hs-dropdown-open:rotate-180 w-2.5 h-2.5 text-gray-600"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 16 16"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
+                    {/* Date 1 */}
+                    <div className="flex flex-col lg:flex-row mt-2">
+                      <div className="w-full lg:w-1/6">
+                        <label
+                          htmlFor="from_year"
+                          className=" w-full font-base flex items-center"
                         >
-                          <path
-                            d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                          />
-                        </svg>
-                      </button>
-
-                      <div
-                        class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 w-56 hidden z-10 mt-2 min-w-[15rem] bg-white shadow-md rounded-lg p-2"
-                        aria-labelledby="hs-dropdown-basic"
-                      >
-                        <a
-                          class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                          href="#"
-                        >
-                          2023
-                        </a>
-                        <a
-                          class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                          href="#"
-                        >
-                          2022
-                        </a>
-                        <a
-                          class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                          href="#"
-                        >
-                          2021
-                        </a>
-                        <a
-                          class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                          href="#"
-                        >
-                          2020
-                        </a>
+                          FROM YEAR:{" "}
+                        </label>
+                      </div>
+                      <div className="w-full lg:w-5/6">
+                        <input
+                          type="month"
+                          className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                          id="from_year"
+                          onChange={(e) =>
+                            setOfficial({
+                              ...official,
+                              fromYear: e.target.value,
+                            })
+                          }
+                          value={official.fromYear}
+                          required
+                        />
                       </div>
                     </div>
-
-                     {/* Date 2 */}
-                    <div class="hs-dropdown relative inline-flex">
-                      <button
-                        id="hs-dropdown-basic"
-                        type="button"
-                        class="hs-dropdown-toggle mt-1 py-1 px-2 lg:px-4 inline-flex justify-center items-center gap-2 rounded-md border font-base bg-white text-black shadow-sm align-middle"
-                      >
-                        PRESENT
-                        <svg
-                          class="hs-dropdown-open:rotate-180 w-2.5 h-2.5 text-gray-600"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 16 16"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
+                    {/* Date 2 */}
+                    <div className="flex flex-col lg:flex-row mt-3">
+                      <div className="w-full lg:w-1/6">
+                        <label
+                          htmlFor="To_year"
+                          className=" w-[6rem] flex items-center"
                         >
-                          <path
-                            d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                          />
-                        </svg>
-                      </button>
-
-                      <div
-                        class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 w-56 hidden z-10 mt-2 min-w-[15rem] bg-white shadow-md rounded-lg p-2"
-                        aria-labelledby="hs-dropdown-basic"
-                      >
-                        <a
-                          class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                          href="#"
-                        >
-                          Present
-                        </a>
-                        <a
-                          class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                          href="#"
-                        >
-                          2022
-                        </a>
-                        <a
-                          class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                          href="#"
-                        >
-                          2021
-                        </a>
-                        <a
-                          class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                          href="#"
-                        >
-                          2020
-                        </a>
+                          TO YEAR:{" "}
+                        </label>
+                      </div>
+                      <div className="w-full lg:w-5/6">
+                        <input
+                          type="month"
+                          className="shadow border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                          id="To_year"
+                          onChange={(e) =>
+                            setOfficial({ ...official, toYear: e.target.value })
+                          }
+                          value={official.toYear}
+                          required
+                        />
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* E-Mail and Password */}
-                <div class="relative mt-5 mx-6 overflow-y-auto flex flex-col md:flex-row md:space-x-3">
-                  <div className="w-full md:w-1/2">
-                    <h1
-                      class="font-base text-black mx-auto text-sm"
-                      style={{ letterSpacing: "0.1em" }}
-                    >
-                      E-MAIL
-                    </h1>
-                    <input
-                      type="search"
-                      id="search-dropdown"
-                      className="block w-full mt-2 p-1 text-sm text-gray-900 bg-gray-100 rounded-lg"
-                      placeholder=""
-                      required
-                    />
-                  </div>
-                  <div className="w-full md:w-1/2 sm:mt-2 md:mt-0">
-                    <h1
-                      class="font-base text-black mx-auto text-sm"
-                      style={{ letterSpacing: "0.1em" }}
-                    >
-                      PASSWORD
-                    </h1>
-                    <input
-                      type="search"
-                      id="search-dropdown"
-                      className="block w-full mt-2 p-1 text-sm text-gray-900 bg-gray-100 rounded-lg  "
-                      placeholder=""
-                      required
-                    />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Buttons */}
-            <div class="flex justify-end items-center gap-x-2 py-3 px-6 dark:border-gray-700">
+            <div className="flex justify-end items-center gap-x-2 py-3 px-6 dark:border-gray-700">
               <button
                 type="button"
-                class="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md borde text-sm font-base bg-custom-green-button3 text-white shadow-sm align-middle"
+                className="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md borde text-sm font-base bg-custom-green-button3 text-white shadow-sm align-middle"
                 data-hs-overlay="#hs-create-official-modal"
+                onClick={handleSubmit}
               >
                 SAVE CHANGES
               </button>
               <button
                 type="button"
-                class="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md border text-sm font-base bg-custom-red-button text-white shadow-sm align-middle"
+                className="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md border text-sm font-base bg-custom-red-button text-white shadow-sm align-middle"
                 data-hs-overlay="#hs-create-official-modal"
               >
                 CLOSE

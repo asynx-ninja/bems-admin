@@ -25,7 +25,7 @@ function BarangayMenu() {
     "San Rafael",
   ];
   return (
-    <div className=" mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:px-4  lg:h-[31rem] ">
+    <div className="mx-4 mt-[10rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div className="py-2 text-center font-bold text-3xl">
         <h1>BARANGAY MANAGEMENT</h1>
       </div>
@@ -33,7 +33,7 @@ function BarangayMenu() {
         {barangayLinks.map((barangay, index) => (
           <Link
             to={`/barangayinformation/?id=${id}&brgy=${barangay}`}
-            className="h-[12rem] bg-[#013D74] shadow-lg rounded-2xl flex justify-center items-center text-white font-bold text-lg flex-col hover:bg-[#0a4e8d] transition duration-300"
+            className="h-[12rem] bg-[#295141] shadow-lg rounded-2xl flex justify-center items-center text-white font-bold text-lg flex-col hover:bg-[#2b6950] transition duration-300"
             key={index}
           >
             <img src={Logo} alt="" className="h-[8rem]" />

@@ -1,5 +1,5 @@
 import React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Information from "./BarangayTabs/Brgyinformation";
 import Profit from "../pages/BarangayTabs/Profit";
 import Services from "./BarangayTabs/BrgyServices";
@@ -10,8 +10,9 @@ import Residents from "./BarangayTabs/BrgyResidents";
 import Inquiries from "./BarangayTabs/BrgyInquiries";
 import { useParams, useSearchParams } from "react-router-dom";
 import Announcement from "./BarangayTabs/BrgyAnnouncements";
-
+import { MdExpandMore, MdExpandLess } from "react-icons/md";
 function BarangayDetails() {
+  const [collapseOpen, setCollapseOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
@@ -22,99 +23,133 @@ function BarangayDetails() {
   }, []);
 
   return (
-    <div className="mx-4 my-5 md:mx-5 md:my-6 lg:ml-[19rem] lg:mt-8 lg:mr-6 lg:h-full border rounded-lg bg-white shadow-lg">
-      <div className="w-full flex items-center justify-center bg-[#013D74] rounded-t-lg">
+    <div className="mx-4 mt-[10rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)] ">
+      <div className="w-full flex items-center justify-center bg-[#295141] rounded-t-lg">
         <h1 className="text-white lg:text-3xl py-2 px-5 font-heavy ">
           BARANGAY {brgy ? brgy.toUpperCase() : ""} INFORMATION
         </h1>
       </div>
-      <div className="px-4 py-4 overflow-x-scroll items-center flex bg-gray-100">
-        <nav
-          className="flex space-x-4 justify-center items-center mx-auto"
-          aria-label="Tabs"
-          role="tablist"
+      <div className="px-4 py-4 items-center bg-gray-100">
+        <button
+          type="button"
+          className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-[#295141] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+          id="hs-basic-collapse"
+          data-hs-collapse="#hs-basic-collapse-heading"
+          onClick={() => setCollapseOpen(!collapseOpen)}
         >
-          <button
-            type="button"
-            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74] active"
-            id="basic-tabs-item-1"
-            data-hs-tab="#basic-tabs-1"
-            aria-controls="basic-tabs-1"
-            role="tab"
+          {collapseOpen ? "Collapse" : "Collapse"}
+          <svg
+            className={`hs-collapse-open ${
+              collapseOpen ? "rotate-180" : ""
+            } flex-shrink-0 w-4 h-4 text-white`}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            Information
-          </button>
-          <button
-            type="button"
-            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
-            id="basic-tabs-item-1"
-            data-hs-tab="#basic-tabs-2"
-            aria-controls="basic-tabs-2"
-            role="tab"
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+
+        <div
+          id="hs-basic-collapse-heading"
+          className={`hs-collapse ${
+            collapseOpen ? "block" : "hidden"
+          } w-full overflow-hidden transition-[height] duration-300`}
+          aria-labelledby="hs-basic-collapse"
+        >
+          <nav
+            className="grid grid-cols-2 lg:grid-cols-3"
+            aria-label="Tabs"
+            role="tablist"
           >
-            Barangay Officials
-          </button>
-          <button
-            type="button"
-            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
-            id="basic-tabs-item-1"
-            data-hs-tab="#basic-tabs-3"
-            aria-controls="basic-tabs-3"
-            role="tab"
-          >
-            Services
-          </button>
-          <button
-            type="button"
-            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
-            id="basic-tabs-item-1"
-            data-hs-tab="#basic-tabs-4"
-            aria-controls="basic-tabs-4"
-            role="tab"
-          >
-            Service Requests
-          </button>
-          <button
-            type="button"
-            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
-            id="basic-tabs-item-1"
-            data-hs-tab="#basic-tabs-5"
-            aria-controls="basic-tabs-5"
-            role="tab"
-          >
-            Residents
-          </button>
-          <button
-            type="button"
-            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
-            id="basic-tabs-item-1"
-            data-hs-tab="#basic-tabs-6"
-            aria-controls="basic-tabs-6"
-            role="tab"
-          >
-            Announcements
-          </button>{" "}
-          <button
-            type="button"
-            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
-            id="basic-tabs-item-1"
-            data-hs-tab="#basic-tabs-7"
-            aria-controls="basic-tabs-7"
-            role="tab"
-          >
-            Inquiries
-          </button>
-          <button
-            type="button"
-            className="hs-tab-active:font-semibold hs-tab-active:bg-[#013D74] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#013D74]"
-            id="basic-tabs-item-1"
-            data-hs-tab="#basic-tabs-8"
-            aria-controls="basic-tabs-8"
-            role="tab"
-          >
-            Profits
-          </button>
-        </nav>
+            <button
+              type="button"
+              className="hs-tab-active:font-semibold mx-1 my-1 font-bold hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active"
+              id="basic-tabs-item-1"
+              data-hs-tab="#basic-tabs-1"
+              aria-controls="basic-tabs-1"
+              role="tab"
+            >
+              Information
+            </button>
+            <button
+              type="button"
+              className="hs-tab-active:font-semibold mx-1 font-bold my-1 hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              id="basic-tabs-item-1"
+              data-hs-tab="#basic-tabs-2"
+              aria-controls="basic-tabs-2"
+              role="tab"
+            >
+              Barangay Officials
+            </button>
+            <button
+              type="button"
+              className="hs-tab-active:font-semibold mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              id="basic-tabs-item-1"
+              data-hs-tab="#basic-tabs-3"
+              aria-controls="basic-tabs-3"
+              role="tab"
+            >
+              Services
+            </button>
+            <button
+              type="button"
+              className="hs-tab-active:font-semibold  mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              id="basic-tabs-item-1"
+              data-hs-tab="#basic-tabs-4"
+              aria-controls="basic-tabs-4"
+              role="tab"
+            >
+              Service Requests
+            </button>
+            <button
+              type="button"
+              className="hs-tab-active:font-semibold  mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              id="basic-tabs-item-1"
+              data-hs-tab="#basic-tabs-5"
+              aria-controls="basic-tabs-5"
+              role="tab"
+            >
+              Residents
+            </button>
+            <button
+              type="button"
+              className="hs-tab-active:font-semibold mx-1  my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              id="basic-tabs-item-1"
+              data-hs-tab="#basic-tabs-6"
+              aria-controls="basic-tabs-6"
+              role="tab"
+            >
+              Announcements
+            </button>{" "}
+            <button
+              type="button"
+              className="hs-tab-active:font-semibold mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              id="basic-tabs-item-1"
+              data-hs-tab="#basic-tabs-7"
+              aria-controls="basic-tabs-7"
+              role="tab"
+            >
+              Inquiries
+            </button>
+            <button
+              type="button"
+              className="hs-tab-active:font-semibold mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              id="basic-tabs-item-1"
+              data-hs-tab="#basic-tabs-8"
+              aria-controls="basic-tabs-8"
+              role="tab"
+            >
+              Profits
+            </button>
+          </nav>
+        </div>
       </div>
 
       <div className="mt-3 py-4 px-4">

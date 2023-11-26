@@ -1,28 +1,27 @@
-import React from 'react';
-import {AiFillNotification} from "react-icons/ai";
-import {FaArchive} from "react-icons/fa";
+import React from "react";
+import { TfiAnnouncement } from "react-icons/tfi";
+import { GrFormNext } from "react-icons/gr";
 const Breadcrumb = ({ id }) => {
   return (
-    <nav className="flex p-6 mt-4 ">
-    <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
-      <li className="flex items-center">
-        <AiFillNotification className="mr-2 text-gray-900" />
-        <a
-           href={`/announcements/?id=${id}`}
-          className="text-gray-900 font-bold hover:underline uppercase"
-        >
-          Announcement
-        </a>
-      </li>
-      <li>
-        <span>/</span>
-      </li>
-      <li className="flex items-center font-bold text-teal-600 uppercase">
-        <FaArchive className="mr-2" />
-        Archived Announcement
-      </li>
-    </ol>
-  </nav>
+    <nav className="flex ">
+      <ol className="flex items-center space-x-2 text-gray-500">
+        <TfiAnnouncement size={22} />
+        <li>
+          <a
+            href={`/announcements/?id=${id}`}
+            className="text-gray-600 font-bold hover:underline text-xs md:text-lg"
+          >
+            ANNOUNCEMENT
+          </a>
+        </li>
+        <li>
+          <GrFormNext size={24} style={{ color: "#ffffff" }} />
+        </li>
+        <li className="text-[10px] md:text-lg text-[#295141] font-bold">
+          ARCHIVED ANNOUNCEMENT
+        </li>
+      </ol>
+    </nav>
   );
 };
 
