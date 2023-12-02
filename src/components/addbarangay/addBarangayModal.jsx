@@ -2,34 +2,22 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Dropbox from "./Dropbox";
 import API_LINK from "../../config/API";
 import { CiImageOn } from "react-icons/ci";
 
 function CreateAnnouncementModal() {
-  const brgy = "MUNISIPYO";
-  const [announcement, setAnnouncement] = useState({
-    title: "",
-    details: "",
-    date: "",
-    brgy: brgy,
-    isOpen: false,
+  const [barangay, setBarangay] = useState({
+    brgy: "",
+    story:"",
+    mission:"",
+    vision:"",
   });
 
   const [logo, setLogo] = useState();
   const [banner, setBanner] = useState();
-  const [files, setFiles] = useState([]);
+
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   var logoSrc = document.getElementById("logo");
-  //   logoSrc.src =
-  //     "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
-
-  //   var bannerSrc = document.getElementById("banner");
-  //   bannerSrc.src =
-  //     "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
-  // }, []);
 
   const handleLogoChange = (e) => {
     setLogo(e.target.files[0]);
@@ -52,20 +40,14 @@ function CreateAnnouncementModal() {
   };
 
   const handleChange = (e) => {
-    setAnnouncement((prev) => ({
+    setBarangay((prev) => ({
       ...prev,
       [e.target.name]:
         e.target.name === "isOpen" ? e.target.checked : e.target.value,
     }));
   };
 
-  console.log(announcement);
 
-  const handleFileChange = (e) => {
-    e.preventDefault();
-
-    setFiles([...files, ...e.target.files]);
-  };
 
   const handleSubmit = async (e) => {
     try {
@@ -73,42 +55,30 @@ function CreateAnnouncementModal() {
 
       var formData = new FormData();
 
-      const arr1 = [banner, logo];
-      const newFiles = arr1.concat(files);
+     formData.append("files", logo);
+     formData.append("files", banner);
 
-      for (let f = 0; f < newFiles.length; f += 1) {
-        formData.append("files", newFiles[f]);
-      }
 
       const obj = {
-        title: announcement.title,
-        details: announcement.details,
-        date: announcement.date,
-        brgy: brgy,
-        isOpen: announcement.isOpen,
+        brgy:barangay.brgy,
+        story:barangay.story,
+        mission:barangay.mission,
+        vision:barangay.vision
       };
 
-      formData.append("announcement", JSON.stringify(obj));
+      formData.append("brgyinfo", JSON.stringify(obj));
 
-      const result = await axios.post(`${API_LINK}/announcement/`, formData);
+      const result = await axios.post(`${API_LINK}/brgyinfo`, formData);
 
       if (result.status === 200) {
-        var logoSrc = document.getElementById("logo");
-        logoSrc.src =
-          "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
-
-        var bannerSrc = document.getElementById("banner");
-        bannerSrc.src =
-          "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
-        setAnnouncement({
-          title: "",
-          details: "",
-          date: "",
+        setBarangay({
           brgy: "",
+          story:"",
+          mission:"",
+          vision:"",
         });
         setLogo();
         setBanner();
-        setFiles([]);
         window.location.reload();
       }
     } catch (err) {
@@ -119,7 +89,7 @@ function CreateAnnouncementModal() {
   return (
     <div>
       <div
-        id="hs-modal-add"
+        id="hs-modal-addbarangay"
         className="hs-overlay hidden fixed top-0 left-0 z-[80] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center "
       >
         {/* Modal */}
@@ -131,7 +101,7 @@ function CreateAnnouncementModal() {
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
                 >
-                  CREATE ANNOUNCEMENT
+                  ADD BARANGAY
                 </h3>
               </div>
 
@@ -206,36 +176,22 @@ function CreateAnnouncementModal() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block sm:text-xs lg:text-sm text-gray-700 font-bold">
-                  OPEN FOR ALL?
-                </label>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    name="isOpen"
-                    onChange={handleChange}
-                    defaultChecked={announcement.isOpen}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-400 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-800" />
-                </label>
-              </div>
+            
               <div className="mb-4">
                 <label
                   className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="title"
+                  htmlFor="brgy"
                 >
-                  Announcement Title
+                  BARANGAY NAME
                 </label>
                 <input
-                  id="title"
+                  id="brgy"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                  name="title"
+                  name="brgy"
                   type="text"
-                  value={announcement.title}
+                  value={barangay.brgy}
                   onChange={handleChange}
-                  placeholder="Announcement title"
+                  placeholder="Barangay name"
                 />
               </div>
               <div className="mb-4">
@@ -243,40 +199,54 @@ function CreateAnnouncementModal() {
                   htmlFor="message"
                   className="block mb-2 text-sm font-bold text-gray-700 "
                 >
-                  Details
+                  STORY
                 </label>
                 <textarea
-                  id="details"
+                  id="story"
                   rows={4}
-                  name="details"
-                  value={announcement.details}
+                  name="story"
+                  value={barangay.story}
                   onChange={handleChange}
                   className="block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline "
-                  placeholder="Enter announcement details..."
+                  placeholder="Enter barangay story..."
                 />
               </div>
               <div className="mb-4">
                 <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="fee"
+                  htmlFor="message"
+                  className="block mb-2 text-sm font-bold text-gray-700 "
                 >
-                  Date
+                  MISSION
                 </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                  id="date"
-                  name="date"
-                  type="date"
-                  value={announcement.date}
+                <textarea
+                  id="mission"
+                  rows={4}
+                  name="mission"
+                  value={barangay.mission}
                   onChange={handleChange}
+                  className="block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline "
+                  placeholder="Enter barangay mission..."
                 />
               </div>
-              <Dropbox
-                files={files}
-                setFiles={setFiles}
-                handleFileChange={handleFileChange}
-                handleSubmit={handleSubmit}
-              />
+              <div className="mb-4">
+                <label
+                  htmlFor="message"
+                  className="block mb-2 text-sm font-bold text-gray-700 "
+                >
+                  VISION
+                </label>
+                <textarea
+                  id="vision"
+                  rows={4}
+                  name="vision"
+                  value={barangay.vision}
+                  onChange={handleChange}
+                  className="block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline "
+                  placeholder="Enter barangay vision..."
+                />
+              </div>
+
+             
             </div>
             <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700">
               <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
@@ -290,7 +260,7 @@ function CreateAnnouncementModal() {
                 <button
                   type="button"
                   className="h-[2.5rem] w-full py-1 px-6  gap-2 rounded-md borde text-sm font-base bg-pink-800 text-white shadow-sm"
-                  data-hs-overlay="#hs-modal-add"
+                  data-hs-overlay="#hs-modal-addbarangay"
                 >
                   CLOSE
                 </button>

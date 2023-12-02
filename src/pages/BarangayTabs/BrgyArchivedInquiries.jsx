@@ -6,11 +6,12 @@ import { BsPrinter } from "react-icons/bs";
 import imgSrc from "/imgs/bg-header.png";
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
-import Breadcrumbs from "../../components/barangaytabs/brgyinquiries/Breadcrumbs";
-import ViewArchivedModal from "../../components/barangaytabs/brgyinquiries/ViewArchived";
+import Breadcrumbs from "../../components/barangaytabs/brgyarchivedInquiries/Breadcrumbs";
+import ViewArchivedModal from "../../components/barangaytabs/brgyInquiries/ViewArchived";
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
+import Tabss from "../../pages/BarangayInfoExt"
 
 const BrgyArchivedInquiries = () => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -23,18 +24,13 @@ const BrgyArchivedInquiries = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      try {
-        const response = await axios.get(
-          `${API_LINK}/inquiries/staffinquiries/?brgy=${brgy}&to=${to}&archived=true`
-        );
-        if (response.status === 200) setInquiries(response.data);
-        else setInquiries([]);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setInquiries([]);
-      }
+      const response = await axios.get(
+        `${API_LINK}/inquiries/staffinquiries/?brgy=${brgy}&to=${to}&archived=true`
+      );
+      if (response.status === 200) setInquiries(response.data);
+      else setInquiries([]);
     };
-  
+
     fetch();
   }, []);
 
@@ -65,19 +61,6 @@ const BrgyArchivedInquiries = () => {
     }
   };
 
-  const tableData = [
-    {
-      id: 1,
-      imageSrc: imgSrc,
-      name: "Juanito Madrigal",
-      email: "JuanitoMadrigal@gmail.com",
-      subject: "English",
-      message: "wag mo ginagalaw oten ko",
-      status: "no reply",
-      date: "10 Jan 2023",
-    },
-  ];
-
   const tableHeader = [
     "Inquiry id",
     "name",
@@ -95,6 +78,36 @@ const BrgyArchivedInquiries = () => {
     const dateFormat = date === undefined ? "" : date.substr(0, 10);
     return dateFormat;
   };
+  const handleSort = (sortBy) => {
+    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newSortOrder);
+    setSortColumn(sortBy);
+
+    const sortedData = inquiries.slice().sort((a, b) => {
+      if (sortBy === "inquiries_id") {
+        return newSortOrder === "asc"
+          ? a.inquiries_id.localeCompare(b.inquiries_id)
+          : b.inquiries_id.localeCompare(a.inquiries_id);
+      } else if (sortBy === "lastName") {
+        return newSortOrder === "asc"
+          ? a.lastName.localeCompare(b.lastName)
+          : b.lastName.localeCompare(a.lastName);
+      } else if (sortBy === "isApproved") {
+        const order = { Completed: 1, "In Progress": 2, "Not Responded": 3 };
+        return newSortOrder === "asc"
+          ? order[a.isApproved] - order[b.isApproved]
+          : order[b.isApproved] - order[a.isApproved];
+      }
+
+      return 0;
+    });
+
+    setInquiries(sortedData);
+  };
+
+  const handleView = (item) => {
+    setInquiry(item);
+  };
   return (
     <div className="mx-4 mt-[10rem] lg:mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div className="w-full flex items-center justify-center bg-[#295141] rounded-t-lg">
@@ -103,6 +116,7 @@ const BrgyArchivedInquiries = () => {
         </h1>
       </div>
       <div className="flex items-center justify-start bg-gray-100">
+            
             <Breadcrumbs brgy={brgy} id={id} />
           </div>
       <div className="mt-3 py-4 px-4">
@@ -209,7 +223,7 @@ const BrgyArchivedInquiries = () => {
 
           <div className="overflow-auto sm:overflow-x-auto h-[calc(100vh_-_315px)] xxxl:h-[calc(100vh_-_330px)]">
           <table className="w-full ">
-            <thead className="bg-[#253a7a] sticky top-0">
+            <thead className="bg-[#295141] sticky top-0">
               <tr className="">
                 <th scope="col" className="px-6 py-4">
                   <div className="flex justify-center items-center">
@@ -303,6 +317,7 @@ const BrgyArchivedInquiries = () => {
                         <button
                           type="button"
                           data-hs-overlay="#hs-modal-viewArchived"
+                          onClick={() => handleView({ ...item })}
                           className="hs-tooltip-toggle text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
                         >
                           <AiOutlineEye
@@ -343,7 +358,7 @@ const BrgyArchivedInquiries = () => {
           />
         </div>
       </div>
-        <ViewArchivedModal />
+      <ViewArchivedModal inquiry={inquiry} setInquiry={setInquiry} />
     </div>
   );
 };

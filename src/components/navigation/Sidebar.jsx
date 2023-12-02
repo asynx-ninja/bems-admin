@@ -85,7 +85,7 @@ const Sidebar = () => {
               <ul className="space-y-1.5 text-white font-bold uppercase">
                 <li>
                   <Link
-                    to={`/dashboard/?id=${id}&brgy=${brgy}`}
+                    to={`/dashboard/?id=${id}`}
                     onClick={() => {
                       window.innerWidth >= 320 && window.innerWidth <= 1023
                         ? document
@@ -96,7 +96,7 @@ const Sidebar = () => {
                         : null;
                     }}
                     className={`${
-                      currentPath === "/dashboard"
+                      currentPath === `/dashboard/?id=${id}`
                         ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                         : null
                     } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
@@ -149,50 +149,62 @@ const Sidebar = () => {
                     Inquiries
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to={`/municipalityofficials/?id=${id}`}
-                    onClick={() => {
-                      window.innerWidth >= 320 && window.innerWidth <= 1023
-                        ? document
-                            .getQuerySelector(
-                              "[data-hs-overlay-backdrop-template]"
-                            )
-                            .remove()
-                        : null;
-                    }}
-                    className={`${
-                      currentPath === `/municipalityofficials/?id=${id}`
-                        ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
-                        : null
-                    } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
-                  >
-                    <HiBuildingOffice2 size={15} />
-                    Officials
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to={`/accountmanagement/?id=${id}`}
-                    onClick={() => {
-                      window.innerWidth >= 320 && window.innerWidth <= 1023
-                        ? document
-                            .getQuerySelector(
-                              "[data-hs-overlay-backdrop-template]"
-                            )
-                            .remove()
-                        : null;
-                    }}
-                    className={`${
-                      currentPath === `/accountmanagement/?id=${id}`
-                        ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
-                        : null
-                    } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
-                  >
-                    <RiAdminFill size={15} />
-                    Account Management
-                  </Link>
-                </li>
+                {userData.type === "Head Admin" && (
+                  <>
+                    <li>
+                      <Link
+                        to={`/municipalityofficials/?id=${id}`}
+                        onClick={() => {
+                          if (
+                            window.innerWidth >= 320 &&
+                            window.innerWidth <= 1023
+                          ) {
+                            document
+                              .querySelector(
+                                "[data-hs-overlay-backdrop-template]"
+                              )
+                              .remove();
+                          }
+                        }}
+                        className={`${
+                          currentPath === `/municipalityofficials/?id=${id}`
+                            ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
+                            : ""
+                        } flex items-center gap-x-3 py-2 px-2.5 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                      >
+                        <HiBuildingOffice2 size={15} />
+                        Officials
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link
+                        to={`/accountmanagement/?id=${id}`}
+                        onClick={() => {
+                          if (
+                            window.innerWidth >= 320 &&
+                            window.innerWidth <= 1023
+                          ) {
+                            document
+                              .querySelector(
+                                "[data-hs-overlay-backdrop-template]"
+                              )
+                              .remove();
+                          }
+                        }}
+                        className={`${
+                          currentPath === `/accountmanagement/?id=${id}`
+                            ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
+                            : ""
+                        } flex items-center gap-x-3 py-2 px-2.5 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                      >
+                        <RiAdminFill size={15} />
+                        Admin Management
+                      </Link>
+                    </li>
+                  </>
+                )}
+
                 <li>
                   <Link
                     to={`/barangaymenu/?id=${id}`}

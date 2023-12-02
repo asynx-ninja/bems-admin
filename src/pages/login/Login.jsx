@@ -8,20 +8,35 @@ import API_LINK from "../../config/API";
 const Login = () => {
   const [eye, isEye] = useState(true);
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [data, setData] = useState({
+    username: "",
+    password: "",
+  });
   const [errorMessage, setErrorMessage] = useState("");
-  const type = "Admin";
+  const [error, setError] = useState("");
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleLogin = async () => {
+    const obj = {
+      username: data.username,
+      password: data.password,
+    };
+
     try {
-      const response = await axios.get(
-        `${API_LINK}/auth/${username}/${password}/${type}`
+      const res = await axios.get(
+        `${API_LINK}/auth/${obj.username}/${obj.password}`
       );
       setErrorMessage("");
-
-      navigate(`/dashboard/?id=${response.data[0]._id}`);
+      console.log(res);
+      if (res.status === 200) {
+        if (res.data[0].type === "Head Admin" || res.data[0].type === "Admin") {
+          const id = res.data[0]._id;
+          navigate(`/dashboard/?id=${res.data[0]._id}`);
+        } else {
+          setErrorMessage(
+            "Your user credentials is not available. Please contact an administrator."
+          );
+        }
+      }
     } catch (error) {
       if (error.response) {
         setErrorMessage(error.response.data.error);
@@ -32,8 +47,15 @@ const Login = () => {
       }
     }
   };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
+
   return (
-    <div className='bg-[url("/imgs/login-bg3.jpg")] bg-cover bg-center bg-no-repeat md:px-[3rem] md:py-[3rem] lg:px-[7rem] lg:py-[4rem] h-screen flex sm:flex-col md:flex-row sm:space-y-5 md:space-y-0'>
+    <div className='bg-[url("/imgs/login-bg.jpg")] bg-cover bg-center bg-no-repeat md:px-[3rem] md:py-[3rem] lg:px-[7rem] lg:py-[4rem] h-screen flex sm:flex-col md:flex-row sm:space-y-5 md:space-y-0'>
       <div className="sm:block md:hidden h-[320px] border-[5px] border-t-0 border-[#1C8058] bg-[url('/imgs/login.png)] flex flex-col w-full rounded-b-full overflow-hidden shadow-[0px_4px_4px_rgba(0,0,0,0.51)]">
         <img
           src={login}
@@ -110,6 +132,29 @@ const Login = () => {
                 <span className="font-bold ">Warning:</span> {errorMessage}
               </div>
             )}
+            {error && (
+              <div class="w-full bg-white border rounded-md border-red-500 flex items-center justify-center">
+                <div class="flex p-4">
+                  <div class="flex-shrink-0">
+                    <svg
+                      class="h-4 w-4 text-red-500 mt-0.5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-red-700 dark:text-gray-400">
+                      Incorrect username and password!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div>
               <label
                 htmlFor="input-label-with-helper-text"
@@ -123,8 +168,9 @@ const Login = () => {
                 className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
                 placeholder="username"
                 aria-describedby="hs-input-helper-text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={data.username}
+                onChange={(e) => setData({ ...data, username: e.target.value })}
+                onKeyDown={handleKeyPress}
               />
             </div>
             <div>
@@ -140,8 +186,11 @@ const Login = () => {
                   name="username"
                   className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
                   aria-describedby="hs-input-helper-text"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={data.password}
+                  onChange={(e) =>
+                    setData({ ...data, password: e.target.value })
+                  }
+                  onKeyDown={handleKeyPress}
                 />
                 <button
                   onClick={() => isEye(!eye)}
@@ -166,7 +215,7 @@ const Login = () => {
               <button
                 type="submit"
                 onClick={handleLogin}
-                className="w-full rounded-[12px] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] sm:py-1.5 lg:py-2.5 text-white font-medium text-base"
+                className="w-full rounded-[12px] bg-gradient-to-r from-[#295141] to-[#408D51] sm:py-1.5 lg:py-2.5 text-white font-medium text-base"
               >
                 Login
               </button>
@@ -175,7 +224,7 @@ const Login = () => {
           <div className="hs-tooltip sm:hidden md:inline-block">
             <button
               type="button"
-              class="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
+              class="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#295141] to-[#408D51]  inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
             >
               ?
               <span

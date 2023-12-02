@@ -12,7 +12,7 @@ function RestoreOfficialModal({selectedItems}) {
 
       for (let i = 0; i < selectedItems.length; i++) {
         const response = await axios.patch(
-          `${API_LINK}/municipalityofficials/archived/${selectedItems[i]}/false`
+          `${API_LINK}/mofficials/archived/${selectedItems[i]}/false`
         );
       }
 

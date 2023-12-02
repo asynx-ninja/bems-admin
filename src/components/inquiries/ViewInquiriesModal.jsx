@@ -7,6 +7,7 @@ import EditDropbox from "./EditDropbox";
 import { IoIosAttach } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
 import Dropbox from "./Dropbox";
+import ViewDropbox from "./ViewDropbox";
 
 function ViewInquiriesModal({ inquiry, setInquiry }) {
   const [reply, setReply] = useState(false);
@@ -14,10 +15,54 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
   const [expandedIndexes, setExpandedIndexes] = useState([]);
   const [files, setFiles] = useState([]);
   const [createFiles, setCreateFiles] = useState([]);
+  const [viewFiles, setViewFiles] = useState([]);
+  const [newMessage, setNewMessage] = useState({
+    sender: "Admin",
+    message: "",
+    date: new Date(),
+  });
 
   useEffect(() => {
     setFiles(inquiry.length === 0 ? [] : inquiry.compose.file);
   }, [inquiry]);
+
+  useEffect(() => {
+    if (inquiry && inquiry.response && inquiry.response.length > 0) {
+      const lastResponse = inquiry.response[inquiry.response.length - 1];
+
+      if (lastResponse.file && lastResponse.file.length > 0) {
+        setViewFiles(lastResponse.file);
+      } else {
+        setViewFiles([]);
+      }
+    } else {
+      setViewFiles([]);
+    }
+  }, [inquiry]);
+
+  // Initialize with the last index expanded
+  useEffect(() => {
+    const lastIndex = inquiry.response ? inquiry.response.length - 1 : 0;
+    setExpandedIndexes([lastIndex]);
+  }, [inquiry.response]);
+
+  const fileInputRef = useRef();
+
+  const handleToggleClick = (index) => {
+    if (expandedIndexes.includes(index)) {
+      // Collapse the clicked div
+      setExpandedIndexes((prev) => prev.filter((i) => i !== index));
+    } else {
+      // Expand the clicked div
+      setExpandedIndexes((prev) => [...prev, index]);
+    }
+  };
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+
+    fileInputRef.current.click();
+  };
 
   const handleOnReply = () => {
     setReply(!reply);
@@ -28,7 +73,8 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
   };
 
   const handleChange = (e) => {
-    setInquiry((prev) => ({
+    e.preventDefault();
+    setNewMessage((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -48,34 +94,38 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
     return new Intl.DateTimeFormat("en-US", options).format(new Date(date));
   };
 
-  const handleToggleClick = (index) => {
-    if (expandedIndexes.includes(index)) {
-      // Collapse the clicked div
-      setExpandedIndexes((prev) => prev.filter((i) => i !== index));
-    } else {
-      // Expand the clicked div
-      setExpandedIndexes((prev) => [...prev, index]);
-    }
-  };
-
-  // Initialize with the last index expanded
-  useEffect(() => {
-    const lastIndex = inquiry.response ? inquiry.response.length - 1 : 0;
-    setExpandedIndexes([lastIndex]);
-  }, [inquiry.response]);
-
-  const fileInputRef = useRef();
-
-  const handleAdd = (e) => {
-    e.preventDefault();
-
-    fileInputRef.current.click();
-  };
-
   const handleFileChange = (e) => {
     e.preventDefault();
 
     setCreateFiles([...createFiles, ...e.target.files]);
+  };
+
+  const handleOnSend = async (e) => {
+    e.preventDefault();
+    console.log(newMessage);
+
+    try {
+      const obj = {
+        sender: newMessage.sender,
+        message: newMessage.message,
+        date: newMessage.date,
+        folder_id: inquiry.folder_id,
+      };
+      var formData = new FormData();
+      formData.append("response", JSON.stringify(obj));
+      for (let i = 0; i < createFiles.length; i++) {
+        formData.append("files", createFiles[i]);
+      }
+
+      const response = await axios.patch(
+        `${API_LINK}/inquiries/?inq_id=${inquiry._id}`,
+        formData
+      );
+
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -89,7 +139,7 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
               {/* Header */}
-              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#3e5fc2] to-[#1f2f5e] overflow-hidden rounded-t-2xl">
+              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] overflow-hidden rounded-t-2xl">
                 <h3
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
@@ -198,6 +248,70 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
                     Conversation History
                   </b>
                   <form>
+                    {!inquiry.response || inquiry.response.length === 0 ? (
+                      <div className="flex flex-row items-center">
+                        <div className="relative w-full mt-4 mx-2">
+                          <div className="relative w-full">
+                            <textarea
+                              id="message"
+                              name="message"
+                              onChange={handleChange}
+                              className="p-4 pb-12 block w-full border-gray-200 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none border"
+                              placeholder="Input response..."
+                            ></textarea>
+
+                            <div className="absolute bottom-px inset-x-px p-2 rounded-b-md bg-white">
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center">
+                                  <input
+                                    type="file"
+                                    name="file"
+                                    onChange={(e) => handleFileChange(e)}
+                                    ref={fileInputRef}
+                                    accept=".xlsx,.xls,.doc,.docx,.ppt,.pptx,.txt,.pdf"
+                                    multiple="multiple"
+                                    className="hidden"
+                                  />
+                                  <button
+                                    id="button"
+                                    onClick={handleAdd || handleOnUpload}
+                                    className="mt-2 rounded-xl px-3 py-1 hover:bg-gray-300 focus:shadow-outline focus:outline-none"
+                                  >
+                                    <IoIosAttach size={24} />
+                                  </button>
+                                </div>
+
+                                <div className="flex items-center gap-x-1">
+                                  <button
+                                    type="submit"
+                                    onClick={handleOnSend}
+                                    className="inline-flex flex-shrink-0 justify-center items-center w-28 rounded-lg text-white py-1 px-6 gap-2 bg-cyan-700"
+                                  >
+                                    <span>SEND</span>
+                                    <IoSend
+                                      size={18}
+                                      className="flex-shrink-0"
+                                    />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          {!upload ? (
+                            // Render Dropbox only when there are uploaded files
+                            createFiles.length > 0 && (
+                              <Dropbox
+                                createFiles={createFiles}
+                                setCreateFiles={setCreateFiles}
+                                handleFileChange={handleFileChange}
+                              />
+                            )
+                          ) : (
+                            <div></div>
+                          )}
+                        </div>
+                      </div>
+                    ) : null}
                     {inquiry &&
                       inquiry.response &&
                       inquiry.response.map((responseItem, index) => (
@@ -249,11 +363,17 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
                                   </p>
                                 </div>
                               </div>
+                              {viewFiles.length > 0 && (
+                                <ViewDropbox
+                                  viewFiles={responseItem.file || []}
+                                  setViewFiles={setViewFiles}
+                                />
+                              )}
                               {index === inquiry.response.length - 1 && (
                                 <div className="flex flex-row items-center">
                                   <button
                                     type="button"
-                                    className="h-8 w-full lg:w-32 py-1 px-2 gap-2 rounded-full borde text-sm font-base bg-teal-900 text-white shadow-sm"
+                                    className="h-8 w-full lg:w-32 py-1 px-2 gap-2 mt-4 rounded-full borde text-sm font-base bg-teal-900 text-white shadow-sm"
                                     onClick={handleOnReply}
                                     hidden={reply}
                                   >
@@ -263,22 +383,25 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
                                   {!reply ? (
                                     <div></div>
                                   ) : (
-                                    <div className="relative w-full mx-2">
+                                    <div className="relative w-full mt-4 mx-2">
                                       <div className="relative w-full">
                                         <textarea
-                                          id="response"
-                                          name="response"
-                                          class="p-4 pb-12 block w-full border-gray-200 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none border"
+                                          id="message"
+                                          name="message"
+                                          onChange={handleChange}
+                                          className="p-4 pb-12 block w-full border-gray-200 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none border"
                                           placeholder="Input response..."
                                         ></textarea>
 
-                                        <div class="absolute bottom-px inset-x-px p-2 rounded-b-md bg-white">
-                                          <div class="flex justify-between items-center">
-                                            <div class="flex items-center">
+                                        <div className="absolute bottom-px inset-x-px p-2 rounded-b-md bg-white">
+                                          <div className="flex justify-between items-center">
+                                            <div className="flex items-center">
                                               <input
                                                 type="file"
                                                 name="file"
-                                                onChange={handleFileChange}
+                                                onChange={(e) =>
+                                                  handleFileChange(e)
+                                                }
                                                 ref={fileInputRef}
                                                 accept=".xlsx,.xls,.doc,.docx,.ppt,.pptx,.txt,.pdf"
                                                 multiple="multiple"
@@ -296,10 +419,11 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
                                               {/* <IoIosAttach size={24} /> */}
                                             </div>
 
-                                            <div class="flex items-center gap-x-1">
+                                            <div className="flex items-center gap-x-1">
                                               <button
                                                 type="submit"
-                                                class="inline-flex flex-shrink-0 justify-center items-center w-28 rounded-lg text-white py-1 px-6 gap-2 bg-cyan-700"
+                                                onClick={handleOnSend}
+                                                className="inline-flex flex-shrink-0 justify-center items-center w-28 rounded-lg text-white py-1 px-6 gap-2 bg-cyan-700"
                                               >
                                                 <span>SEND</span>
                                                 <IoSend

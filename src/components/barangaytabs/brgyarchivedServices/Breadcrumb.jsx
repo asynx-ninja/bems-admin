@@ -19,7 +19,7 @@ const Breadcrumb = ({id, brgy}) => {
         </li>
         <li className="flex items-center font-bold text-teal-600">
           <FaArchive className="mr-2" />
-          Archived Service
+          Archived Inquiries
         </li>
       </ol>
     </nav>

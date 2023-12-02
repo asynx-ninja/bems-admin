@@ -164,7 +164,7 @@ const Information = () => {
             <div>
               <img
                 id="edit_banner"
-                className="w-full h-[150px] md:h-[300px] lg:h-[350px] xl:h-[470px] rounded-lg"
+                className="w-full h-[150px] md:h-[300px] lg:h-[350px] xl:h-[470px] object-contain rounded-lg"
               />
             </div>
           </div>
@@ -176,7 +176,7 @@ const Information = () => {
                   <div
                     className="relative h-32 md:h-60 mx-auto justify-center items-center rounded-t-lg"
                     style={{
-                      backgroundImage: 'url("./public/imgs/header-bg.png")',
+                      backgroundImage: 'url("./imgs/header-bg.png")',
                     }}
                   >
                     <img
@@ -210,7 +210,7 @@ const Information = () => {
                           className="font-bold text-sm md:text-xl md:text-2xl xl:text-3xl text-white mb-10"
                           style={{ letterSpacing: "0.4em" }}
                         >
-                          BARANGAY {information.brgy}
+                          BARANGAY {brgy.toUpperCase()}
                         </h1>
                       </div>
                     </div>
@@ -226,7 +226,7 @@ const Information = () => {
                       STORY
                     </h1>
                   </div>
-                  <div className="w-full md:w-2/3 px-6 py-4 border md:rounded-tr-[20px] rounded-b-[20px] md:rounded-br-[20px] flex flex-col">
+                  <div className="w-full md:w-2/3 px-6 py-4 border md:rounded-tr-[20px]  md:rounded-br-[20px] flex flex-col">
                     <textarea
                       name="story"
                       readOnly={!isEditingMode}
@@ -260,7 +260,7 @@ const Information = () => {
                       MISSION
                     </h1>
                   </div>
-                  <div className="w-full md:w-2/3 px-6 py-4 border md:rounded-tr-[20px] rounded-b-[20px] md:rounded-br-[20px] flex flex-col">
+                  <div className="w-full md:w-2/3 px-6 py-4 border md:rounded-tr-[20px]  md:rounded-br-[20px] flex flex-col">
                     <textarea
                       readOnly={!isEditingMode}
                       className="font-base text-black text-sm h-36 lg:h-40 overflow-y-auto mb-5"
@@ -292,7 +292,7 @@ const Information = () => {
                       VISION
                     </h1>
                   </div>
-                  <div className="w-full md:w-2/3 px-6 py-4 border md:rounded-tr-[20px] rounded-b-[20px] md:rounded-br-[20px] flex flex-col">
+                  <div className="w-full md:w-2/3 px-6 py-4 border md:rounded-tr-[20px] md:rounded-br-[20px] flex flex-col">
                     <textarea
                       readOnly={!isEditingMode}
                       className="font-base text-black text-sm h-36 lg:h-40 overflow-y-auto mb-5"
@@ -332,23 +332,7 @@ const Information = () => {
             </div>
           </div>
         </div>
-        {/* <EditMissionModal
-        brgyInformation={brgyInformation}
-        setBrgyInformation={setBrgyInformation}
-        updateInfo={handleSaveChanges}
-      />
-      <EditStoryModal
-        brgyInformation={brgyInformation}
-        setBrgyInformation={setBrgyInformation}
-        updateInfo={handleSaveChanges}
-        information={information}
-        brgy={brgy}
-      />
-      <EditVisionModal
-        brgyInformation={brgyInformation}
-        setBrgyInformation={setBrgyInformation}
-        updateInfo={handleSaveChanges}
-      /> */}
+      
       </div>
     </>
   );

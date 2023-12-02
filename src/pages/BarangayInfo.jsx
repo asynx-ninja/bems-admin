@@ -14,6 +14,10 @@ import { MdExpandMore, MdExpandLess } from "react-icons/md";
 function BarangayDetails() {
   const [collapseOpen, setCollapseOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(1); // Initial active tab
+  const handleTabChange = (tabIndex) => {
+    setActiveTab(tabIndex);
+  }
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
   console.log("SAASA", id);
@@ -30,31 +34,38 @@ function BarangayDetails() {
         </h1>
       </div>
       <div className="px-4 py-4 items-center bg-gray-100">
-        <button
-          type="button"
-          className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-[#295141] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-          id="hs-basic-collapse"
-          data-hs-collapse="#hs-basic-collapse-heading"
-          onClick={() => setCollapseOpen(!collapseOpen)}
+      <button
+        type="button"
+        className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-[#295141] to-[#408D51] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+        id="hs-basic-collapse"
+        data-hs-collapse="#hs-basic-collapse-heading"
+        onClick={() => setCollapseOpen(!collapseOpen)}
+      >
+        {activeTab === 1 && 'Information'}
+        {activeTab === 2 && 'Barangay Officials'}
+        {activeTab === 3 && 'Services'}
+        {activeTab === 4 && 'Service Requests'}
+        {activeTab === 5 && 'Residents'}
+        {activeTab === 6 && 'Announcements'}
+        {activeTab === 7 && 'Inquiries'}
+        {activeTab === 8 && 'Profits'}
+        <svg
+          className={`hs-collapse-open ${
+            collapseOpen ? 'rotate-180' : ''
+          } flex-shrink-0 w-4 h-4 text-white`}
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          {collapseOpen ? "Collapse" : "Collapse"}
-          <svg
-            className={`hs-collapse-open ${
-              collapseOpen ? "rotate-180" : ""
-            } flex-shrink-0 w-4 h-4 text-white`}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="m6 9 6 6 6-6" />
-          </svg>
-        </button>
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
 
         <div
           id="hs-basic-collapse-heading"
@@ -75,6 +86,7 @@ function BarangayDetails() {
               data-hs-tab="#basic-tabs-1"
               aria-controls="basic-tabs-1"
               role="tab"
+              onClick={() => handleTabChange(1)}
             >
               Information
             </button>
@@ -85,6 +97,7 @@ function BarangayDetails() {
               data-hs-tab="#basic-tabs-2"
               aria-controls="basic-tabs-2"
               role="tab"
+              onClick={() => handleTabChange(2)}
             >
               Barangay Officials
             </button>
@@ -95,6 +108,7 @@ function BarangayDetails() {
               data-hs-tab="#basic-tabs-3"
               aria-controls="basic-tabs-3"
               role="tab"
+              onClick={() => handleTabChange(3)}
             >
               Services
             </button>
@@ -105,6 +119,7 @@ function BarangayDetails() {
               data-hs-tab="#basic-tabs-4"
               aria-controls="basic-tabs-4"
               role="tab"
+              onClick={() => handleTabChange(4)}
             >
               Service Requests
             </button>
@@ -115,6 +130,7 @@ function BarangayDetails() {
               data-hs-tab="#basic-tabs-5"
               aria-controls="basic-tabs-5"
               role="tab"
+              onClick={() => handleTabChange(5)}
             >
               Residents
             </button>
@@ -125,6 +141,7 @@ function BarangayDetails() {
               data-hs-tab="#basic-tabs-6"
               aria-controls="basic-tabs-6"
               role="tab"
+              onClick={() => handleTabChange(6)}
             >
               Announcements
             </button>{" "}
@@ -135,6 +152,7 @@ function BarangayDetails() {
               data-hs-tab="#basic-tabs-7"
               aria-controls="basic-tabs-7"
               role="tab"
+              onClick={() => handleTabChange(7)}
             >
               Inquiries
             </button>
@@ -145,6 +163,7 @@ function BarangayDetails() {
               data-hs-tab="#basic-tabs-8"
               aria-controls="basic-tabs-8"
               role="tab"
+              onClick={() => handleTabChange(8)}
             >
               Profits
             </button>

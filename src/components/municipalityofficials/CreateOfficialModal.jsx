@@ -40,7 +40,7 @@ function CreateOfficialModal({ brgy }) {
       formData.append("official", JSON.stringify(obj));
 
       const result = await axios.post(
-        `${API_LINK}/municipalityofficials/?brgy=${brgy}`,
+        `${API_LINK}/mofficials/?brgy=${brgy}`,
         formData
       );
 

@@ -7,7 +7,7 @@ const Breadcrumb = ({id, brgy}) => {
         <li className="flex items-center">
           <FaHome className="mr-2 text-gray-900" />
           <a
-            href="/inquiries"
+            href={`/barangayinformation/?id=${id}&brgy=${brgy}`}
             className="text-gray-900 font-bold hover:underline uppercase"
           >
             Barangay Information

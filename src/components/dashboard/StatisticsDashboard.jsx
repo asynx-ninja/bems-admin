@@ -21,11 +21,16 @@ const StatisticsDashboard = () => {
   const [services, setServices] = useState([]);
   const [archivedServices, setArchivedServices] = useState([]);
   const [officials, setOfficials] = useState([]);
+  const [inquiries, setInquiries] = useState([]);
+  const [archivedinquiries, setArchivedInquiries] = useState([]);
   const [archivedOfficials, setArchivedOfficials] = useState([]);
+  const [barangays, setBarangays] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [userData, setUserData] = useState({});
   const id = searchParams.get("id");
   const brgy = "MUNISIPYO";
-console.log(id)
+  const to = "Admin";
+  console.log(id);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -35,12 +40,37 @@ console.log(id)
         setAnnouncements(
           announcementsResponse.status === 200 ? announcementsResponse.data : []
         );
+        const archivedAnnouncementsResponse = await axios.get(
+          `${API_LINK}/announcement/?brgy=${brgy}&archived=true`
+        );
+        setArchivedAnnouncements(
+          archivedAnnouncementsResponse.status === 200
+            ? archivedAnnouncementsResponse.data
+            : []
+        );
 
-        const usersResponse = await axios.get(`${API_LINK}/users/${brgy}`);
+        const inquiryresponse = await axios.get(
+          `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=false`
+        );
+        setInquiries(
+          inquiryresponse.status === 200 ? inquiryresponse.data : []
+        );
+        const archivedinquiryresponse = await axios.get(
+          `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=true`
+        );
+        setArchivedInquiries(
+          archivedinquiryresponse.status === 200
+            ? archivedinquiryresponse.data
+            : []
+        );
+
+        const usersResponse = await axios.get(
+          `${API_LINK}/users/?brgy=${brgy}&type=Admin`
+        );
         setUsers(usersResponse.status === 200 ? usersResponse.data : []);
 
         const archivedUsersResponse = await axios.get(
-          `${API_LINK}/users/showArchived/${brgy}`
+          `${API_LINK}/users/showArchived/?brgy=${brgy}&type=Admin`
         );
         setArchivedUsers(
           archivedUsersResponse.status === 200 ? archivedUsersResponse.data : []
@@ -52,14 +82,6 @@ console.log(id)
         setServices(
           servicesResponse.status === 200 ? servicesResponse.data : []
         );
-
-        const officialsResponse = await axios.get(
-          `${API_LINK}/municipalityofficials/?brgy=${brgy}&archived=false`
-        );
-        setOfficials(
-          officialsResponse.status === 200 ? officialsResponse.data : []
-        );
-
         const archivedServicesResponse = await axios.get(
           `${API_LINK}/services/allservices/?archived=true`
         );
@@ -69,22 +91,42 @@ console.log(id)
             : []
         );
 
-        const archivedAnnouncementsResponse = await axios.get(
-          `${API_LINK}/announcement/?brgy=${brgy}&archived=true`
-        );
-        setArchivedAnnouncements(
-          archivedAnnouncementsResponse.status === 200
-            ? archivedAnnouncementsResponse.data
-            : []
-        );
-        const archivedOfficialsResponse = await axios.get(
-          `${API_LINK}/municipalityofficials/?brgy=${brgy}&archived=true`
-        );
-        setArchivedOfficials(
-          archivedOfficialsResponse.status === 200
-            ? archivedOfficialsResponse.data
-            : []
-        );
+        try {
+          const officialsResponse = await axios.get(
+            `${API_LINK}/mofficials/?brgy=${brgy}&archived=false`
+          );
+          setOfficials(
+            officialsResponse.status === 200 ? officialsResponse.data : []
+          );
+        } catch (err) {
+          console.log("err", err.message);
+        }
+
+        try {
+          const archivedOfficialsResponse = await axios.get(
+            `${API_LINK}/mofficials/?brgy=${brgy}&archived=true`
+          );
+          setArchivedOfficials(
+            archivedOfficialsResponse.status === 200
+              ? archivedOfficialsResponse.data
+              : []
+          );
+        } catch (err) {
+          setArchivedOfficials([])
+          console.log("err", err.message);
+        }
+        try {
+          const response = await axios.get(`${API_LINK}/brgyinfo/allinfo`);
+          setBarangays(response.data);
+        } catch (error) {
+          console.error("Error fetching barangays:", error);
+        }
+        try {
+          const getUser = await axios.get(`${API_LINK}/admin/specific/${id}`);
+          setUserData(getUser.status === 200 ? getUser.data[0] : []);
+        } catch (err) {
+          console.log("err", err.message);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -92,6 +134,22 @@ console.log(id)
 
     fetchData();
   }, [brgy]);
+
+  // useEffect(() => {
+  //   const fetch = async () => {
+  //     try {
+  //       const res = await axios.get(`${API_LINK}/admin/specific/${id}`);
+  //       if (res.status === 200) {
+  //         setUserData(res.data[0]);
+
+  //       } else {
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   fetch();
+  // }, [id]);
 
   const gradients = [
     { gradient1: "from-[#2E3192]", gradient2: "to-[#2CAFFF]" },
@@ -113,19 +171,11 @@ console.log(id)
     },
     {
       title: "Inquiries",
-      active: "n/a",
-      archived: "n/a",
+      active: inquiries.length,
+      archived: archivedinquiries.length, // Ensure archivedinquiries is defined
       activeLink: `/inquiries/?id=${id}&brgy=${brgy}`,
       archivedLink: `/archivedinquiries/?id=${id}&brgy=${brgy}`,
       icon: <FaRegNoteSticky size={15} className="sm:block md:hidden" />,
-    },
-    {
-      title: "Admin Accounts",
-      active: users.length,
-      archived: archivedUsers.length,
-      activeLink: `/residents/?id=${id}&brgy=${brgy}`,
-      archivedLink: `/archivedresidents/?id=${id}&brgy=${brgy}`,
-      icon: <BsPeopleFill size={15} className="sm:block md:hidden" />,
     },
     {
       title: "Service Requests",
@@ -135,6 +185,19 @@ console.log(id)
       archivedLink: `/archivedrequests/?id=${id}&brgy=${brgy}`,
       icon: <GoGitPullRequest size={15} className="sm:block md:hidden" />,
     },
+    userData.type === "Head Admin"
+    ? 
+    {
+      title: "Admin Accounts",
+      active: users.length,
+      archived: archivedUsers.length,
+      activeLink: `/residents/?id=${id}&brgy=${brgy}`,
+      archivedLink: `/archivedresidents/?id=${id}&brgy=${brgy}`,
+      icon: <BsPeopleFill size={15} className="sm:block md:hidden" />,
+    }:null,
+
+    userData.type === "Head Admin"
+    ? 
     {
       title: "Officials",
       active: officials.length,
@@ -142,11 +205,12 @@ console.log(id)
       activeLink: `/officials/?id=${id}&brgy=${brgy}`,
       archivedLink: `/archived_officials/?id=${id}&brgy=${brgy}`,
       icon: <FaPeopleGroup size={15} className="sm:block md:hidden" />,
-    },
+    }:null,
+  
     {
       title: "Barangays",
-      active: officials.length,
-      archived: archivedOfficials.length,
+      active: barangays.length, // Check if officials is defined before using it
+      archived: "n/a",
       activeLink: `/officials/?id=${id}&brgy=${brgy}`,
       archivedLink: `/archived_officials/?id=${id}&brgy=${brgy}`,
       icon: <FaPeopleGroup size={15} className="sm:block md:hidden" />,
@@ -172,11 +236,11 @@ console.log(id)
                 <button
                   id="hs-unstyled-collapse"
                   data-hs-collapse={`#hs-statistics-dashboard-${idx}`}
-                  className="hs-collapse-toggle justify-between flex items-center w-full  gap-x-3 py-2 px-2.5  text-sm rounded-md"
+                  className="hs-collapse-toggle justify-between flex items-center w-full  gap-x-3  text-[12px] xl:text-base rounded-md"
                 >
-                  <div className="flex items-center gap-x-3 p-1.5 w-full inline-flex items-center text-base  font-heavy rounded-lg">
+                  <div className="flex items-center gap-x-3 p-0.5 w-full inline-flex font-heavy rounded-lg line-clamp-1">
                     {titleItem ? titleItem.icon : ""}
-                    <span className="flex uppercase block justify-end item-end">
+                    <span className="flex uppercase block justify-end item-end ">
                       {titleItem ? titleItem.title : ""}
                     </span>
                   </div>
@@ -205,7 +269,9 @@ console.log(id)
                   aria-labelledby="hs-unstyled-collapse"
                 >
                   <Link to={titleItem ? titleItem.activeLink : ""}>
-                    <a className={`flex items-center p-3 gap-x-3.5 rounded-lg font-heavy text-sm text-white hover:bg-gradient-to-r ${item.gradient1} hover:border hover:border-gray-300`}>
+                    <a
+                      className={`flex items-center p-1 gap-x-3.5 rounded-lg font-heavy text-[12px] xl:text-[14px] text-white hover:bg-gradient-to-r ${item.gradient1} hover:border hover:border-gray-300`}
+                    >
                       Active:
                       <strong className="ml-auto">
                         {titleItem ? titleItem.active : ""}
@@ -213,7 +279,9 @@ console.log(id)
                     </a>
                   </Link>
                   <Link to={titleItem ? titleItem.archivedLink : ""}>
-                    <a className={`flex items-center p-3 gap-x-3.5 rounded-lg font-heavy text-sm text-white hover:bg-gradient-to-r ${item.gradient1} hover:border hover:border-gray-300`}>
+                    <a
+                      className={`flex items-center p-1 gap-x-3.5 rounded-lg font-heavy text-[12px] xl:text-[14px] text-white hover:bg-gradient-to-r ${item.gradient1} hover:border hover:border-gray-300`}
+                    >
                       Archived:
                       <strong className="ml-auto">
                         {titleItem ? titleItem.archived : ""}

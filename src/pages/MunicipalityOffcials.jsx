@@ -80,7 +80,7 @@ const MunicipalityOfficials = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/municipalityofficials/?brgy=${brgy}&archived=false`
+          `${API_LINK}/mofficials/?brgy=${brgy}&archived=false`
         );
 
         if (response.status === 200) {
