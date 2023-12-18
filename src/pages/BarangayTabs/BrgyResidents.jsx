@@ -17,6 +17,7 @@ const Residents = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
+  const type = "Resident";
   const [user, setUser] = useState({});
   const [status, setStatus] = useState({});
   const [sortOrder, setSortOrder] = useState("asc");
@@ -77,7 +78,7 @@ const Residents = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await axios.get(`${API_LINK}/users/${brgy}`);
+      const response = await axios.get(`${API_LINK}/users/?brgy=${brgy}&type=${type}`);
       if (response.status === 200) setUsers(response.data);
       else setUsers([]);
 

@@ -70,7 +70,7 @@ const AccountManagement = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await axios.get(`${API_LINK}/users/${brgy}`);
+      const response = await axios.get(`${API_LINK}/users/admin/?brgy=${brgy}`);
       if (response.status === 200) setUsers(response.data);
       else setUsers([]);
 

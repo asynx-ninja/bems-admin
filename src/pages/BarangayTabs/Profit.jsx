@@ -17,14 +17,14 @@ function Profit() {
             </div>*/}
 
             {/* Print*/}
-            <div className="flex w-full lg:w-full justify-end py-3">
+            {/* <div className="flex w-full lg:w-full justify-end py-3">
               <button
                 type="button"
                 className="py-[.688rem] mb-3 sm:w-full lg:w-auto lg:px-4 inline-flex justify-center items-center gap-2 rounded-md border font-semibold text-blue-500 hover:text-white hover:bg-blue-500 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm "
               >
                 PRINT REPORT
               </button>
-            </div>
+            </div> */}
           </div>
 
           <div className="p-1.5 min-w-full inline-block align-middle">
@@ -82,28 +82,28 @@ function Profit() {
                         <td className="w-[20%] sm:w-1/5 whitespace-nowrap border">
                           <div className="px-2 sm:px-6 py-2">
                             <span className="text-xs sm:text-lg text-black">
-                              SALSAL
+                              Barangay Clearance
                             </span>
                           </div>
                         </td>
                         <td className="w-[20%] sm:w-1/5 whitespace-nowrap border">
                           <div className="px-2 sm:px-6 py-2">
                             <span className="text-xs sm:text-lg text-black">
-                              SALSAL
+                              Lorem, ipsum dolor sit amet c
                             </span>
                           </div>
                         </td>
                         <td className="w-[20%] sm:w-1/5 whitespace-nowrap border">
                           <div className="px-2 sm:px-6 py-2">
                             <span className="text-xs sm:text-lg text-black">
-                              SALSAL
+                            Lorem, ipsum dolor sit amet 
                             </span>
                           </div>
                         </td>
                         <td className="w-[20%] sm:w-1/5 whitespace-nowrap border">
                           <div className="px-2 sm:px-6 py-2">
                             <span className="text-xs sm:text-lg text-black">
-                              SALSAL
+                            Lorem, ipsum dolor sit amet consectetur 
                             </span>
                           </div>
                         </td>

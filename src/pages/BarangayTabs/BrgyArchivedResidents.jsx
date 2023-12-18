@@ -15,13 +15,14 @@ const Residents = () => {
   const [users, setUsers] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
+  const type = "Resident";
   const brgy = searchParams.get("brgy");
   const [user, setUser] = useState({});
 
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
-        `${API_LINK}/users/showArchived/${brgy}`
+        `${API_LINK}/users/showArchived/?brgy=${brgy}&type=${type}`
       );
 
       if (response.status === 200) setUsers(response.data);

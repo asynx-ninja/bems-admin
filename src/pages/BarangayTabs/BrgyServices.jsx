@@ -23,7 +23,7 @@ function Services() {
   const brgy = searchParams.get("brgy");
   const id = searchParams.get("id");
 
-  console.log("sss", id);
+  console.log("sass", brgy);
   const handleView = (service) => {
     setSelectedService(service);
   };
@@ -51,6 +51,7 @@ function Services() {
           `${API_LINK}/services/?brgy=${brgy}&archived=false`
         ); // Replace "/api/services" with the actual API endpoint URL for fetching all services
         setServices(response.data);
+        console.log("lah", response.data)
       } catch (error) {
         console.error("Error fetching services:", error);
       }
