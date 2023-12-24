@@ -34,7 +34,7 @@ function BarangayMenu() {
         <div className="py-2 text-center font-bold text-3xl">
           <h1>BARANGAY MANAGEMENT</h1>
         </div>
-        <div className="w-6/12 mx-auto rounded-lg flex mb-4">
+        {/* <div className="w-6/12 mx-auto rounded-lg flex mb-4">
           <div className="hs-tooltip inline-block w-full">
             <button
               type="button"
@@ -53,7 +53,7 @@ function BarangayMenu() {
               </span>
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="overflow-y-auto lg:h-[40.7rem] grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 lg:w-full gap-4 sm:gap-6 p-6">

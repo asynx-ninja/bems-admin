@@ -149,6 +149,102 @@ const Sidebar = () => {
                     Inquiries
                   </Link>
                 </li>
+                <li>
+                  <button
+                    id="hs-unstyled-collapse"
+                    data-hs-collapse="#hs-unstyled-collapse-heading"
+                    className="hs-collapse-toggle justify-between flex items-center w-full  gap-x-3 py-2 px-2.5  text-sm rounded-md uppercase  hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]"
+                  >
+                    <div className="flex items-center gap-x-3">
+                      <MdOutlineMiscellaneousServices size={15} />
+                      Municipality Info
+                    </div>
+                    <div className="flex">
+                      <svg
+                        className="hs-collapse-open:rotate-180  w-2.5 h-2.5"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </div>
+                  </button>
+                  <div
+                    id="hs-unstyled-collapse-heading"
+                    className="hs-collapse hidden w-full overflow-hidden transition-[height] duration-300"
+                    aria-labelledby="hs-unstyled-collapse"
+                    style={{ paddingLeft: "20px" }}
+                  >
+                    <Link
+                       to={`/aboutus_info/?id=${id}`}
+                      onClick={() => {
+                        window.innerWidth >= 320 && window.innerWidth <= 1023
+                          ? document
+                              .getQuerySelector(
+                                "[data-hs-overlay-backdrop-template]"
+                              )
+                              .remove()
+                          : null;
+                      }}
+                      className={`${
+                        currentPath === `/aboutus_info/?id=${id}`
+                          ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
+                          : null
+                      } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                    >
+                      <GoGitPullRequest size={15} />
+                      Manage AboutUs
+                    </Link> 
+                    <Link
+                      to={`/services_info/?id=${id}`}
+                      onClick={() => {
+                        window.innerWidth >= 320 && window.innerWidth <= 1023
+                          ? document
+                              .getQuerySelector(
+                                "[data-hs-overlay-backdrop-template]"
+                              )
+                              .remove()
+                          : null;
+                      }}
+                      className={`${
+                        currentPath === `/services_info/?id=${id}`
+                          ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
+                          : null
+                      } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                    >
+                      <GoGitPullRequest size={15} />
+                      Manage Services
+                    </Link>
+                    <Link
+                     to={`/tourist_spot/?id=${id}`}
+                      onClick={() => {
+                        window.innerWidth >= 320 && window.innerWidth <= 1023
+                          ? document
+                              .getQuerySelector(
+                                "[data-hs-overlay-backdrop-template]"
+                              )
+                              .remove()
+                          : null;
+                      }}
+                      className={`${
+                        currentPath === `/tourist_spot/?id=${id}`
+                          ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
+                          : null
+                      } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                    >
+                      <GoGitPullRequest size={15} />
+                      Manage tourist spot
+                    </Link>
+                  </div>
+                </li>
                 {userData.type === "Head Admin" && (
                   <>
                     <li>

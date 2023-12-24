@@ -111,7 +111,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
       formData.append("announcement", JSON.stringify(announcement));
 
       const result = await axios.patch(
-        `${API_LINK}/api/announcement/${announcement._id}/`,
+        `${API_LINK}/announcement/${announcement._id}/`,
         formData, 
       );
 
