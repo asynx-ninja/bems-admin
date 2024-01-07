@@ -6,7 +6,8 @@ import { useState } from "react";
 
 function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
   console.log(selectedOfficial);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerId, setTimerId] = useState(null);
   const [edit, setEdit] = useState(false);
 
   const handleOnEdit = () => {
@@ -22,16 +23,22 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
   const handleChange = (e) => {
     setSelectedOfficial((prev) => {
       const updatedOfficial = { ...prev, [e.target.name]: e.target.value };
-  
+
       // Update the name based on the new input values
-      if (e.target.name === "lastName" || e.target.name === "firstName" || e.target.name === "middleName" || e.target.name === "suffix") {
-        updatedOfficial.name = `${updatedOfficial.lastName || ""}, ${updatedOfficial.firstName || ""} ${updatedOfficial.middleName || ""} ${updatedOfficial.suffix || ""}`;
+      if (
+        e.target.name === "lastName" ||
+        e.target.name === "firstName" ||
+        e.target.name === "middleName" ||
+        e.target.name === "suffix"
+      ) {
+        updatedOfficial.name = `${updatedOfficial.lastName || ""}, ${
+          updatedOfficial.firstName || ""
+        } ${updatedOfficial.middleName || ""} ${updatedOfficial.suffix || ""}`;
       }
-  
+
       return updatedOfficial;
     });
   };
-  
 
   const [pfp, setPfp] = useState();
 
@@ -49,22 +56,31 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
   };
 
   const handleSaveChanges = async (e) => {
-    e.preventDefault();
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
+
     try {
+      e.preventDefault();
       const formData = new FormData();
       if (pfp) formData.append("file", pfp);
       formData.append("official", JSON.stringify(selectedOfficial));
 
       const result = await axios.patch(
-        `${API_LINK}/municipalityofficials/?brgy=${brgy}&doc_id=${selectedOfficial._id}`,
+        `${API_LINK}/mofficials/?brgy=${brgy}&doc_id=${selectedOfficial._id}`,
         formData
       );
 
-      console.log(result);
-      setTimeout(() => {
-        HSOverlay.close(document.getElementById("hs-modal-editServices"));
-        window.location.reload();
-      }, 1000);
+      if (result.status === 200) {
+        setTimerId(
+          setTimeout(() => {
+            setIsLoading(false);
+            HSOverlay.close(document.getElementById("hs-edit-official-modal"));
+            window.location.reload();
+          }, 1000)
+        );
+      }
     } catch (error) {
       console.error(error);
     }
@@ -76,6 +92,15 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
         id="hs-edit-official-modal"
         class="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center lg:ml-10 xxl:ml-0"
       >
+        {isLoading && (
+          <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
+            <div className="loaders">
+              <div className="loader"></div>
+              <div className="loader"></div>
+              <div className="loader"></div>
+            </div>
+          </div>
+        )}
         {/* Modal */}
         <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
           <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
@@ -120,80 +145,80 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
 
                 {/* Request Information */}
                 <div className="relative mt-2 overflow-y-auto flex flex-col w-fullh-full rounded-lg space-y-2">
-                    <b className="border-solid border-0 border-black/50 border-b-2  uppercase font-medium text-lg md:text-lg">
-                      Personal Informations
-                    </b>
-                   
-                      <div>
-                        <h1
-                          className="font-medium mb-1 mt-2 text-black text-sm"
-                          style={{ letterSpacing: "0.1em" }}
-                        >
-                          FIRST NAME
-                        </h1>
-                        <input
-                          type="text"
-                          id="firstName"
-                          name="firstName"
-                          className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                          placeholder=""
-                          onChange={handleChange}
-                          value={selectedOfficial.firstName}
-                          disabled={!edit}
-                        />
+                  <b className="border-solid border-0 border-black/50 border-b-2  uppercase font-medium text-lg md:text-lg">
+                    Personal Informations
+                  </b>
 
-                        <h1
-                          className="font-medium mb-1 mt-2 text-black text-sm"
-                          style={{ letterSpacing: "0.1em" }}
-                        >
-                          MIDDLE NAME
-                        </h1>
-                        <input
-                          type="text"
-                          id="middleName"
-                          name="middleName"
-                          className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                          placeholder=""
-                          onChange={handleChange}
-                          value={selectedOfficial.middleName}
-                          disabled={!edit}
-                        />
+                  <div>
+                    <h1
+                      className="font-medium mb-1 mt-2 text-black text-sm"
+                      style={{ letterSpacing: "0.1em" }}
+                    >
+                      FIRST NAME
+                    </h1>
+                    <input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      placeholder=""
+                      onChange={handleChange}
+                      value={selectedOfficial.firstName}
+                      disabled={!edit}
+                    />
 
-                        <h1
-                          className="font-medium mb-1 mt-2 text-black text-sm"
-                          style={{ letterSpacing: "0.1em" }}
-                        >
-                          SUFFIX
-                        </h1>
-                        <input
-                          type="text"
-                          id="suffix"
-                          name="suffix"
-                          className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                          placeholder=""
-                          onChange={handleChange}
-                          value={selectedOfficial.suffix}
-                          disabled={!edit}
-                        />
+                    <h1
+                      className="font-medium mb-1 mt-2 text-black text-sm"
+                      style={{ letterSpacing: "0.1em" }}
+                    >
+                      MIDDLE NAME
+                    </h1>
+                    <input
+                      type="text"
+                      id="middleName"
+                      name="middleName"
+                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      placeholder=""
+                      onChange={handleChange}
+                      value={selectedOfficial.middleName}
+                      disabled={!edit}
+                    />
 
-                        <h1
-                          className="font-medium mb-1 mt-2 text-black text-sm"
-                          style={{ letterSpacing: "0.1em" }}
-                        >
-                          LAST NAME
-                        </h1>
-                        <input
-                          type="text"
-                          id="lastName"
-                          name="lastName"
-                          className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                          placeholder=""
-                          onChange={handleChange}
-                          value={selectedOfficial.lastName}
-                          disabled={!edit}
-                        />
-                      </div>
+                    <h1
+                      className="font-medium mb-1 mt-2 text-black text-sm"
+                      style={{ letterSpacing: "0.1em" }}
+                    >
+                      SUFFIX
+                    </h1>
+                    <input
+                      type="text"
+                      id="suffix"
+                      name="suffix"
+                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      placeholder=""
+                      onChange={handleChange}
+                      value={selectedOfficial.suffix}
+                      disabled={!edit}
+                    />
+
+                    <h1
+                      className="font-medium mb-1 mt-2 text-black text-sm"
+                      style={{ letterSpacing: "0.1em" }}
+                    >
+                      LAST NAME
+                    </h1>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      placeholder=""
+                      onChange={handleChange}
+                      value={selectedOfficial.lastName}
+                      disabled={!edit}
+                    />
                   </div>
+                </div>
 
                 {/* Other info */}
                 <b className="border-solid border-0 border-black/50 border-b-2 uppercase font-medium text-lg md:text-lg mt-4">
@@ -220,13 +245,13 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
                       <option value="" disabled>
                         Select Position
                       </option>
-                      <option value="City Mayor">
-                        City Mayor
-                      </option>
+                      <option value="City Mayor">City Mayor</option>
                       <option value="Vice Mayo">Vice Mayor</option>
                       <option value="Congressman">Congressman</option>
                       <option value="Councilors">Councilors</option>
-                      <option value="Sangguniang Kabataan">Sangguniang Kabataan</option>
+                      <option value="Sangguniang Kabataan">
+                        Sangguniang Kabataan
+                      </option>
                     </select>
                   </div>
                   <div className="w-full mt-2">

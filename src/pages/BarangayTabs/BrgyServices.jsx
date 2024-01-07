@@ -22,6 +22,8 @@ function Services() {
   const [status, setStatus] = useState({});
   const brgy = searchParams.get("brgy");
   const id = searchParams.get("id");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   console.log("sss", id);
   const handleView = (service) => {
@@ -48,16 +50,20 @@ function Services() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/services/?brgy=${brgy}&archived=false`
+          `${API_LINK}/services/?brgy=${brgy}&archived=false&page=${currentPage}`
         ); // Replace "/api/services" with the actual API endpoint URL for fetching all services
-        setServices(response.data);
+        setServices(response.data.result);
+        setPageCount(response.data.pageCount);
       } catch (error) {
         console.error("Error fetching services:", error);
       }
     };
 
     fetchServices();
-  }, [brgy]);
+  }, [currentPage, brgy]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   return (
     <div className="">
@@ -281,7 +287,7 @@ function Services() {
                       </button>
                       <button
                         type="button"
-                        data-hs-overlay="#hs-modal-statusResident"
+                        data-hs-overlay="#hs-modal-serviceStatus"
                         onClick={() =>
                           handleStatus({
                             id: service._id,
@@ -301,22 +307,22 @@ function Services() {
         </div>
       </div>
       <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
-        <span className="font-medium text-white sm:text-xs text-sm">
-          Showing 1 out of 15 pages
-        </span>
-        <ReactPaginate
-          breakLabel="..."
-          nextLabel=">>"
-          onPageChange={() => {}}
-          pageRangeDisplayed={3}
-          pageCount={15}
-          previousLabel="<<"
-          className="flex space-x-3 text-white font-bold "
-          activeClassName="text-yellow-500"
-          disabledLinkClassName="text-gray-300"
-          renderOnZeroPageCount={null}
-        />
-      </div>
+          <span className="font-medium text-white sm:text-xs text-sm">
+            Showing {currentPage + 1} out of {pageCount} pages
+          </span>
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel=">>"
+            onPageChange={handlePageChange}
+            pageRangeDisplayed={3}
+            pageCount={pageCount}
+            previousLabel="<<"
+            className="flex space-x-3 text-white font-bold"
+            activeClassName="text-yellow-500"
+            disabledLinkClassName="text-gray-300"
+            renderOnZeroPageCount={null}
+          />
+        </div>
       <ReplyServiceModal
         selectedService={selectedService}
         setSelectedService={setSelectedService}

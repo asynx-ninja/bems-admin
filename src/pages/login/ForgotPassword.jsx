@@ -14,7 +14,11 @@ const ForgotPassword = () => {
     error: false,
     message: "",
   });
-  const type = "Admin";
+  
+
+  const handleOnChange = (e) => {
+    setEmail(e.target.value)
+  }
 
   const handleOnSubmit = async () => {
     if (!email) {
@@ -28,33 +32,24 @@ const ForgotPassword = () => {
     }
 
     try {
-      const res = await axios.patch(`${API_LINK}/auth/send_pin/${email}`, {
-        type,
-      });
+      const res = await axios.patch(`${API_LINK}/auth/send_pin/${email}`, {type: "Admin"});
       const encodedEmail = btoa(email);
-      console.log("Response data:", res.data); // Log the response data
 
       if (res.status === 200) {
-        console.log("User type:", res.data.type); // Log the user type
-        console.log(res.data.message);
-        if (res.data.type === "Admin") {
-          setResponse({
-            success: true,
-            error: false,
-            message: "Code sent successfully pleas check your email",
-          });
+        console.log(res)
+        setResponse({
+          success: true,
+          error: false,
+          message: "Code has been successfully sent to your Email!"
+        })
 
-          setTimeout(navigate(`/pin/${encodedEmail}`), 3000);
-        } else {
-          setResponse({
-            success: false,
-            error: true,
-            message: error.response.data.error,
-          });
-        }
+        console.log(encodedEmail)
+
+        setTimeout(()=> {
+          navigate(`/pin/${encodedEmail}`)
+        }, 3000)
       }
     } catch (error) {
-      console.error("Error:", error.message); // Log the error message
       setResponse({
         success: false,
         error: true,
@@ -160,7 +155,7 @@ const ForgotPassword = () => {
               </label>
               <input
                 type="email"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleOnChange}
                 id="input-label-with-helper-text"
                 className="sm:py-2 sm:px-3 lg:py-3 lg:px-4 block w-full border-2 border-solid border-[#C7D1DD] rounded-[12px] text-sm shadow-[0px_0px_12px_rgba(142,142,142,0.25)] focus:border-green-500 focus:ring-green-500"
                 placeholder="you@site.com"

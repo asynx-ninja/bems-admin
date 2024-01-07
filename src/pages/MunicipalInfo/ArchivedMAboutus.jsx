@@ -10,7 +10,7 @@ import { useSearchParams } from "react-router-dom";
 import Breadcrumbs from "../../components/maboutusnfo/Breadcrumbs";
 import RestoreAboutusModal from "../../components/maboutusnfo/restoreAboutusModal";
 import GenerateReportsModal from "../../components/accountmanagement/GenerateReportsModal";
-import ViewArchivedAboutusModal from "../../components/maboutusnfo/viewArchivedAboutusModal"
+import ViewArchivedAboutusModal from "../../components/maboutusnfo/viewArchivedAboutusModal";
 const ArchivedAboutusInfo = () => {
   useEffect(() => {
     document.title = "Archived About Us | Barangay E-Services Management";
@@ -22,19 +22,26 @@ const ArchivedAboutusInfo = () => {
   const id = searchParams.get("id");
   const brgy = "Municipal Info";
   const [aboutusInfo, setAboutusinfo] = useState({});
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
-        `${API_LINK}/aboutus/?brgy=${brgy}&archived=true`
+        `${API_LINK}/aboutus/?brgy=${brgy}&archived=true&page=${currentPage}`
       );
 
-      if (response.status === 200) setAboutus(response.data);
-      else setAboutus([]);
+      if (response.status === 200) {
+        setPageCount(response.data.pageCount);
+        setAboutus(response.data.result);
+      } else setAboutus([]);
     };
 
     fetch();
-  }, []);
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
@@ -285,16 +292,16 @@ const ArchivedAboutusInfo = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}
@@ -303,7 +310,10 @@ const ArchivedAboutusInfo = () => {
         {/* <ViewArchivedAdmin user={user} setUser={setUser}/> */}
         <RestoreAboutusModal selectedItems={selectedItems} />
         <GenerateReportsModal />
-        <ViewArchivedAboutusModal aboutusInfo={aboutusInfo} setAboutusinfo={setAboutusinfo}/>
+        <ViewArchivedAboutusModal
+          aboutusInfo={aboutusInfo}
+          setAboutusinfo={setAboutusinfo}
+        />
       </div>
     </div>
   );

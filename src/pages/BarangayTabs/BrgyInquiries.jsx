@@ -22,6 +22,8 @@ const Inquiries = () => {
   const [status, setStatus] = useState({});
   const [sortOrder, setSortOrder] = useState("desc");
   const [sortColumn, setSortColumn] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -54,47 +56,27 @@ const Inquiries = () => {
     const fetch = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/inquiries/staffinquiries/?brgy=${brgy}&to=${to}&archived=false`
+          `${API_LINK}/inquiries/staffinquiries/?brgy=${brgy}&to=${to}&archived=false&page=${currentPage}`
         );
-        if (response.status === 200) setInquiries(response.data);
+        if (response.status === 200) {
+          setPageCount(response.data.pageCount);
+          setInquiries(response.data.result);
+
+        }
         else setInquiries([]);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         setInquiries([]);
       }
     };
-  
+
     fetch();
-  }, []);
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   console.log(inquiries);
-
-  const checkboxHandler = (e) => {
-    let isSelected = e.target.checked;
-    let value = e.target.value;
-
-    if (isSelected) {
-      setSelectedItems([...selectedItems, value]);
-    } else {
-      setSelectedItems((prevData) => {
-        return prevData.filter((id) => {
-          return id !== value;
-        });
-      });
-    }
-  };
-
-  const checkAllHandler = () => {
-    if (inquiries.length === selectedItems.length) {
-      setSelectedItems([]);
-    } else {
-      const postIds = inquiries.map((item) => {
-        return item._id;
-      });
-
-      setSelectedItems(postIds);
-    }
-  };
 
   const tableHeader = [
     "Inquiry id",
@@ -124,10 +106,10 @@ const Inquiries = () => {
 
   return (
     <div className="">
-    {/* Body */}
-    <div>
-      {/* Header */}
-      <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
+      {/* Body */}
+      <div>
+        {/* Header */}
+        <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
               className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-[2.1rem] xxxl:text-4xl xxxl:mt-1 text-white"
@@ -296,16 +278,6 @@ const Inquiries = () => {
           <table className="w-full ">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
-                <th scope="col" className="px-6 py-4">
-                  <div className="flex justify-center items-center">
-                    <input
-                      type="checkbox"
-                      name=""
-                      onClick={checkAllHandler}
-                      id=""
-                    />
-                  </div>
-                </th>
                 {tableHeader.map((item, idx) => (
                   <th
                     scope="col"
@@ -320,17 +292,6 @@ const Inquiries = () => {
             <tbody className="odd:bg-slate-100">
               {inquiries.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                    <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        value={item._id}
-                        onChange={checkboxHandler}
-                        id=""
-                      />
-                    </div>
-                  </td>
                   <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2 ">
                       {item.inq_id}
@@ -405,7 +366,6 @@ const Inquiries = () => {
                           View Inquiry
                         </span>
                       </div>
-                   
                     </div>
                   </td>
                 </tr>
@@ -415,16 +375,16 @@ const Inquiries = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}

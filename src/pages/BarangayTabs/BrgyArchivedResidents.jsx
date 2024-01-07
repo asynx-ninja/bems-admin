@@ -17,23 +17,32 @@ const Residents = () => {
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
   const [user, setUser] = useState({});
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
-        `${API_LINK}/users/showArchived/${brgy}`
+        `${API_LINK}/users/showArchived/?brgy=${brgy}&type=Resident`
       );
 
-      if (response.status === 200) setUsers(response.data);
+      if (response.status === 200) 
+      {
+        setPageCount(response.data.pageCount);
+        setUsers(response.data.result);
+      }
       else setUsers([]);
     };
 
     fetch();
-  }, []);
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
 
   const tableHeader = [
     "PROFILE",
-    "USER_ID",
     "NAME",
     "AGE",
     "GENDER",
@@ -196,11 +205,7 @@ const Residents = () => {
                       </div>
                     </span>
                   </td>
-                    <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                        {item.user_id}
-                      </span>
-                    </td>
+                 
                     <td className="px-6 py-3">
                       <span className="text-xs sm:text-sm text-black line-clamp-2 ">
                         {item.firstName +
@@ -277,16 +282,16 @@ const Residents = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}

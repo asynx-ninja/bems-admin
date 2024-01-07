@@ -6,61 +6,92 @@ import { AiOutlineSend } from "react-icons/ai";
 import { FaArchive } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
-import ViewServiceReqModal from "../../components/barangaytabs/brgyserviceRequests/ViewServiceReqModal";
+import RequestsReportsModal from "../../components/barangaytabs/brgyserviceRequests/RequestsReportsModal";
+import ReplyServiceModal from "../../components/barangaytabs/brgyserviceRequests/ReplyServiceModal"
+import ViewRequestModal from "../../components/barangaytabs/brgyserviceRequests/ViewRequestModal";
+import { useSearchParams } from "react-router-dom";
+import API_LINK from "../../config/API";
+import axios from "axios";
 
 function ServiceRequests() {
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [searchParams] = useSearchParams();
+  const [requests, setRequests] = useState([]);
+  const [request, setRequest] = useState({ response: [{ file: [] }] });
+  const brgy = searchParams.get("brgy");
+  const id = searchParams.get("id");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortColumn, setSortColumn] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/requests/?brgy=${brgy}&archived=false&page=${currentPage}`
+        );
+        console.log(response)
+
+        if (response.status === 200)
+        {
+          setPageCount(response.data.pageCount);
+          setRequests(response.data.result);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetch();
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
   useEffect(() => {
     document.title = "Service Requests | Barangay E-Services Management";
   }, []);
-  const checkboxHandler = (e) => {
-    let isSelected = e.target.checked;
-    let value = parseInt(e.target.value);
 
-    if (isSelected) {
-      setSelectedItems([...selectedItems, value]);
-    } else {
-      setSelectedItems((prevData) => {
-        return prevData.filter((id) => {
-          return id !== value;
-        });
-      });
-    }
+
+  const handleView = (item) => {
+    setRequest(item);
   };
-
-  const checkAllHandler = () => {
-    if (tableData.length === selectedItems.length) {
-      setSelectedItems([]);
-    } else {
-      const postIds = tableData.map((item) => {
-        return item.id;
-      });
-
-      setSelectedItems(postIds);
-    }
-  };
-
-  const tableData = [
-    {
-      id: 1,
-      name: "Juan Karlos",
-      title: "PANGKABUHAYAN QC",
-      details:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Felis bibendum ut tristique et egestas quis ipsum suspendisse. Lorem ipsum dolor sit amet, ",
-      typeofservice: "MEDICAL",
-      date: "10 Jan 2023",
-      status: "approved",
-    },
-  ];
   const tableHeader = [
-    "CLIENT NAME",
     "SERVICE NAME",
-    "DETAILS",
     "TYPE OF SERVICE",
     "DATE",
     "STATUS",
     "ACTIONS",
   ];
+
+  const handleSort = (sortBy) => {
+    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newSortOrder);
+    setSortColumn(sortBy);
+
+    const sortedData = requests.slice().sort((a, b) => {
+      if (sortBy === "request_id") {
+        return newSortOrder === "asc"
+          ? a.request_id.localeCompare(b.request_id)
+          : b.request_id.localeCompare(a.request_id);
+      } else if (sortBy === "service_name") {
+        return newSortOrder === "asc"
+          ? a.service_name.localeCompare(b.service_name)
+          : b.service_name.localeCompare(a.service_name);
+      } else if (sortBy === "status") {
+        const order = { Completed: 1, " Not Responded": 2, Pending: 3, Paid: 4, Processing: 5,  Cancelled: 6, Rejected: 7 };
+        return newSortOrder === "asc"
+          ? order[a.status] - order[b.status]
+          : order[b.status] - order[a.status];
+      }
+
+      return 0;
+    });
+
+    setRequests(sortedData);
+  };
+
   return (
     <div className="">
       {/* Body */}
@@ -78,7 +109,7 @@ function ServiceRequests() {
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">
             <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
               <div className="w-full rounded-lg ">
-                <Link to="/brgyarchivedservicesreq">
+                <Link to={`/brgyarchivedservicesreq/?id=${id}&brgy=${brgy}`}>
                   <div className="hs-tooltip inline-block w-full">
                     <button
                       type="button"
@@ -211,16 +242,6 @@ function ServiceRequests() {
           <table className="w-full ">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
-                <th scope="col" className="px-6 py-4">
-                  <div className="flex justify-center items-center">
-                    <input
-                      type="checkbox"
-                      name=""
-                      onClick={checkAllHandler}
-                      id=""
-                    />
-                  </div>
-                </th>
                 {tableHeader.map((item, idx) => (
                   <th
                     scope="col"
@@ -233,89 +254,120 @@ function ServiceRequests() {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {tableData.map((item, index) => (
+              {requests.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
                   <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item.id)}
-                        value={item.id}
-                        onChange={checkboxHandler}
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2">
-                      {item.name}
-                    </span>
-                  </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2">
-                      {item.title}
+                      {item.service_name}
                     </span>
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.details}
+                        {item.type}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.typeofservice}
+                        {new Date(item.createdAt).toISOString().split("T")[0]}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.date}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    {item.status === "approved" && (
-                      <div className="flex items-center justify-center bg-custom-green-button3 m-2">
-                        <span className="text-xs sm:text-sm text-white p-3 mx-5">
-                          APPROVED
+                    {item.status === "Completed" && (
+                      <div className="flex items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          COMPLETED
                         </span>
                       </div>
                     )}
-                    {item.status === "rejected" && (
-                      <div className="flex items-center justify-center bg-custom-red-button m-2">
-                        <span className="text-xs sm:text-sm text-white p-3 mx-5">
+                    {item.status === "Rejected" && (
+                      <div className="flex items-center justify-center bg-custom-red-button m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
                           REJECTED
                         </span>
                       </div>
                     )}
-                    {item.status === "pending" && (
-                      <div className="flex items-center justify-center bg-custom-amber m-2">
-                        <span className="text-xs sm:text-sm text-white p-3 mx-5">
+                    {item.status === "Pending" && (
+                      <div className="flex items-center justify-center bg-custom-amber m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
                           PENDING
+                        </span>
+                      </div>
+                    )}
+                    {item.status === "Not Responded" && (
+                      <div className="flex items-center justify-center bg-pink-700 m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          NOT RESPONDED
+                        </span>
+                      </div>
+                    )}
+                    {item.status === "Paid" && (
+                      <div className="flex items-center justify-center bg-violet-800 m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          PAID
+                        </span>
+                      </div>
+                    )}
+
+                    {item.status === "Processing" && (
+                      <div className="flex items-center justify-center bg-blue-800 m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          PROCESSING
+                        </span>
+                      </div>
+                    )}
+
+                    {item.status === "Cancelled" && (
+                      <div className="flex items-center justify-center bg-gray-800 m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          CANCELLED
                         </span>
                       </div>
                     )}
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center space-x-1 sm:space-x-none">
-                      {/* <button
-                        type="button"
-                        data-hs-overlay="#hs-view-request-modal"
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button> */}
-
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-view-request-modal"
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
+                      <div className="hs-tooltip inline-block">
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-view-request-modal"
+                          onClick={() => handleView({ ...item })}
+                          className="hs-tooltip-toggle text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                        >
+                          <AiOutlineEye
+                            size={24}
+                            style={{ color: "#ffffff" }}
+                          />
+                        </button>
+                        <span
+                          className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                          role="tooltip"
+                        >
+                          View Request
+                        </span>
+                      </div>
+                      <div className="hs-tooltip inline-block">
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-reply-modal"
+                          onClick={() => handleView({ ...item })}
+                          className="hs-tooltip-toggle text-white bg-custom-red-button font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                        >
+                          <AiOutlineSend
+                            size={24}
+                            style={{ color: "#ffffff" }}
+                          />
+                        </button>
+                        <span
+                          className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                          role="tooltip"
+                        >
+                          Reply to Request
+                        </span>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -325,24 +377,28 @@ function ServiceRequests() {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}
           />
         </div>
       </div>
+      {Object.hasOwn(request, "service_id") ? (
+        <ViewRequestModal request={request} />
+      ) : null}
+      <RequestsReportsModal />
+      <ReplyServiceModal request={request} setRequest={setRequest} />
 
-      <ViewServiceReqModal />
     </div>
   );
 }

@@ -10,6 +10,8 @@ import Dropbox from "./Dropbox";
 import ViewDropbox from "./ViewDropbox";
 
 function ViewInquiriesModal({ inquiry, setInquiry }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerId, setTimerId] = useState(null);
   const [reply, setReply] = useState(false);
   const [upload, setUpload] = useState(false);
   const [expandedIndexes, setExpandedIndexes] = useState([]);
@@ -101,6 +103,10 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
   };
 
   const handleOnSend = async (e) => {
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
     e.preventDefault();
     console.log(newMessage);
 
@@ -121,8 +127,14 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
         `${API_LINK}/inquiries/?inq_id=${inquiry._id}`,
         formData
       );
-
-      window.location.reload();
+      setTimerId(
+        setTimeout(() => {
+          setIsLoading(false);
+          HSOverlay.close(document.getElementById("hs-modal-viewInquiries"));
+          window.location.reload();
+        }, 1000)
+      );
+    
     } catch (error) {
       console.log(error);
     }
@@ -135,6 +147,15 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
           id="hs-modal-viewInquiries"
           className="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center"
         >
+          {isLoading && (
+            <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
+              <div className="loaders">
+                <div className="loader"></div>
+                <div className="loader"></div>
+                <div className="loader"></div>
+              </div>
+            </div>
+          )}
           {/* Modal */}
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
@@ -325,7 +346,8 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
                           onClick={() => handleToggleClick(index)}
                         >
                           {!expandedIndexes.includes(index) ? (
-                            <div className="flex flex-col w-full px-2 md:px-4 py-2">
+                           
+                             <div className="flex flex-col w-full px-2 md:px-4 py-2">
                               <div className="flex flex-row w-full justify-between">
                                 <p className="text-[14px] md:text-sm font-medium uppercase">
                                   {responseItem.sender}
@@ -338,6 +360,8 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
                                 {responseItem.message}
                               </p>
                             </div>
+                         
+                            
                           ) : (
                             <div
                               className="flex flex-col w-full px-2 md:px-4 py-2"

@@ -12,30 +12,39 @@ import ReactPaginate from "react-paginate";
 import axios from "axios";
 import API_LINK from "../../config/API";
 
-import ArchiveAboutusModal from "../../components/maboutusnfo/archivedAboutusModal";
+import ArchiveTouristSpotModal from "../../components/mtouristspot/archiveTouristSpot";
 import ManageTouristSpotModal from "../../components/mtouristspot/manageTouristSpotModal";
 import AddAboutusModal from "../../components/mtouristspot/addTouristSpotModal";
 
 const MTouristSpot = () => {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [touristspot, settouristSpot] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const brgy = "MUNICIPAL INFO";
+  const section = "MUNICIPAL INFO";
+  const [touristspot, settouristSpot] = useState([]);
   const [touristspotInfo, settouristspotInfo] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
-        `${API_LINK}/tourist_spot/?brgy=${brgy}&archived=false`
+        `${API_LINK}/tourist_spot/?section=${section}&archived=false&page=${currentPage}`
       );
-      if (response.status === 200) settouristSpot(response.data);
+      if (response.status === 200) {
+        setPageCount(response.data.pageCount);
+        settouristSpot(response.data.result);
+      
+      }
       else settouristSpot([]);
     };
 
     fetch();
-  }, []);
+  }, [currentPage]);
 
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
     let value = e.target.value;
@@ -114,7 +123,7 @@ const MTouristSpot = () => {
               </div>
               <div className="w-full rounded-lg ">
                 <Link
-                  to={`/archived_aboutus_info/?id=${id}&brgy=${brgy}&archived=true`}
+                  to={`/archived_tourist_spot/?id=${id}&section=${section}&archived=true`}
                 >
                   <div className="hs-tooltip inline-block w-full">
                     <button
@@ -225,7 +234,7 @@ const MTouristSpot = () => {
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
-                    data-hs-overlay="#hs-archive-aboutus-modal"
+                    data-hs-overlay="#hs-archive-touristspot-modal"
                     className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md  bg-pink-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
                   >
                     <AiOutlineStop size={24} style={{ color: "#ffffff" }} />
@@ -233,7 +242,7 @@ const MTouristSpot = () => {
                       className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                       role="tooltip"
                     >
-                      Archived Selected About Us
+                      Archived Selected Tourist Spot
                     </span>
                   </button>
                 </div>
@@ -341,23 +350,23 @@ const MTouristSpot = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}
           />
         </div>
-        <AddAboutusModal brgy={brgy} />
-        <ArchiveAboutusModal selectedItems={selectedItems} />
+        <AddAboutusModal section={section} />
+        <ArchiveTouristSpotModal selectedItems={selectedItems} />
         <ManageTouristSpotModal touristspotInfo = {touristspotInfo} settouristspotInfo = {settouristspotInfo}/>
       </div>
     </div>

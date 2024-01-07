@@ -29,7 +29,7 @@ function BarangayDetails() {
     "Services",
     "Service Requests",
     "Residents",
-    "Announcements",
+    "Events",
     "Inquiries",
     "Profits",
   ];
@@ -93,7 +93,7 @@ function BarangayDetails() {
             <ServiceRequest brgy={brgy} id={id} />
           )}
           {tab === "Residents" && <Residents brgy={brgy} id={id} />}
-          {tab === "Announcements" && <Announcement brgy={brgy} id={id} />}
+          {tab === "Events" && <Announcement brgy={brgy} id={id} />}
           {tab === "Inquiries" && <Inquiries brgy={brgy} id={id} />}
           {tab === "Profits" && <Profit brgy={brgy} id={id} />}
         </div>

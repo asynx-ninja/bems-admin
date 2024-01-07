@@ -196,7 +196,7 @@ function RevisionServiceModal({ setSelectedService, selectedService }) {
                   ></textarea>
                 </div>
 
-                {/* Response */}
+                {/* Response
                 <div className="w-full px-5">
                   <h1
                     className="font-medium mb-1 my-2 text-black text-sm"
@@ -211,43 +211,8 @@ function RevisionServiceModal({ setSelectedService, selectedService }) {
                     placeholder="Enter response..."
                   ></textarea>
 
-                  {/* <div className="flex flex-col items-center justify-center w-full">
-                    <label
-                      htmlFor="dropzone-file"
-                      className="flex flex-col items-center justify-center w-full h-16 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 mt-5"
-                    >
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                          <span className="font-semibold">Click to upload</span>{" "}
-                          or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          PNG, JPG, PDF (MAX. 800x400px)
-                        </p>
-                      </div>
-                      <input
-                        id="dropzone-file"
-                        type="file"
-                        className="hidden"
-                        multiple
-                        onChange={handleFileChange}
-                      />
-                    </label>
-                    <div className="mt-2 overflow-x-auto w-full">
-                      <p>Selected Files:</p>
-                      {selectedFiles.length > 0 && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {selectedFiles.map((file, index) => (
-                            <span key={index} className="truncate pr-1">
-                              {file.replace(/\.[^.]+$/, "")}&hellip;
-                              {file.split(".").pop()},
-                            </span>
-                          ))}
-                        </p>
-                      )}
-                    </div>
-                  </div> */}
-                </div>
+           
+                </div> */}
                 <div className="m-full px-5 py-2">
                   <EditDropbox
                     edit={edit}
@@ -261,13 +226,13 @@ function RevisionServiceModal({ setSelectedService, selectedService }) {
 
             {/* Buttons */}
             <div className="flex justify-end items-center gap-x-2 py-3 px-6 dark:border-gray-700">
-              <button
+              {/* <button
                 type="button"
                 className="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md borde text-sm font-base bg-[#013D74] text-white shadow-sm align-middle"
                 data-hs-overlay="#hs-tab-revision-modal"
               >
                 SEND
-              </button>
+              </button> */}
               <button
                 type="button"
                 className="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md border text-sm font-base bg-custom-red-button text-white shadow-sm align-middle"

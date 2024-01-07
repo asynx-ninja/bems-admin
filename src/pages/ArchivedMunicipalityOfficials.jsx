@@ -23,7 +23,8 @@ const ArchivedOfficials = () => {
   const [selectedOfficial, setSelectedOfficial] = useState({});
   const [sortOrder, setSortOrder] = useState("desc");
   const [sortColumn, setSortColumn] = useState(null);
-
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
@@ -82,34 +83,37 @@ const ArchivedOfficials = () => {
     document.title =
       "Archived Barangay Officials | Barangay E-Services Management";
 
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${API_LINK}/mofficials/?brgy=${brgy}&archived=true`
-        );
-
-        if (response.status === 200) {
-          const officialsData = response.data || [];
-
-          if (officialsData.length > 0) {
-            setOfficials(officialsData);
+      const fetchData = async () => {
+        try {
+          const response = await axios.get(
+            `${API_LINK}/mofficials/?brgy=${brgy}&archived=true&page=${currentPage}`
+          );
+    
+          if (response.status === 200) {
+            const officialsData = response.data.result || [];
+            setPageCount(response.data.pageCount);
+            if (officialsData.length > 0) {
+              setOfficials(officialsData);
+            } else {
+              setOfficials([]);
+              console.log(`No officials found for Barangay ${brgy}`);
+            }
           } else {
             setOfficials([]);
-            console.log(`No officials found for Barangay ${brgy}`);
+            console.error("Failed to fetch officials:", response.status);
           }
-        } else {
+        } catch (error) {
+          console.error("Error fetching data:", error);
           setOfficials([]);
-          console.error("Failed to fetch officials:", response.status);
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setOfficials([]);
-      }
+      };
+    
+      fetchData();
+    }, [brgy, currentPage]);
+  
+    const handlePageChange = ({ selected }) => {
+      setCurrentPage(selected);
     };
-
-    fetchData();
-  }, [brgy]);
-
   const tableHeader = [
     "IMAGE",
     "NAME",
@@ -379,22 +383,22 @@ const ArchivedOfficials = () => {
         </div>
       </div>
       <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
-        <span className="font-medium text-white sm:text-xs text-sm">
-          Showing 1 out of 15 pages
-        </span>
-        <ReactPaginate
-          breakLabel="..."
-          nextLabel=">>"
-          onPageChange={() => {}}
-          pageRangeDisplayed={3}
-          pageCount={15}
-          previousLabel="<<"
-          className="flex space-x-3 text-white font-bold "
-          activeClassName="text-yellow-500"
-          disabledLinkClassName="text-gray-300"
-          renderOnZeroPageCount={null}
-        />
-      </div>
+          <span className="font-medium text-white sm:text-xs text-sm">
+            Showing {currentPage + 1} out of {pageCount} pages
+          </span>
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel=">>"
+            onPageChange={handlePageChange}
+            pageRangeDisplayed={3}
+            pageCount={pageCount}
+            previousLabel="<<"
+            className="flex space-x-3 text-white font-bold"
+            activeClassName="text-yellow-500"
+            disabledLinkClassName="text-gray-300"
+            renderOnZeroPageCount={null}
+          />
+        </div>
       <GenerateReportsModal />
       <RestoreOfficialModal selectedItems={selectedItems} />
       <ViewOfficialModal

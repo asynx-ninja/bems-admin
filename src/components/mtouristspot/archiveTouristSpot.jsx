@@ -3,7 +3,8 @@ import Error from "../../assets/modals/Error.png";
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useState } from "react";
-function ArchiveAdminModal({ selectedItems }) {
+
+function ArchiveServicesInfoModal({ selectedItems }) {
   const [isLoading, setIsLoading] = useState(false);
   const [timerId, setTimerId] = useState(null);
   const handleSave = async (e) => {
@@ -16,13 +17,16 @@ function ArchiveAdminModal({ selectedItems }) {
 
       for (let i = 0; i < selectedItems.length; i++) {
         const response = await axios.patch(
-          `${API_LINK}/users/archived/${selectedItems[i]}/true`
+          `${API_LINK}/tourist_spot/archived/${selectedItems[i]}/true`
         );
       }
+
       setTimerId(
         setTimeout(() => {
           setIsLoading(false);
-          HSOverlay.close(document.getElementById("hs-modal-archiveAdmin"));
+          HSOverlay.close(
+            document.getElementById("hs-archive-touristspot-modal")
+          );
           window.location.reload();
         }, 1000)
       );
@@ -30,7 +34,6 @@ function ArchiveAdminModal({ selectedItems }) {
       console.log(err);
     }
   };
-
   return (
     <div>
       {isLoading && (
@@ -42,8 +45,9 @@ function ArchiveAdminModal({ selectedItems }) {
           </div>
         </div>
       )}
+
       <div
-        id="hs-modal-archiveAdmin"
+        id="hs-archive-touristspot-modal"
         className="z-[100] hs-overlay hidden w-full h-full fixed top-0 left-0 z-60 overflow-x-hidden overflow-y-auto"
       >
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-300 bg-opacity-0 ">
@@ -55,21 +59,21 @@ function ArchiveAdminModal({ selectedItems }) {
             />
 
             <p className="relative bottom-[3rem] text-center sm:text-[16px] sm:w-[13rem] md:text-[1.2rem] md:w-[15rem] lg:w-[19rem]  lg:text-2xl text-gray-700 w-[30rem]">
-              Are you sure you want to archive this admin account?
+              Are you sure you want to archive this information?
             </p>
 
             <div className="flex mt-8 space-x-4 relative bottom-[3rem]">
               <button
                 type="button"
-                data-hs-overlay="#hs-modal-archiveAdmin"
-                onClick={handleSave} // Call the handleArchive function
-                className="w-[6rem] lg:w-[12rem] px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600"
+                data-hs-overlay="#hs-archive-touristspot-modal"
+                onClick={handleSave}
+                className=" w-[6rem] lg:w-[12rem] px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600"
               >
                 Yes
               </button>
               <button
                 type="button"
-                data-hs-overlay="#hs-modal-archiveAdmin"
+                data-hs-overlay="#hs-archive-touristspot-modal"
                 className="lg:w-[12rem] w-[6rem] px-4 py-2 border border-red-600 text-red-700 rounded hover:bg-red-400"
               >
                 No
@@ -82,4 +86,4 @@ function ArchiveAdminModal({ selectedItems }) {
   );
 }
 
-export default ArchiveAdminModal;
+export default ArchiveServicesInfoModal;

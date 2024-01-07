@@ -5,12 +5,14 @@ import API_LINK from "../../config/API";
 import axios from "axios";
 
 function CreateOfficialModal({ brgy }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerId, setTimerId] = useState(null);
   const [official, setOfficial] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
     suffix: "",
-    details:"",
+    details: "",
     position: "",
     fromYear: "",
     toYear: "",
@@ -20,6 +22,10 @@ function CreateOfficialModal({ brgy }) {
   const [pfp, setPfp] = useState();
 
   const handleSubmit = async (e) => {
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
     try {
       e.preventDefault();
 
@@ -55,7 +61,15 @@ function CreateOfficialModal({ brgy }) {
           brgy: "",
         });
         setPfp(null);
-        window.location.reload();
+        setTimerId(
+          setTimeout(() => {
+            setIsLoading(false);
+            HSOverlay.close(
+              document.getElementById("hs-create-official-modal")
+            );
+            window.location.reload();
+          }, 1000)
+        );
       }
     } catch (err) {
       console.error("Error adding official:", err);
@@ -74,6 +88,15 @@ function CreateOfficialModal({ brgy }) {
 
   return (
     <div>
+      {isLoading && (
+        <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
+          <div className="loaders">
+            <div className="loader"></div>
+            <div className="loader"></div>
+            <div className="loader"></div>
+          </div>
+        </div>
+      )}
       <div
         id="hs-create-official-modal"
         className="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center lg:ml-10 xxl:ml-0"
@@ -241,13 +264,13 @@ function CreateOfficialModal({ brgy }) {
                       <option value="" disabled>
                         -- Select Position --
                       </option>
-                      <option value="City Mayor">
-                        City Mayor
-                      </option>
+                      <option value="City Mayor">City Mayor</option>
                       <option value="Vice Mayo">Vice Mayor</option>
                       <option value="Congressman">Congressman</option>
                       <option value="Councilors">Councilors</option>
-                      <option value="Sangguniang Kabataan">Sangguniang Kabataan</option>
+                      <option value="Sangguniang Kabataan">
+                        Sangguniang Kabataan
+                      </option>
                     </select>
                   </div>
                   <div className="w-full mt-2">

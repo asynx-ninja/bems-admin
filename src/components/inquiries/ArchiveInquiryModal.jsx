@@ -2,10 +2,16 @@ import React from "react";
 import Error from "../../assets/modals/Error.png";
 import axios from "axios";
 import API_LINK from "../../config/API";
+import { useState } from "react";
 
 function ArchiveInquiryModal({ selectedItems }) {
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerId, setTimerId] = useState(null);
   const handleSave = async (e) => {
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
     try {
       e.preventDefault();
 
@@ -14,14 +20,31 @@ function ArchiveInquiryModal({ selectedItems }) {
           `${API_LINK}/inquiries/archived/${selectedItems[i]}/true`
         );
       }
-
-      window.location.reload();
+      setTimerId(
+        setTimeout(() => {
+          setIsLoading(false);
+          HSOverlay.close(document.getElementById("hs-modal-archiveInquiry"));
+          window.location.reload();
+        }, 1000)
+      );
+     
     } catch (err) {
       console.log(err);
     }
+    
   };
   return (
-    <div
+ <div>
+     {isLoading && (
+        <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
+          <div className="loaders">
+            <div className="loader"></div>
+            <div className="loader"></div>
+            <div className="loader"></div>
+          </div>
+        </div>
+      )}
+     <div
       id="hs-modal-archiveInquiry"
       className="z-[100] hs-overlay hidden w-full h-full fixed top-0 left-0 overflow-x-hidden overflow-y-auto"
     >
@@ -57,6 +80,7 @@ function ArchiveInquiryModal({ selectedItems }) {
         </div>
       </div>
     </div>
+ </div>
   );
 }
 

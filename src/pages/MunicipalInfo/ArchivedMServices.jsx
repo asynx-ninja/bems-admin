@@ -12,7 +12,7 @@ import RestoreServicesInfoModal from "../../components/mservicesinfo/restoreServ
 import GenerateReportsModal from "../../components/accountmanagement/GenerateReportsModal";
 import ViewArchivedServicesInfo from "../../components/mservicesinfo/viewArchivedServicesInfoModal"
 
-const ArchivedAccountManagement = () => {
+const ArchivedServicesInfo = () => {
   useEffect(() => {
     document.title = "Archived Municipal Services | Barangay E-Services Management";
   }, []);
@@ -23,20 +23,26 @@ const ArchivedAccountManagement = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
   const brgy = "Municipal Info";
-
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
-        `${API_LINK}/services_info/?brgy=${brgy}&archived=true`
+        `${API_LINK}/services_info/?brgy=${brgy}&archived=true&page=${currentPage}`
       );
-
-      if (response.status === 200) setServicesInfo(response.data);
+      if (response.status === 200) {
+        setPageCount(response.data.pageCount);
+        setServicesInfo(response.data.result);
+      }
+        
       else setServicesInfo([]);
     };
-
     fetch();
-  }, []);
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
@@ -83,7 +89,7 @@ const ArchivedAccountManagement = () => {
               className="sm:text-[15px] mx-auto font-bold md:text-xl text-center lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-[1.5rem] xxxl:text-4xl text-white"
               style={{ letterSpacing: "0.2em" }}
             >
-              ARCHIVED ABOUT US
+              ARCHIVED SERVICES
             </h1>
           </div>
         </div>
@@ -287,16 +293,16 @@ const ArchivedAccountManagement = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}
@@ -311,4 +317,4 @@ const ArchivedAccountManagement = () => {
   );
 };
 
-export default ArchivedAccountManagement;
+export default ArchivedServicesInfo;

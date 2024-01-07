@@ -10,7 +10,8 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
   const [files, setFiles] = useState([]);
   const [edit, setEdit] = useState(false);
   const navigate = useNavigate();
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerId, setTimerId] = useState(null);
 
   const dateFormat = (date) => {
     const eventdate = date === undefined ? "" : date.substr(0, 10);
@@ -79,6 +80,10 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
   };
 
   const handleSubmit = async (e) => {
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
     try {
       e.preventDefault();
 
@@ -112,7 +117,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
 
       const result = await axios.patch(
         `${API_LINK}/announcement/${announcement._id}/`,
-        formData, 
+        formData
       );
 
       if (result.status === 200) {
@@ -128,18 +133,19 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
         // setBanner();
         // setFiles([]);
         // navigate("/");
-        
-
-        setTimeout(() => {
-          HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
-          window.location.reload();
-        }, 1000);
+        setTimerId(
+          setTimeout(() => {
+            setIsLoading(false);
+            HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
+            window.location.reload();
+          }, 1000)
+        );
+       
       }
     } catch (err) {
       console.log(err);
     }
   };
-
 
   return (
     <div>
@@ -148,6 +154,16 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
           id="hs-modal-editAnnouncement"
           className="hs-overlay hidden fixed top-0 bottom-0 left-0 z-[60] w-full h-full flex items-center justify-center"
         >
+          {isLoading && (
+            <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
+              <div className="loaders">
+                <div className="loader"></div>
+                <div className="loader"></div>
+                <div className="loader"></div>
+              </div>
+            </div>
+          )}
+
           {/* Modal */}
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
@@ -157,7 +173,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
                 >
-                  MANAGE ANNOUNCEMENT
+                  MANAGE EVENTS
                 </h3>
               </div>
 

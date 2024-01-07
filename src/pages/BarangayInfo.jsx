@@ -46,7 +46,7 @@ function BarangayDetails() {
         {activeTab === 3 && 'Services'}
         {activeTab === 4 && 'Service Requests'}
         {activeTab === 5 && 'Residents'}
-        {activeTab === 6 && 'Announcements'}
+        {activeTab === 6 && 'Events'}
         {activeTab === 7 && 'Inquiries'}
         {activeTab === 8 && 'Profits'}
         <svg
@@ -143,7 +143,7 @@ function BarangayDetails() {
               role="tab"
               onClick={() => handleTabChange(6)}
             >
-              Announcements
+              Events
             </button>{" "}
             <button
               type="button"

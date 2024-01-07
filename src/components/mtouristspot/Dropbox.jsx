@@ -1,11 +1,11 @@
-import React, { useState, useRef } from "react";
+import React from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-const EditDropbox = ({
-  edit,
+const Dropbox = ({
+  editImageRef,
   images,
   setImages,
-  editImageRef,
   handleFileChange,
   handleSubmit,
 }) => {
@@ -15,6 +15,7 @@ const EditDropbox = ({
 
   const dropHandler = (e) => {
     e.preventDefault();
+
     const droppedFiles = e.dataTransfer.files;
     setImages([...files, ...droppedFiles]);
     setIsDragging(false);
@@ -40,6 +41,7 @@ const EditDropbox = ({
 
   const handleAdd = (e) => {
     e.preventDefault();
+
     fileInputRef.current.click();
   };
 
@@ -47,7 +49,10 @@ const EditDropbox = ({
     setImages((prev) => prev.filter((_, index) => index !== idx));
   };
 
- 
+  const handleCancel = (e) => {
+    setImages([]);
+    window.location.reload();
+  };
 
   return (
     <>
@@ -84,44 +89,36 @@ const EditDropbox = ({
             )}
             {/* scroll area */}
             <section className="h-full overflow-auto p-1 w-full flex flex-col">
-              {edit ? (
-                <header className="border-dashed border-2 border-gray-400 py-12 flex flex-col justify-center items-center">
-                  <p className="mb-3 font-semibold text-gray-900 flex flex-wrap justify-center">
-                    <span>Drag and drop your</span>&nbsp;
-                    <span>files anywhere or</span>
-                  </p>
-                  <input
-                    type="file"
-                    name="images"
-                    onChange={handleFileChange}
-                    ref={fileInputRef}
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                  />
-                  <button
-                    id="button"
-                    onClick={handleAdd}
-                    className="mt-2 rounded-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 focus:shadow-outline focus:outline-none"
-                  >
-                    Upload a file
-                  </button>
-                </header>
-              ) : null}
-              {edit ? (
-                <h1 className="pb-3 font-semibold sm:text-lg text-gray-900">
-                  To Upload:
-                </h1>
-              ) : (
-                <h1 className="pb-3 font-semibold sm:text-lg text-gray-900">
-                  Files Attached:
-                </h1>
-              )}
+              <header className="border-dashed border-2 border-gray-400 py-12 flex flex-col justify-center items-center">
+                <p className="mb-3 font-semibold text-gray-900 flex flex-wrap justify-center">
+                  <span>Drag and drop your</span>&nbsp;
+                  <span>files anywhere or</span>
+                </p>
+                <input
+                  type="file"
+                  name="file"
+                  onChange={handleFileChange}
+                  ref={fileInputRef}
+                  accept=".xlsx,.xls,.doc,.docx,.ppt,.pptx,.txt,.pdf"
+                  multiple="multiple"
+                  className="hidden"
+                />
+                <button
+                  id="button"
+                  onClick={handleAdd}
+                  className="mt-2 rounded-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 focus:shadow-outline focus:outline-none"
+                >
+                  Upload a file
+                </button>
+              </header>
+              <h1 className="pt-3 font-semibold sm:text-lg text-gray-900">
+                To Upload
+              </h1>
               <ul id="gallery" className="flex flex-1 flex-wrap -m-1">
                 {images.length > 0 ? (
                   images.map((file, idx) => (
                     <li
-                      className="block p-1 w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/2 xl:w-1/2 h-24"
+                    className="block p-1 w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/2 xl:w-1/2 h-24"
                       key={idx}
                     >
                       <article
@@ -130,24 +127,19 @@ const EditDropbox = ({
                       >
                         <img
                           alt="upload preview"
-                          name="images"
                           ref={editImageRef}
-                          src={file.link} 
-                          className="img-preview  w-full h-full sticky object-cover rounded-md bg-fixed"
+                          name="images"
+                          className="img-preview w-full h-full sticky object-cover rounded-md bg-fixed"
                         />
                         <section className="flex flex-col rounded-md text-xs break-words w-full h-full z-20 absolute top-0 py-2 px-3">
-                          <a
-                            href={file.link}
-                            target="_blank"
-                            className="flex-1 group-hover:text-blue-800 font-medium line-clamp-1"
-                          >
+                          <h1 className="flex-1 group-hover:text-blue-800 line-clamp-1">
                             {file.name}
-                          </a>
+                          </h1>
                           <div className="flex">
-                            <span className="p-1 text-gray-800">
+                            <span className="p-1 text-blue-800">
                               <i>
                                 <svg
-                                  className="fill-current w-4 h-4 ml-auto pt-1 text-white" // Use the text-white class to set fill to white
+                                  className="fill-current w-4 h-4 ml-auto pt-1"
                                   xmlns="http://www.w3.org/2000/svg"
                                   width={24}
                                   height={24}
@@ -157,11 +149,16 @@ const EditDropbox = ({
                                 </svg>
                               </i>
                             </span>
-
+                            <p className="p-1 size text-xs text-gray-700">
+                              {file.size > 1024
+                                ? file.size > 1048576
+                                  ? Math.round(file.size / 1048576) + "mb"
+                                  : Math.round(file.size / 1024) + "kb"
+                                : file.size + "b"}
+                            </p>
                             <button
-                              className="delete ml-auto focus:outline-none hover:bg-gray-300 p-1 rounded-md text-white"
+                              className="delete ml-auto focus:outline-none hover:bg-gray-300 p-1 rounded-md text-gray-800"
                               onClick={(e) => handleDelete(idx)}
-                              hidden={!edit}
                             >
                               <svg
                                 className="pointer-events-none fill-current w-4 h-4 ml-auto"
@@ -203,13 +200,13 @@ const EditDropbox = ({
               <button
                 id="submit"
                 onClick={handleSubmit}
-                // data-hs-overlay="#hs-modal-editServices"
                 className="px-3 rounded-lg py-1 bg-teal-800 hover:bg-teal-700 text-white focus:shadow-outline focus:outline-none"
               >
                 Submit
               </button>
               <button
-                data-hs-overlay="#hs-modal-editServices"
+                id="cancel"
+                onClick={handleCancel}
                 className="ml-3 rounded-sm px-3 py-1 hover:bg-gray-300 focus:shadow-outline focus:outline-none"
               >
                 Cancel
@@ -225,4 +222,4 @@ const EditDropbox = ({
   );
 };
 
-export default EditDropbox;
+export default Dropbox;

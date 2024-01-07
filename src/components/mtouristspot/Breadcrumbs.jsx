@@ -8,17 +8,17 @@ const Breadcrumb = ({ id }) => {
         <TfiAnnouncement size={22} />
         <li>
           <a
-            href={`/announcements/?id=${id}`}
+            href={`/tourist_spot/?id=${id}`}
             className="text-gray-600 font-bold hover:underline text-xs md:text-lg"
           >
-            EVENT
+            MUNICPAL INFO
           </a>
         </li>
         <li>
           <GrFormNext size={24} style={{ color: "#ffffff" }} />
         </li>
         <li className="text-[10px] md:text-lg text-[#295141] font-bold">
-          ARCHIVED EVENT
+          ARCHIVED TOURIST SPOT
         </li>
       </ol>
     </nav>

@@ -31,6 +31,7 @@ import ArchivedAboutusInfo from "../pages/MunicipalInfo/ArchivedMAboutus"
 import MServicesInfo from "../pages/MunicipalInfo/MServicesInfo";
 import ArchivedServicesInfo from "../pages/MunicipalInfo/ArchivedMServices"
 import MTouristSpot from "../pages/MunicipalInfo/MTouristSpot";
+import ArchivedTouristSpot from "../pages/MunicipalInfo/ArchivedTouristSpot";
 const pages = [
   {
     path: "/",
@@ -88,6 +89,10 @@ const pages = [
   {
     path: "/tourist_spot",
     element: <Navbar comp={<MTouristSpot />} />,
+  },
+  {
+    path: "/archived_tourist_spot",
+    element: <Navbar comp={<ArchivedTouristSpot />} />,
   },
   {
     path: "/municipalityofficials",

@@ -6,7 +6,7 @@ import { FiEdit } from "react-icons/fi";
 import { BsPrinter } from "react-icons/bs";
 import ArchiveModal from "../components/inquiries/ArchiveInquiryModal";
 import ReplyModal from "../components/inquiries/ReplyInquiries";
-import ViewMessage from "../components/inquiries/ViewInquiriesModal";
+import ViewMessage from "../components/inquiries/ManageInquiries";
 import Status from "../components/inquiries/Status";
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
@@ -25,6 +25,8 @@ const Inquiries = () => {
   const [status, setStatus] = useState({});
   const [sortOrder, setSortOrder] = useState("desc");
   const [sortColumn, setSortColumn] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -57,11 +59,13 @@ const Inquiries = () => {
     const fetchInquiries = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=false`
+          `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=false&page=${currentPage}`
         );
-        console.log(response.data)
-        if (response.status === 200) setInquiries(response.data);
-        else {
+  
+        if (response.status === 200) {
+          setPageCount(response.data.pageCount);
+          setInquiries(response.data.result); // Update the state variable with the fetched inquiries
+        } else {
           // Handle error here
           console.error("Error fetching inquiries:", response.error);
         }
@@ -72,8 +76,12 @@ const Inquiries = () => {
     };
   
     fetchInquiries();
-  }, []);
+  }, [currentPage]);
+
   
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   console.log(inquiries);
 
@@ -142,7 +150,7 @@ const Inquiries = () => {
               MUNICIPALITY INQUIRIES
             </h1>
           </div>
-          <div className="lg:w-3/5 flex flex-row justify-end items-center ">
+          {/* <div className="lg:w-3/5 flex flex-row justify-end items-center ">
             <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
               <div className="w-full rounded-lg ">
                 <Link to={`/archivedinquiries/?id=${id}&brgy=${brgy}`}>
@@ -166,7 +174,7 @@ const Inquiries = () => {
                 </Link>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
@@ -317,7 +325,7 @@ const Inquiries = () => {
           <table className="w-full ">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
-                <th scope="col" className="px-6 py-4">
+                {/* <th scope="col" className="px-6 py-4">
                   <div className="flex justify-center items-center">
                     <input
                       type="checkbox"
@@ -326,7 +334,7 @@ const Inquiries = () => {
                       id=""
                     />
                   </div>
-                </th>
+                </th> */}
                 {tableHeader.map((item, idx) => (
                   <th
                     scope="col"
@@ -341,7 +349,7 @@ const Inquiries = () => {
             <tbody className="odd:bg-slate-100">
               {inquiries.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
+                  {/* <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                     <input
                         type="checkbox"
@@ -351,7 +359,7 @@ const Inquiries = () => {
                         id=""
                       />
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2 ">
                       {item.inq_id}
@@ -456,16 +464,16 @@ const Inquiries = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}

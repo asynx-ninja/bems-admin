@@ -25,7 +25,7 @@ const Sidebar = () => {
   const currentPath = location.pathname;
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
-
+  const [servicesReq, setServicesreq] = useState([]);
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -43,6 +43,22 @@ const Sidebar = () => {
     };
     fetch();
   }, [id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const servicesResponse = await axios.get(
+          `${API_LINK}/services/pendingservices/?archived=false&status=Pending`
+        );
+        setServicesreq(servicesResponse.data);
+        console.log(servicesResponse.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -89,20 +105,26 @@ const Sidebar = () => {
                     onClick={() => {
                       window.innerWidth >= 320 && window.innerWidth <= 1023
                         ? document
-                            .getQuerySelector(
+                            .querySelector(
                               "[data-hs-overlay-backdrop-template]"
                             )
                             .remove()
                         : null;
                     }}
                     className={`${
-                      currentPath === `/dashboard/?id=${id}`
+                      currentPath === "/dashboard/"
                         ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
-                        : null
-                    } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                        : "focus:outline-none"
+                    } flex items-center gap-x-3 py-2 px-2.5 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                   >
                     <BiSolidDashboard size={15} />
                     Dashboard
+                    <span className="flex relative ">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
+                      <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
+                       {servicesReq.length}
+                      </span>
+                    </span>
                   </Link>
                 </li>
                 <li>
@@ -111,22 +133,29 @@ const Sidebar = () => {
                     onClick={() => {
                       window.innerWidth >= 320 && window.innerWidth <= 1023
                         ? document
-                            .getQuerySelector(
+                            .querySelector(
                               "[data-hs-overlay-backdrop-template]"
                             )
                             .remove()
                         : null;
                     }}
                     className={`${
-                      currentPath === `/announcements/?id=${id}`
+                      currentPath === "/announcements/"
                         ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
-                        : null
-                    } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                        : "focus:outline-none"
+                    } flex items-center gap-x-3 py-2 px-2.5 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                   >
                     <ImBullhorn size={15} />
-                    Announcements
+                    Events
+                    {/* <span className="flex relative  ">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
+                      <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
+                        9+
+                      </span>
+                    </span> */}
                   </Link>
                 </li>
+
                 <li>
                   <Link
                     to={`/inquiries/?id=${id}`}
@@ -140,13 +169,19 @@ const Sidebar = () => {
                         : null;
                     }}
                     className={`${
-                      currentPath === `/inquiries/?id=${id}`
+                      currentPath === "/inquiries/"
                         ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                         : null
                     } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                   >
                     <FaRegNoteSticky size={15} />
                     Inquiries
+                    <span className="flex relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
+                      <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
+                        9+
+                      </span>
+                    </span>
                   </Link>
                 </li>
                 <li>
@@ -184,7 +219,7 @@ const Sidebar = () => {
                     style={{ paddingLeft: "20px" }}
                   >
                     <Link
-                       to={`/aboutus_info/?id=${id}`}
+                      to={`/aboutus_info/?id=${id}`}
                       onClick={() => {
                         window.innerWidth >= 320 && window.innerWidth <= 1023
                           ? document
@@ -195,14 +230,20 @@ const Sidebar = () => {
                           : null;
                       }}
                       className={`${
-                        currentPath === `/aboutus_info/?id=${id}`
+                        currentPath === "/aboutus_info/"
                           ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                           : null
                       } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                     >
                       <GoGitPullRequest size={15} />
                       Manage AboutUs
-                    </Link> 
+                      {/* <span className="flex relative  end-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
+                        <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
+                          9+
+                        </span>
+                      </span> */}
+                    </Link>
                     <Link
                       to={`/services_info/?id=${id}`}
                       onClick={() => {
@@ -215,16 +256,22 @@ const Sidebar = () => {
                           : null;
                       }}
                       className={`${
-                        currentPath === `/services_info/?id=${id}`
+                        currentPath === "/services_info/"
                           ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                           : null
                       } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                     >
                       <GoGitPullRequest size={15} />
                       Manage Services
+                      {/* <span className="flex relative  end-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
+                        <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
+                          9+
+                        </span>
+                      </span> */}
                     </Link>
                     <Link
-                     to={`/tourist_spot/?id=${id}`}
+                      to={`/tourist_spot/?id=${id}`}
                       onClick={() => {
                         window.innerWidth >= 320 && window.innerWidth <= 1023
                           ? document
@@ -235,44 +282,50 @@ const Sidebar = () => {
                           : null;
                       }}
                       className={`${
-                        currentPath === `/tourist_spot/?id=${id}`
+                        currentPath === "/tourist_spot/"
                           ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                           : null
                       } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                     >
                       <GoGitPullRequest size={15} />
                       Manage tourist spot
+                      {/* <span className="flex relative  end-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
+                        <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
+                          9+
+                        </span>
+                      </span> */}
+                    </Link>
+                    <Link
+                      to={`/municipalityofficials/?id=${id}`}
+                      onClick={() => {
+                        window.innerWidth >= 320 && window.innerWidth <= 1023
+                          ? document
+                              .getQuerySelector(
+                                "[data-hs-overlay-backdrop-template]"
+                              )
+                              .remove()
+                          : null;
+                      }}
+                      className={`${
+                        currentPath === "/municipalityofficials/"
+                          ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
+                          : null
+                      } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                    >
+                      <GoGitPullRequest size={15} />
+                      Manage Officials
+                      {/* <span className="flex relative  end-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
+                        <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
+                          9+
+                        </span>
+                      </span> */}
                     </Link>
                   </div>
                 </li>
-                {userData.type === "Head Admin" && (
+                {userData.type === "Admin" && (
                   <>
-                    <li>
-                      <Link
-                        to={`/municipalityofficials/?id=${id}`}
-                        onClick={() => {
-                          if (
-                            window.innerWidth >= 320 &&
-                            window.innerWidth <= 1023
-                          ) {
-                            document
-                              .querySelector(
-                                "[data-hs-overlay-backdrop-template]"
-                              )
-                              .remove();
-                          }
-                        }}
-                        className={`${
-                          currentPath === `/municipalityofficials/?id=${id}`
-                            ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
-                            : ""
-                        } flex items-center gap-x-3 py-2 px-2.5 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
-                      >
-                        <HiBuildingOffice2 size={15} />
-                        Officials
-                      </Link>
-                    </li>
-
                     <li>
                       <Link
                         to={`/accountmanagement/?id=${id}`}
@@ -289,7 +342,7 @@ const Sidebar = () => {
                           }
                         }}
                         className={`${
-                          currentPath === `/accountmanagement/?id=${id}`
+                          currentPath === "/accountmanagement/"
                             ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                             : ""
                         } flex items-center gap-x-3 py-2 px-2.5 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
@@ -314,7 +367,7 @@ const Sidebar = () => {
                         : null;
                     }}
                     className={`${
-                      currentPath === `/barangaymenu/?id=${id}`
+                      currentPath === "/barangaymenu/"
                         ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                         : null
                     } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
@@ -337,7 +390,7 @@ const Sidebar = () => {
                         : null;
                     }}
                     className={`${
-                      currentPath === "/settings"
+                      currentPath === "/settings/"
                         ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                         : null
                     } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}

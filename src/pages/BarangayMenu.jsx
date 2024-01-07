@@ -32,7 +32,7 @@ function BarangayMenu() {
     <div className="mx-4 mt-[10rem] md:mt-[4rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div className="flex flex-col justify-center items-center mx-auto mt-4">
         <div className="py-2 text-center font-bold text-3xl">
-          <h1>BARANGAY MANAGEMENT</h1>
+          <h1>SELECT A BARANGAY</h1>
         </div>
         {/* <div className="w-6/12 mx-auto rounded-lg flex mb-4">
           <div className="hs-tooltip inline-block w-full">

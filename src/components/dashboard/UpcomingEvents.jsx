@@ -14,15 +14,22 @@ const UpcomingEvents = () => {
   const [announcement, setAnnouncement] = useState([]);
 
   useEffect(() => {
-    const fetch = async () => {
-      const response = await axios.get(
-        `${API_LINK}/announcement/?brgy=${brgy}&archived=false`
-      );
-      if (response.status === 200) setAnnouncements(response.data);
-      else setAnnouncements([]);
+    const fetchAnnouncements = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/announcement/?brgy=${brgy}&archived=false`
+        );
+        if (response.status === 200) {
+          setAnnouncements(response.data.result);
+        } else {
+          setAnnouncements([]);
+        }
+      } catch (error) {
+        console.error("Error fetching announcements:", error);
+      }
     };
-    fetch();
-  }, []);
+    fetchAnnouncements();
+  }, [brgy]);
 
   const dateFormat = (date) => {
     const eventdate = date === undefined ? "" : date.substr(0, 10);
@@ -38,10 +45,10 @@ const UpcomingEvents = () => {
       <b className="border-solid border-0 border-black border-b-2 pb-2 uppercase font-heavy text-lg md:text-xl mb-4">
         UPCOMING EVENTS
       </b>
-      <div className="overflow-y-auto h-[calc(100vh_-_475px)]">
+      <div className="overflow-y-auto h-auto">
         <div className="w-full gap-3 flex flex-col border">
-          {announcements.map((item, index) => (
-            <div className="flex flex-row bg-gradient-to-r from-[#295141]  to-[#408D51] h-full text-white font-medium overflow-hidden">
+        {announcements.map((item, index) => (
+            <div key={index} className="flex flex-row bg-gradient-to-r from-[#295141]  to-[#408D51] h-full text-white font-medium overflow-hidden">
               <div
                 className="bg-cover bg-center w-[20%] h-[4rem] md:h-[5rem] lg:h-[6rem] object-cover rounded-r-full border-solid border-0"
                 style={{

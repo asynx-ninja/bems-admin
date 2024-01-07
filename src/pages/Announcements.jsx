@@ -16,7 +16,6 @@ import ArchiveModal from "../components/announcement/ArchiveAnnouncementModal";
 import AddModal from "../components/announcement/AddAnnouncementModal";
 import ManageAnnouncementModal from "../components/announcement/ManageAnnouncementModal";
 
-
 const Announcement = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
@@ -24,18 +23,28 @@ const Announcement = () => {
   const id = searchParams.get("id");
   const brgy = "MUNISIPYO";
   const [announcement, setAnnouncement] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
-    const fetch = async () => {
-      const response = await axios.get(
-        `${API_LINK}/announcement/?brgy=${brgy}&archived=false`
-      );
-      if (response.status === 200) setAnnouncements(response.data);
-      else setAnnouncements([]);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/announcement/?brgy=${brgy}&archived=false&page=${currentPage}`
+        );
+        setAnnouncements(response.data.result);
+        setPageCount(response.data.pageCount);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
-    fetch();
-  }, []);
+    fetchData();
+  }, [currentPage]);
+
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
@@ -74,7 +83,7 @@ const Announcement = () => {
   ];
 
   useEffect(() => {
-    document.title = "Announcement | Barangay E-Services Management";
+    document.title = "Events | Barangay E-Services Management";
   }, []);
 
   const handleView = (item) => {
@@ -91,11 +100,11 @@ const Announcement = () => {
       <div className="flex flex-col">
         <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full shrink-0">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
-          <h1
+            <h1
               className="mx-auto font-bold text-xs md:text-xl lg:text-[17px] xl:text-[20px] xxl:text-[1.5rem] xxxl:text-4xl text-white text-center"
               style={{ letterSpacing: "0.2em" }}
             >
-              MUNICIPALITY ANNOUNCEMENT
+              MUNICIPALITY EVENTS
             </h1>
           </div>
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">
@@ -121,7 +130,9 @@ const Announcement = () => {
                 </div>
               </div>
               <div className="w-full rounded-lg ">
-                <Link to={`/archivedannoucements/?id=${id}&brgy=${brgy}&archived=true`}>
+                <Link
+                  to={`/archivedannoucements/?id=${id}&brgy=${brgy}&archived=true`}
+                >
                   <div className="hs-tooltip inline-block w-full">
                     <button
                       type="button"
@@ -309,14 +320,14 @@ const Announcement = () => {
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                      {dateFormat(item.date) || ""}
+                        {dateFormat(item.date) || ""}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                      {item.attendees.length}
+                        {item.attendees.length}
                       </span>
                     </div>
                   </td>
@@ -339,24 +350,27 @@ const Announcement = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}
           />
         </div>
-        <AddModal brgy={brgy}/>
+        <AddModal brgy={brgy} />
         <ArchiveModal selectedItems={selectedItems} />
-        <ManageAnnouncementModal announcement={announcement} setAnnouncement={setAnnouncement}/>
+        <ManageAnnouncementModal
+          announcement={announcement}
+          setAnnouncement={setAnnouncement}
+        />
       </div>
     </div>
   );

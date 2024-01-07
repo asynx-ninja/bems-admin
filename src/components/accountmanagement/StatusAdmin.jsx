@@ -1,9 +1,15 @@
 import React from "react";
 import axios from "axios";
 import API_LINK from "../../config/API";
-
+import { useState } from "react";
 function StatusAdmin({ status, setStatus }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerId, setTimerId] = useState(null);
   const handleSave = async (e) => {
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
     try {
       e.preventDefault();
 
@@ -15,10 +21,15 @@ function StatusAdmin({ status, setStatus }) {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      if (response.status === 200){
-        window.location.reload();
-      }
-      else ;
+      if (response.status === 200) {
+        setTimerId(
+          setTimeout(() => {
+            setIsLoading(false);
+            HSOverlay.close(document.getElementById("hs-modal-statusAdmin"));
+            window.location.reload();
+          }, 1000)
+        );
+      } else;
     } catch (err) {
       console.log(err);
     }
@@ -33,6 +44,15 @@ function StatusAdmin({ status, setStatus }) {
 
   return (
     <div>
+      {isLoading && (
+        <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
+          <div className="loaders">
+            <div className="loader"></div>
+            <div className="loader"></div>
+            <div className="loader"></div>
+          </div>
+        </div>
+      )}
       <div className="">
         <div
           id="hs-modal-statusAdmin"
@@ -50,7 +70,7 @@ function StatusAdmin({ status, setStatus }) {
                   STATUS
                 </h3>
               </div>
-              
+
               <div className="mt-5">
                 <form>
                   <div className="flex flex-col lg:flex-row">
@@ -69,21 +89,9 @@ function StatusAdmin({ status, setStatus }) {
                           className="w-full mt-3 p-2 border border-gray-300 rounded"
                           value={status.status}
                         >
-                          <option
-                            value="Registered"
-                          >
-                            REGISTERED
-                          </option>
-                          <option
-                            value="Pending"
-                          >
-                            PENDING
-                          </option>
-                          <option
-                            value="Denied"
-                          >
-                            DENIED
-                          </option>
+                          <option value="Registered">REGISTERED</option>
+                          <option value="Pending">PENDING</option>
+                          <option value="Denied">DENIED</option>
                         </select>
                       </div>
                     </div>
@@ -92,23 +100,23 @@ function StatusAdmin({ status, setStatus }) {
               </div>
               {/* Buttons */}
               <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700 mx-auto">
-              <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="h-[2.5rem] w-full md:w-[9.5rem] py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md borde text-sm font-base bg-[#295141]  text-white shadow-sm align-middle"
-                  data-hs-overlay="#hs-modal-statusAdmin"
-                >
-                  SAVE CHANGES
-                </button>
-                <button
-                  type="button"
-                  className="h-[2.5rem] w-full md:w-[9.5rem] py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md border text-sm font-base bg-pink-800 text-white shadow-sm align-middle"
-                  data-hs-overlay="#hs-modal-statusAdmin"
-                >
-                  CLOSE
-                </button>
-              </div>
+                <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="h-[2.5rem] w-full md:w-[9.5rem] py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md borde text-sm font-base bg-[#295141]  text-white shadow-sm align-middle"
+                    data-hs-overlay="#hs-modal-statusAdmin"
+                  >
+                    SAVE CHANGES
+                  </button>
+                  <button
+                    type="button"
+                    className="h-[2.5rem] w-full md:w-[9.5rem] py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md border text-sm font-base bg-pink-800 text-white shadow-sm align-middle"
+                    data-hs-overlay="#hs-modal-statusAdmin"
+                  >
+                    CLOSE
+                  </button>
+                </div>
               </div>
             </div>
           </div>

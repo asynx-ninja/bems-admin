@@ -29,7 +29,9 @@ const AccountManagement = () => {
   const type = "Admin";
   const [user, setUser] = useState({});
   const [status, setStatus] = useState({});
-
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+  
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
     let value = e.target.value;
@@ -61,25 +63,38 @@ const AccountManagement = () => {
     "PROFILE",
     "USER_ID",
     "NAME",
-    "AGE",
-    "GENDER",
+    // "AGE",
+    // "GENDER",
     "CONTACT",
     "ACCOUNT STATUS",
     "ACTIONS",
   ];
 
   useEffect(() => {
-    const fetch = async () => {
-      const response = await axios.get(`${API_LINK}/users/${brgy}`);
-      if (response.status === 200) setUsers(response.data);
-      else setUsers([]);
-
-      console.log("rr",response.data);
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/users/?brgy=${brgy}&type=Admin&page=${currentPage}`
+        );
+  
+        if (response.status === 200) {
+          setPageCount(response.data.pageCount);
+          setUsers(response.data.result); // Update the state variable with the fetched users
+        } else {
+          // Handle error here
+          console.error("Error fetching users:", response.error);
+        }
+      } catch (err) {
+        // Handle uncaught error here
+        console.error("Uncaught error:", err.message);
+      }
     };
-
-    fetch();
-  }, []);
-
+  
+    fetchUsers();
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
   const handleView = (item) => {
     setUser(item);
   };
@@ -321,7 +336,7 @@ const AccountManagement = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-3">
+                  {/* <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
                         {item.age}
@@ -334,7 +349,7 @@ const AccountManagement = () => {
                         {item.sex}
                       </span>
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
@@ -397,16 +412,16 @@ const AccountManagement = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}
