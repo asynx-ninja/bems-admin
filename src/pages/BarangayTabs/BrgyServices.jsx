@@ -259,20 +259,28 @@ function Services() {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-3">
-                    <div
-                      className={`flex items-center justify-center ${
-                        service.isApproved === "Approved"
-                          ? "bg-custom-green-button3"
-                          : service.isApproved === "Pending"
-                          ? "bg-custom-yellow"
-                          : "bg-custom-red-button"
-                      } m-2`}
-                    >
-                      <span className="text-xs sm:text-sm text-white p-3 mx-5">
-                        {service.isApproved}
-                      </span>
-                    </div>
+                  <td className="px-6 py-3 w-4/12">
+                    {service.isApproved === "Approved" && (
+                      <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          APPROVED
+                        </span>
+                      </div>
+                    )}
+                    {service.isApproved === "Disapproved" && (
+                      <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          DISAPPROVED
+                        </span>
+                      </div>
+                    )}
+                    {service.isApproved === "Pending" && (
+                      <div className="flex w-full items-center justify-center bg-custom-amber m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          PENDING
+                        </span>
+                      </div>
+                    )}
                   </td>
 
                   <td className="px-6 py-3">

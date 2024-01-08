@@ -319,7 +319,7 @@ const Inquiries = () => {
                     </div>
                   </td>
 
-                  <td className="px-6 py-3">
+                  <td className="px-6 py-3 xxl:w-4/12">
                     <div className="flex justify-center items-center">
                       {item.isApproved === "Completed" && (
                         <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
@@ -328,10 +328,10 @@ const Inquiries = () => {
                           </span>
                         </div>
                       )}
-                      {item.isApproved === "Not Responded" && (
+                      {item.isApproved === "Pending" && (
                         <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
                           <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
-                            NOT RESPONDED
+                            PENDING
                           </span>
                         </div>
                       )}

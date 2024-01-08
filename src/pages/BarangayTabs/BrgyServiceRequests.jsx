@@ -276,10 +276,10 @@ function ServiceRequests() {
                     </div>
                   </td>
                   <td className="px-6 py-3">
-                    {item.status === "Completed" && (
+                    {item.status === "Transaction Completed" && (
                       <div className="flex items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
                         <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
-                          COMPLETED
+                          TRANSACTION COMPLETED
                         </span>
                       </div>
                     )}
@@ -294,13 +294,6 @@ function ServiceRequests() {
                       <div className="flex items-center justify-center bg-custom-amber m-2 rounded-lg">
                         <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
                           PENDING
-                        </span>
-                      </div>
-                    )}
-                    {item.status === "Not Responded" && (
-                      <div className="flex items-center justify-center bg-pink-700 m-2 rounded-lg">
-                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
-                          NOT RESPONDED
                         </span>
                       </div>
                     )}
