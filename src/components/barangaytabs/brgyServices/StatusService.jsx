@@ -2,17 +2,15 @@ import React from "react";
 import axios from "axios";
 import API_LINK from "../../../config/API";
 import { useState } from "react";
+import StatusLoader from "./loaders/StatusLoader";
 function ServiceStatus({ status, setStatus }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
   const handleSave = async (e) => {
-    setIsLoading(true);
-
-    // Clear any existing timer
-    clearTimeout(timerId);
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       const response = await axios.patch(
         `${API_LINK}/services/status/${status.id}`,
         {
@@ -21,18 +19,20 @@ function ServiceStatus({ status, setStatus }) {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      if (response.status === 200){
-        setTimerId(
+      if (response.status === 200) {
+        setTimeout(() => {
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
           setTimeout(() => {
-            setIsLoading(false);
-            HSOverlay.close(document.getElementById("hs-modal-statusResident"));
             window.location.reload();
-          }, 1000)
-        );
+          }, 3000);
+        }, 1000);
       }
-      else ;
     } catch (err) {
       console.log(err);
+      setSubmitClicked(false);
+      setUpdatingStatus(null);
+      setError("An error occurred while updating the inquiry.");
     }
   };
 
@@ -45,19 +45,10 @@ function ServiceStatus({ status, setStatus }) {
 
   return (
     <div>
-      {isLoading && (
-      <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-        <div className="loaders">
-          <div className="loader"></div>
-          <div className="loader"></div>
-          <div className="loader"></div>
-        </div>
-      </div>
-    )}
       <div className="">
         <div
           id="hs-modal-serviceStatus"
-          className="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center"
+          className="hs-overlay hidden fixed top-0 left-0 z-[80] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center"
         >
           {/* Modal */}
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-xl">
@@ -71,7 +62,7 @@ function ServiceStatus({ status, setStatus }) {
                   STATUS
                 </h3>
               </div>
-              
+
               <div className="mt-5">
                 <form>
                   <div className="flex flex-col lg:flex-row">
@@ -90,21 +81,9 @@ function ServiceStatus({ status, setStatus }) {
                           className="w-full mt-3 p-2 border border-gray-300 rounded"
                           value={status.status}
                         >
-                          <option
-                            value="Approved"
-                          >
-                            APPROVED
-                          </option>
-                          <option
-                            value="Disapproved"
-                          >
-                            DISAPPROVED
-                          </option>
-                          <option
-                            value="Pending"
-                          >
-                            PENDING
-                          </option>
+                          <option value="Approved">APPROVED</option>
+                          <option value="Disapproved">DISAPPROVED</option>
+                          <option value="Pending">PENDING</option>
                         </select>
                       </div>
                     </div>
@@ -113,28 +92,31 @@ function ServiceStatus({ status, setStatus }) {
               </div>
               {/* Buttons */}
               <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700 mx-auto">
-              <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="h-[2.5rem] w-full md:w-[9.5rem] py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md borde text-sm font-base bg-[#013D74]  text-white shadow-sm align-middle"
-                  data-hs-overlay="#hs-modal-serviceStatus"
-                >
-                  SAVE CHANGES
-                </button>
-                <button
-                  type="button"
-                  className="h-[2.5rem] w-full md:w-[9.5rem] py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md border text-sm font-base bg-pink-800 text-white shadow-sm align-middle"
-                  data-hs-overlay="#hs-modal-serviceStatus"
-                >
-                  CLOSE
-                </button>
-              </div>
+                <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="h-[2.5rem] w-full md:w-[9.5rem] py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md borde text-sm font-base bg-[#295141]  text-white shadow-sm align-middle"
+                  >
+                    SAVE CHANGES
+                  </button>
+                  <button
+                    type="button"
+                    className="h-[2.5rem] w-full md:w-[9.5rem] py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md border text-sm font-base bg-pink-800 text-white shadow-sm align-middle"
+                    data-hs-overlay="#hs-modal-serviceStatus"
+                  >
+                    CLOSE
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      {submitClicked && <StatusLoader updatingStatus="updating" />}
+      {updatingStatus && (
+        <StatusLoader updatingStatus={updatingStatus} error={error} />
+      )}
     </div>
   );
 }

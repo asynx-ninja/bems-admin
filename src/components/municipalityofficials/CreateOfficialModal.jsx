@@ -3,10 +3,11 @@ import { useState, useEffect } from "react";
 import { CiImageOn } from "react-icons/ci";
 import API_LINK from "../../config/API";
 import axios from "axios";
-
+import AddLoader from "./loaders/AddLoader";
 function CreateOfficialModal({ brgy }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [creationStatus, setCreationStatus] = useState(null);
+  const [error, setError] = useState(null);
   const [official, setOfficial] = useState({
     firstName: "",
     middleName: "",
@@ -22,13 +23,10 @@ function CreateOfficialModal({ brgy }) {
   const [pfp, setPfp] = useState();
 
   const handleSubmit = async (e) => {
-    setIsLoading(true);
-
-    // Clear any existing timer
-    clearTimeout(timerId);
+  
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       const formData = new FormData();
       formData.append("file", pfp);
 
@@ -61,18 +59,18 @@ function CreateOfficialModal({ brgy }) {
           brgy: "",
         });
         setPfp(null);
-        setTimerId(
-          setTimeout(() => {
-            setIsLoading(false);
-            HSOverlay.close(
-              document.getElementById("hs-create-official-modal")
-            );
-            window.location.reload();
-          }, 1000)
-        );
+        setSubmitClicked(false);
+        setCreationStatus("success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+       
       }
     } catch (err) {
-      console.error("Error adding official:", err);
+      console.log(err);
+      setSubmitClicked(false);
+      setCreationStatus(null);
+      setError("An error occurred while creating the info.");
     }
   };
 
@@ -88,15 +86,6 @@ function CreateOfficialModal({ brgy }) {
 
   return (
     <div>
-      {isLoading && (
-        <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-          <div className="loaders">
-            <div className="loader"></div>
-            <div className="loader"></div>
-            <div className="loader"></div>
-          </div>
-        </div>
-      )}
       <div
         id="hs-create-official-modal"
         className="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center lg:ml-10 xxl:ml-0"
@@ -341,7 +330,6 @@ function CreateOfficialModal({ brgy }) {
                 <button
                   type="button"
                   className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-teal-900 text-white shadow-sm"
-                  data-hs-overlay="#hs-create-official-modal"
                   onClick={handleSubmit}
                 >
                   SAVE CHANGES
@@ -357,7 +345,12 @@ function CreateOfficialModal({ brgy }) {
             </div>
           </div>
         </div>
+     
       </div>
+      {submitClicked && <AddLoader creationStatus="creating" />}
+        {creationStatus && (
+          <AddLoader creationStatus={creationStatus} error={error} />
+        )}
       <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
     </div>
   );

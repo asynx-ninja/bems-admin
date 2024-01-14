@@ -81,7 +81,7 @@ function Services() {
           </div>
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">
             <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
-              <div className="w-full rounded-lg ">
+              {/* <div className="w-full rounded-lg ">
                 <Link to={`/brgyarchivedservices/?id=${id}&brgy=${brgy}`}>
                   <div className="hs-tooltip inline-block w-full">
                     <button
@@ -102,7 +102,7 @@ function Services() {
                     </button>
                   </div>
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -144,7 +144,7 @@ function Services() {
                 </li>
               </ul>
             </div>
-            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
+            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">
                 <button className=" bg-[#295141] p-3 rounded-l-md">
                   <div className="w-full overflow-hidden">
@@ -174,23 +174,7 @@ function Services() {
                   placeholder="Search for items"
                 />
               </div>
-              <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-generate-reports-modal"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Generate Report
-                    </span>
-                  </button>
-                </div>
-              </div>
+             
             </div>
           </div>
         </div>

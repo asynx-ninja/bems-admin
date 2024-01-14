@@ -92,7 +92,7 @@ function InquiryStatus({ status, setStatus }) {
                           value={status.status}
                         >
                           <option value="Completed">COMPLETED</option>
-                          <option value="Not Responded">NOT RESPONDED</option>
+                          <option value="Pending">PENDING</option>
                           <option value="In Progress">IN PROGRESS</option>
                         </select>
                       </div>

@@ -303,21 +303,6 @@ const dateFormat = (fromYear, toYear) => {
               <div className="hs-tooltip inline-block w-full">
                 <button
                   type="button"
-                  data-hs-overlay="#hs-generate-reports-modal"
-                  className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                >
-                  <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                  <span
-                    className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                    role="tooltip"
-                  >
-                    Generate Report
-                  </span>
-                </button>
-              </div>
-              <div className="hs-tooltip inline-block w-full">
-                <button
-                  type="button"
                   data-hs-overlay="#hs-archive-official-modal"
                   className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md  bg-pink-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
                 >

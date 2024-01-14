@@ -148,6 +148,14 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 
+@keyframes slideIn {
+  from {
+      transform: translateX(100%);
+  }
+  to {
+      transform: translateX(0);
+  }
+}
 
 
 /* Handle on hover

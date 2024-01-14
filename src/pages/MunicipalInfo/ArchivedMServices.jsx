@@ -162,7 +162,7 @@ const ArchivedServicesInfo = () => {
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                <div className="hs-tooltip inline-block w-full">
+                {/* <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
                     data-hs-overlay="#hs-generate-reports-modal"
@@ -176,7 +176,7 @@ const ArchivedServicesInfo = () => {
                       Generate Report
                     </span>
                   </button>
-                </div>
+                </div> */}
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     data-hs-overlay="#hs-restore-servicesinfo-modal"

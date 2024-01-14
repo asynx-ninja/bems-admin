@@ -129,7 +129,7 @@ const EditDropbox = ({
                         className="group w-full h-full rounded-md focus:outline-none focus:shadow-outline elative bg-gray-100 cursor-pointer relative shadow-sm"
                       >
                         <img
-                          alt="upload preview"
+                          alt=""
                           name="images"
                           ref={editImageRef}
                           src={file.link} 

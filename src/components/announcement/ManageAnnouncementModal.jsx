@@ -4,15 +4,16 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import EditDropbox from "./EditDropbox";
 import API_LINK from "../../config/API";
+import EditLoader from "./loaders/EditLoader";
 function ManageAnnouncementModal({ announcement, setAnnouncement }) {
   const [logo, setLogo] = useState();
   const [banner, setBanner] = useState();
   const [files, setFiles] = useState([]);
   const [edit, setEdit] = useState(false);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
-
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
   const dateFormat = (date) => {
     const eventdate = date === undefined ? "" : date.substr(0, 10);
     return eventdate;
@@ -80,13 +81,9 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
   };
 
   const handleSubmit = async (e) => {
-    setIsLoading(true);
-
-    // Clear any existing timer
-    clearTimeout(timerId);
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       var formData = new FormData();
 
       const arr1 = [banner, logo];
@@ -133,17 +130,21 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
         // setBanner();
         // setFiles([]);
         // navigate("/");
-        setTimerId(
+        setTimeout(() => {
+          // HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
           setTimeout(() => {
-            setIsLoading(false);
-            HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
             window.location.reload();
-          }, 1000)
-        );
+          }, 3000);
+        }, 1000);
        
       }
     } catch (err) {
       console.log(err);
+      setSubmitClicked(false);
+      setUpdatingStatus(null);
+      setError("An error occurred while updating the announcement.");
     }
   };
 
@@ -154,15 +155,6 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
           id="hs-modal-editAnnouncement"
           className="hs-overlay hidden fixed top-0 bottom-0 left-0 z-[60] w-full h-full flex items-center justify-center"
         >
-          {isLoading && (
-            <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-              <div className="loaders">
-                <div className="loader"></div>
-                <div className="loader"></div>
-                <div className="loader"></div>
-              </div>
-            </div>
-          )}
 
           {/* Modal */}
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
@@ -356,6 +348,10 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
             </div>
           </div>
         </div>
+        {submitClicked && <EditLoader updatingStatus="updating" />}
+        {updatingStatus && (
+          <EditLoader updatingStatus={updatingStatus} error={error} />
+        )}
       </div>
     </div>
   );

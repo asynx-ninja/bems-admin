@@ -3,10 +3,11 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import API_LINK from "../../config/API";
 import { LiaRandomSolid } from "react-icons/lia";
-
+import AddLoader from "./loaders/AddLoader";
 function AddAdminModal({ brgy, occupation, type }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [creationStatus, setCreationStatus] = useState(null);
+  const [error, setError] = useState(null);
   const [user, setUser] = useState({
     user_id: "",
     firstName: "",
@@ -56,13 +57,9 @@ function AddAdminModal({ brgy, occupation, type }) {
   };
 
   const handleSubmit = async (e) => {
-    setIsLoading(true);
-
-    // Clear any existing timer
-    clearTimeout(timerId);
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       const calculatedAge = calculateAge(user.birthday);
 
       const obj = {
@@ -115,16 +112,18 @@ function AddAdminModal({ brgy, occupation, type }) {
           city: "Rodriguez, Rizal",
           brgy: brgy,
         });
-        setTimerId(
-          setTimeout(() => {
-            setIsLoading(false);
-            HSOverlay.close(document.getElementById("hs-modal-addAdmin"));
-            window.location.reload();
-          }, 1000)
-        );
+        setSubmitClicked(false);
+        setCreationStatus("success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+       
       }
     } catch (err) {
       console.log(err);
+      setSubmitClicked(false);
+      setCreationStatus(null);
+      setError("An error occurred while creating the announcement.");
     }
   };
 
@@ -165,15 +164,7 @@ function AddAdminModal({ brgy, occupation, type }) {
 
   return (
     <div>
-      {isLoading && (
-        <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-          <div className="loaders">
-            <div className="loader"></div>
-            <div className="loader"></div>
-            <div className="loader"></div>
-          </div>
-        </div>
-      )}
+    
       <div className="">
         <div
           id="hs-modal-addAdmin"
@@ -690,6 +681,10 @@ function AddAdminModal({ brgy, occupation, type }) {
             </div>
           </div>
         </div>
+        {submitClicked && <AddLoader creationStatus="creating" />}
+        {creationStatus && (
+          <AddLoader creationStatus={creationStatus} error={error} />
+        )}
       </div>
     </div>
   );

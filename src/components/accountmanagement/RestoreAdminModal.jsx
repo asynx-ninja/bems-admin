@@ -3,46 +3,38 @@ import Error from "../../assets/modals/Error.png";
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useState } from "react";
+import RestoreLoader from "./loaders/RestoreLoader";
 function RestoreAdminModal({ selectedItems }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
   const handleSave = async (e) => {
-    setIsLoading(true);
 
-    // Clear any existing timer
-    clearTimeout(timerId);
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       for (let i = 0; i < selectedItems.length; i++) {
         const response = await axios.patch(
           `${API_LINK}/users/archived/${selectedItems[i]}/false`
         );
-      }
-      setTimerId(
+      setTimeout(() => {
+        setSubmitClicked(false);
+        setUpdatingStatus("success");
         setTimeout(() => {
-          setIsLoading(false);
-          HSOverlay.close(document.getElementById("hs-modal-restoreAdmin"));
           window.location.reload();
-        }, 1000)
-      );
-
-    } catch (err) {
-      console.log(err);
-    } 
+        }, 3000);
+      }, 1000);
+    }
+  } catch (err) {
+    console.log(err);
+    setSubmitClicked(false);
+    setUpdatingStatus(null);
+    setError("An error occurred while creating the announcement.");
+  }
   };
 
   return (
     <div>
-      {isLoading && (
-        <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-          <div className="loaders">
-            <div className="loader"></div>
-            <div className="loader"></div>
-            <div className="loader"></div>
-          </div>
-        </div>
-      )}
       <div
         id="hs-modal-restoreAdmin"
         className="z-[100] hs-overlay hidden w-full h-full fixed top-0 left-0 z-60 overflow-x-hidden overflow-y-auto"
@@ -62,7 +54,6 @@ function RestoreAdminModal({ selectedItems }) {
             <div className="flex mt-8 space-x-4 relative bottom-[3rem]">
               <button
                 type="button"
-                data-hs-overlay="#hs-modal-restoreAdmin"
                 onClick={handleSave} // Call the handleArchive function
                 className=" w-[6rem] lg:w-[12rem] px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600"
               >
@@ -79,6 +70,10 @@ function RestoreAdminModal({ selectedItems }) {
           </div>
         </div>
       </div>
+      {submitClicked && <RestoreLoader updatingStatus="updating" />}
+      {updatingStatus && (
+        <RestoreLoader updatingStatus={updatingStatus} error={error} />
+      )}
     </div>
   );
 }

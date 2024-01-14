@@ -5,11 +5,12 @@ import axios from "axios";
 import Dropbox from "./Dropbox";
 import API_LINK from "../../config/API";
 import { CiImageOn } from "react-icons/ci";
-
+import AddLoader from "./loaders/AddLoader";
 function CreateAnnouncementModal() {
   const brgy = "MUNISIPYO";
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [creationStatus, setCreationStatus] = useState(null);
+  const [error, setError] = useState(null);
   const [announcement, setAnnouncement] = useState({
     title: "",
     details: "",
@@ -21,7 +22,6 @@ function CreateAnnouncementModal() {
   const [logo, setLogo] = useState();
   const [banner, setBanner] = useState();
   const [files, setFiles] = useState([]);
-  const navigate = useNavigate();
 
   // useEffect(() => {
   //   var logoSrc = document.getElementById("logo");
@@ -70,13 +70,9 @@ function CreateAnnouncementModal() {
   };
 
   const handleSubmit = async (e) => {
-    setIsLoading(true);
-
-    // Clear any existing timer
-    clearTimeout(timerId);
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       var formData = new FormData();
 
       const arr1 = [banner, logo];
@@ -115,15 +111,18 @@ function CreateAnnouncementModal() {
         setLogo();
         setBanner();
         setFiles([]);
-        setTimerId(setTimeout(() => {
-          setIsLoading(false);
-          HSOverlay.close(document.getElementById("hs-modal-add"));
+        setSubmitClicked(false);
+        setCreationStatus("success");
+        setTimeout(() => {
           window.location.reload();
-        }, 1000));
+        }, 3000);
        
       }
     } catch (err) {
       console.log(err);
+      setSubmitClicked(false);
+      setCreationStatus(null);
+      setError("An error occurred while creating the announcement.");
     }
   };
 
@@ -134,15 +133,6 @@ function CreateAnnouncementModal() {
         id="hs-modal-add"
         className="hs-overlay hidden fixed top-0 left-0 z-[80] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center "
       >
-         {isLoading && (
-        <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-          <div className="loaders">
-            <div className="loader"></div>
-            <div className="loader"></div>
-            <div className="loader"></div>
-          </div>
-        </div>
-      )}
 
         {/* Modal */}
         <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
@@ -320,6 +310,10 @@ function CreateAnnouncementModal() {
             </div>
           </div>
         </div>
+        {submitClicked && <AddLoader creationStatus="creating" />}
+        {creationStatus && (
+          <AddLoader creationStatus={creationStatus} error={error} />
+        )}
       </div>
     </div>
   );

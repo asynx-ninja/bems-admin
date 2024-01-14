@@ -5,11 +5,12 @@ import API_LINK from "../../config/API";
 import { LiaRandomSolid } from "react-icons/lia";
 import { FaFacebookSquare, FaInstagram } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
-
+import EditLoader from "./loaders/EditLoader";
 function ManageAdminModal({ user, setUser }) {
   const [edit, setEdit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
   const handleOnEdit = () => {
     setEdit(!edit);
   };
@@ -57,13 +58,9 @@ function ManageAdminModal({ user, setUser }) {
   };
 
   const handleSave = async (e) => {
-    setIsLoading(true);
-
-    // Clear any existing timer
-    clearTimeout(timerId);
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       var formData = new FormData();
       formData.append("users", JSON.stringify(user));
 
@@ -74,20 +71,24 @@ function ManageAdminModal({ user, setUser }) {
 
       if (response.status === 200) {
         console.log("Update successful:", response.data);
-        setTimerId(
+        setTimeout(() => {
+          // HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
           setTimeout(() => {
-            setIsLoading(false);
-            HSOverlay.close(document.getElementById("hs-modal-editAdmin"));
             window.location.reload();
-          }, 1000)
-        );
+          }, 3000);
+        }, 1000);
 
       } else {
         console.error("Update failed. Status:", response.status);
       }
     } catch (err) {
       console.log(err);
-    } 
+      setSubmitClicked(false);
+      setUpdatingStatus(null);
+      setError("An error occurred while creating the announcement.");
+    }
   };
 
   const birthdayFormat = (date) => {
@@ -117,15 +118,7 @@ function ManageAdminModal({ user, setUser }) {
         <div
           id="hs-modal-editAdmin"
           className="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center"
-        > {isLoading && (
-          <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-            <div className="loaders">
-              <div className="loader"></div>
-              <div className="loader"></div>
-              <div className="loader"></div>
-            </div>
-          </div>
-        )}
+        >
           {/* Modal */}
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full   md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
@@ -822,6 +815,10 @@ function ManageAdminModal({ user, setUser }) {
             </div>
           </div>
         </div>
+        {submitClicked && <EditLoader updatingStatus="updating" />}
+        {updatingStatus && (
+          <EditLoader updatingStatus={updatingStatus} error={error} />
+        )}
       </div>
     </div>
   );

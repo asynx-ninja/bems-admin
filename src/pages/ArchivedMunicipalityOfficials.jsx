@@ -5,10 +5,10 @@ import { BsPrinter } from "react-icons/bs";
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { MdRestartAlt } from "react-icons/md";
 import officialimage from "../assets/sample/official.jpg";
-import GenerateReportsModal from "../components/archivedMunicipalityOfficials/GenerateReportsModal";
-import Breadcrumbs from "../components/archivedMunicipalityOfficials/Breadcrumbs";
-import RestoreOfficialModal from "../components/archivedMunicipalityOfficials/RestoreOfficialModal";
-import ViewOfficialModal from "../components/archivedMunicipalityOfficials/ViewOfficialModal";
+import GenerateReportsModal from "../components/municipalityofficials/GenerateReportsModal";
+import Breadcrumbs from "../components/municipalityofficials/Breadcrumbs";
+import RestoreOfficialModal from "../components/municipalityofficials/RestoreOfficialModal";
+import ViewOfficialModal from "../components/municipalityofficials/ViewOfficialModal";
 import axios from "axios";
 import API_LINK from "../config/API";
 import { useSearchParams } from "react-router-dom";
@@ -251,7 +251,7 @@ const ArchivedOfficials = () => {
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                <div className="hs-tooltip inline-block w-full">
+                {/* <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
                     data-hs-overlay="#hs-generate-reports-modal"
@@ -265,7 +265,7 @@ const ArchivedOfficials = () => {
                       Generate Report
                     </span>
                   </button>
-                </div>
+                </div> */}
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"

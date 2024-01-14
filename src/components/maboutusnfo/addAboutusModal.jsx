@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { CiImageOn } from "react-icons/ci";
-
+import AddLoader from "./loaders/AddLoader";
 function AddAboutus({ brgy }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [creationStatus, setCreationStatus] = useState(null);
+  const [error, setError] = useState(null);
   const [aboutus, setAboutus] = useState({
     brgy: brgy,
     title: "",
@@ -36,13 +37,9 @@ function AddAboutus({ brgy }) {
   };
 
   const handleSubmit = async (e) => {
-    setIsLoading(true);
-
-    // Clear any existing timer
-    clearTimeout(timerId);
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       var formData = new FormData();
 
       formData.append("file", banner);
@@ -64,17 +61,19 @@ function AddAboutus({ brgy }) {
           details: "",
         });
         setBanner();
-        setTimerId(
-          setTimeout(() => {
-            setIsLoading(false);
-            HSOverlay.close(document.getElementById("hs-modal-addaboutus"));
-            window.location.reload();
-          }, 1000)
-        );
+        setSubmitClicked(false);
+        setCreationStatus("success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+       
       }
     } catch (err) {
       console.log(err);
-    } 
+      setSubmitClicked(false);
+      setCreationStatus(null);
+      setError("An error occurred while creating the info.");
+    }
   };
 
   return (
@@ -83,16 +82,6 @@ function AddAboutus({ brgy }) {
         id="hs-modal-addaboutus"
         className="hs-overlay hidden fixed top-0 left-0 z-[80] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center "
       >
-        {isLoading && (
-          <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-            <div className="loaders">
-              <div className="loader"></div>
-              <div className="loader"></div>
-              <div className="loader"></div>
-            </div>
-          </div>
-        )}
-
         {/* Modal */}
         <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
           <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
@@ -200,6 +189,10 @@ function AddAboutus({ brgy }) {
           </div>
         </div>
       </div>
+      {submitClicked && <AddLoader creationStatus="creating" />}
+        {creationStatus && (
+          <AddLoader creationStatus={creationStatus} error={error} />
+        )}
     </div>
   );
 }

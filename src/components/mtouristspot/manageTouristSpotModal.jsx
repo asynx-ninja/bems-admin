@@ -4,12 +4,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import EditDropbox from "./EditDropbox";
 import API_LINK from "../../config/API";
-
+import EditLoader from "./loaders/EditLoader";
 function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
   const [images, setImages] = useState([]);
   const [edit, setEdit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setImages(touristspotInfo.image || []);
@@ -41,12 +42,8 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
   };
 
   const handleSubmit = async (e) => {
-    setIsLoading(true);
-
-    // Clear any existing timer
-    clearTimeout(timerId);
     e.preventDefault();
-
+    setSubmitClicked(true);
     try {
       let formData = new FormData();
 
@@ -66,16 +63,20 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
       );
 
       if (result.status === 200) {
-        setTimerId(
+        setTimeout(() => {
+          // HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
           setTimeout(() => {
-            setIsLoading(false);
-            HSOverlay.close(document.getElementById("hs-modal-managetourist"));
             window.location.reload();
-          }, 1000)
-        );
+          }, 3000);
+        }, 1000);
       }
     } catch (err) {
-      console.error(err);
+      console.log(err);
+      setSubmitClicked(false);
+      setUpdatingStatus(null);
+      setError("An error occurred while updating the info.");
     }
   };
   return (
@@ -84,16 +85,6 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
         id="hs-modal-managetourist"
         className="hs-overlay hidden fixed top-0 left-0 z-[70] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center"
       >
-        {" "}
-        {isLoading && (
-          <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-            <div className="loaders">
-              <div className="loader"></div>
-              <div className="loader"></div>
-              <div className="loader"></div>
-            </div>
-          </div>
-        )}
         {/* Modal */}
         <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
           <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
@@ -215,6 +206,10 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
           </div>
         </div>
       </div>
+      {submitClicked && <EditLoader updatingStatus="updating" />}
+      {updatingStatus && (
+        <EditLoader updatingStatus={updatingStatus} error={error} />
+      )}
     </div>
   );
 }
