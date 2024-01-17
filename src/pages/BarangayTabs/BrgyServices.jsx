@@ -14,6 +14,8 @@ import ReplyServiceModal from "../../components/barangaytabs/brgyServices/ReplyS
 import GenerateReportsModal from "../../components/barangaytabs/brgyServices/GenerateReportsModal";
 import StatusResident from "../../components/barangaytabs/brgyServices/StatusService";
 import API_LINK from "../../config/API";
+import PrintPDF from "../../components/barangaytabs/brgyServices/form/PrintPDF";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 function Services() {
   // const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -81,7 +83,7 @@ function Services() {
           </div>
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">
             <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
-              {/* <div className="w-full rounded-lg ">
+              <div className="w-full rounded-lg ">
                 <Link to={`/brgyarchivedservices/?id=${id}&brgy=${brgy}`}>
                   <div className="hs-tooltip inline-block w-full">
                     <button
@@ -102,7 +104,7 @@ function Services() {
                     </button>
                   </div>
                 </Link>
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
@@ -174,7 +176,25 @@ function Services() {
                   placeholder="Search for items"
                 />
               </div>
-             
+              {/* <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
+                <div className="hs-tooltip inline-block w-full">
+                  <PDFDownloadLink
+                    document={
+                      <PrintPDF services={services} tableHeader={tableHeader} brgy={brgy}/>
+                    }
+                    fileName="SAMPLE.pdf"
+                    className="hs-tooltip-toggle sm:w-full md:w-full cursor-pointer text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
+                  >
+                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
+                    <span
+                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                      role="tooltip"
+                    >
+                      Generate Report
+                    </span>
+                  </PDFDownloadLink>
+                </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -299,22 +319,22 @@ function Services() {
         </div>
       </div>
       <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
-          <span className="font-medium text-white sm:text-xs text-sm">
-            Showing {currentPage + 1} out of {pageCount} pages
-          </span>
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel=">>"
-            onPageChange={handlePageChange}
-            pageRangeDisplayed={3}
-            pageCount={pageCount}
-            previousLabel="<<"
-            className="flex space-x-3 text-white font-bold"
-            activeClassName="text-yellow-500"
-            disabledLinkClassName="text-gray-300"
-            renderOnZeroPageCount={null}
-          />
-        </div>
+        <span className="font-medium text-white sm:text-xs text-sm">
+          Showing {currentPage + 1} out of {pageCount} pages
+        </span>
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel=">>"
+          onPageChange={handlePageChange}
+          pageRangeDisplayed={3}
+          pageCount={pageCount}
+          previousLabel="<<"
+          className="flex space-x-3 text-white font-bold"
+          activeClassName="text-yellow-500"
+          disabledLinkClassName="text-gray-300"
+          renderOnZeroPageCount={null}
+        />
+      </div>
       <ReplyServiceModal
         selectedService={selectedService}
         setSelectedService={setSelectedService}

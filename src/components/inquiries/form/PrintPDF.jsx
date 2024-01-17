@@ -8,10 +8,12 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 import logo from "../../../assets/header/montalban-logo.png";
-import id_picture from "../../../assets/sample/official.jpg";
-import Default from "../../../assets/sample-image/default-pfp.png";
-const PrintPDF = ({ users, tableHeader }) => {
-  console.log("table", users);
+const PrintPDF = ({ inquiries, tableHeader }) => {
+  const DateFormat = (date) => {
+    const dateFormat = date === undefined ? "" : date.substr(0, 10);
+    return dateFormat;
+  };
+  console.log("table", inquiries);
   const styles = StyleSheet.create({
     body: {
       padding: 35,
@@ -83,6 +85,7 @@ const PrintPDF = ({ users, tableHeader }) => {
         textAlign: "center",
         borderWidth: 0.5,
         borderColor: "#fff",
+        textTransform: "uppercase",
       },
       tableRow: {
         flexDirection: "row",
@@ -99,6 +102,14 @@ const PrintPDF = ({ users, tableHeader }) => {
         color: "#333", // Dark text color for readability
         flex: 1, // Distributes space evenly across the row
         textAlign: "center", // Center-align text
+      },
+      detailsCell: {
+        width: '30%', // Larger width for details cell
+        textAlign: 'center',
+        fontSize: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        color: "#333",
       },
       userImage: {
         width: 30, // Set appropriate width
@@ -120,18 +131,18 @@ const PrintPDF = ({ users, tableHeader }) => {
         fontSize: 8,
         textAlign: "center",
       },
-      registered: {
+      completed: {
         backgroundColor: "#4CAF50", // Green background
         borderRadius: 5,
         paddingHorizontal: 2,
         paddingVertical: 4,
       },
-      denied: {
+      pending: {
         backgroundColor: "#F44336", // Red background
         borderRadius: 5,
         padding: 4,
       },
-      pending: {
+      inprogress: {
         backgroundColor: "#FFC107", // Amber background
         borderRadius: 5,
         padding: 4,
@@ -159,7 +170,7 @@ const PrintPDF = ({ users, tableHeader }) => {
 
   const Title = () => (
     <View style={styles.title.view1}>
-      <Text style={styles.title.req}>ADMIN ACCOUNT LIST</Text>
+      <Text style={styles.title.req}>INQUIRIES LIST</Text>
     </View>
   );
 
@@ -168,41 +179,41 @@ const PrintPDF = ({ users, tableHeader }) => {
       <View style={styles.table.tableHeader}>
         {tableHeader.map(
           (header, idx) =>
-            header !== "ACTIONS" && header !== "PROFILE" && (
+            header !== "actions" &&(
               <Text key={idx} style={styles.table.tableHeaderCell}>
                 {header}
               </Text>
             )
         )}
       </View>
-
       <View>
-        {users.map((item, index) => (
-          <View key={index} style={styles.table.tableRow}>
-            <Text style={styles.table.tableCell}>{item.user_id}</Text>
-            <Text style={styles.table.tableCell}>
-              {item.firstName + " " + item.middleName + " " + item.lastName}
-            </Text>
-            <Text style={styles.table.tableCell}>{item.contact}</Text>
-            <View style={styles.table.tableCell}>
-              {item.isApproved === "Registered" && (
-                <View style={styles.table.registered}>
-                  <Text style={styles.table.statusText}>REGISTERED</Text>
-                </View>
-              )}
-              {item.isApproved === "Denied" && (
-                <View style={styles.table.denied}>
-                  <Text style={styles.table.statusText}>DENIED</Text>
-                </View>
-              )}
-              {item.isApproved === "Pending" && (
-                <View style={styles.table.pending}>
-                  <Text style={styles.table.statusText}>PENDING</Text>
-                </View>
-              )}
-            </View>
+      {inquiries.map((item, index) => (
+        <View key={index} style={styles.table.tableRow}>
+          <Text style={styles.table.tableCell}>
+           {item.inq_id}
+          </Text>
+          <Text style={styles.table.tableCell}>{item.name}</Text>
+          <Text style={styles.table.tableCell}>{item.email}</Text>
+          <Text style={styles.table.tableCell}>{DateFormat(item.compose.date) || ""}</Text>
+          <View style={styles.table.tableCell}>
+            {item.isApproved === "Completed" && (
+              <View style={styles.table.completed}>
+                <Text style={styles.table.statusText}>COMPLETED</Text>
+              </View>
+            )}
+            {item.isApproved === "Pending" && (
+              <View style={styles.table.pending}>
+                <Text style={styles.statusText}>PENDING</Text>
+              </View>
+            )}
+            {item.isApproved === "In Progress" && (
+              <View style={styles.table.inprogress}>
+                <Text style={styles.table.statusText}>IN PROGRESS</Text>
+              </View>
+            )}
           </View>
-        ))}
+        </View>
+      ))}
       </View>
     </View>
   );

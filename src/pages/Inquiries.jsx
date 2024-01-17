@@ -12,7 +12,8 @@ import ReactPaginate from "react-paginate";
 import axios from "axios";
 import API_LINK from "../config/API";
 import { useSearchParams } from "react-router-dom";
-
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PrintPDF from "../components/inquiries/form/PrintPDF"
 const Inquiries = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -26,7 +27,7 @@ const Inquiries = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
-
+  const [showTooltip, setShowTooltip] = useState(false);
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
@@ -135,6 +136,24 @@ const Inquiries = () => {
   const handleStatus = (status) => {
     setStatus(status);
   };
+  const isLatestResponseResident = (inquiry) => {
+    const { response, isApproved } = inquiry;
+    if (response && response.length > 0) {
+      const latestResponse = response[response.length - 1];
+      return (
+        latestResponse.type === "Resident" &&
+        !["Completed", "Pending"].includes(isApproved)
+      );
+    }
+    return false;
+  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowTooltip((prev) => !prev);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="mx-4 mt-[10rem] lg:mt-4 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
@@ -284,20 +303,20 @@ const Inquiries = () => {
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                {/* <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-modal-archive"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
+              {/* <div className="hs-tooltip inline-block w-full">
+                <PDFDownloadLink
+                  document={<PrintPDF inquiries={inquiries} tableHeader={tableHeader} />}
+                  fileName="SAMPLE.pdf"
+                  className="hs-tooltip-toggle sm:w-full md:w-full cursor-pointer text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
+                >
+                  <BsPrinter size={24} style={{ color: "#ffffff" }} />
                     <span
                       className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                       role="tooltip"
                     >
                       Generate Report
                     </span>
-                  </button>
+                </PDFDownloadLink>
                 </div> */}
                 <div className="hs-tooltip inline-block w-full">
                   <button
@@ -346,10 +365,10 @@ const Inquiries = () => {
             </thead>
             <tbody className="odd:bg-slate-100">
               {inquiries
-                .slice() // Create a shallow copy to avoid mutating the original array
+                .slice()
                 .sort(
                   (a, b) => new Date(b.compose.date) - new Date(a.compose.date)
-                ) // Sort by date descending
+                )
                 .map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
                     <td className="px-6 py-3">
@@ -359,14 +378,16 @@ const Inquiries = () => {
                           checked={selectedItems.includes(item._id)}
                           value={item._id}
                           onChange={checkboxHandler}
-                          disabled={item.isApproved === "Completed"} // Disable checkbox if status is 'Completed'
+                          disabled={item.isApproved === "Completed"}
                         />
                       </div>
                     </td>
                     <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                        {item.inq_id}
-                      </span>
+                      <div className="flex items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.inq_id}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
@@ -418,12 +439,28 @@ const Inquiries = () => {
 
                     <td className="px-6 py-3">
                       <div className="flex justify-center space-x-1 sm:space-x-none">
-                        <div className="hs-tooltip inline-block">
+                        <div className="hs-tooltip inline-block relative">
+                          {isLatestResponseResident(item) && (
+                            <span className="tooltip absolute -top-2 left-8 z-10">
+                              <span className="animate-ping absolute inline-flex h-3 w-3 mt-1 rounded-full bg-red-400 opacity-75 dark:bg-red-600"></span>
+                              <span className="relative inline-flex rounded-full bg-red-500 text-white h-3 w-3"></span>
+                              {showTooltip && (
+                                <span className="tooltiptext bg-red-500 text-white text-xs py-1 px-2 rounded absolute -left-full top-1/2 transform -translate-y-1/2 -translate-x-full whitespace-nowrap">
+                                  You have a new reply
+                                </span>
+                              )}
+                            </span>
+                          )}
                           <button
                             type="button"
                             data-hs-overlay="#hs-modal-viewInquiries"
                             onClick={() => handleView({ ...item })}
-                            className="hs-tooltip-toggle text-white bg-teal-800  font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                            className={`hs-tooltip-toggle text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg ${
+                              item.isApproved === "Completed"
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            disabled={item.isApproved === "Completed"}
                           >
                             <AiOutlineEye
                               size={24}
@@ -431,10 +468,12 @@ const Inquiries = () => {
                             />
                           </button>
                           <span
-                            className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                            className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm"
                             role="tooltip"
                           >
-                            View Inquiry
+                            {item.isApproved === "Completed"
+                              ? "Inquiries already completed"
+                              : "View Inquiry"}
                           </span>
                         </div>
                       </div>

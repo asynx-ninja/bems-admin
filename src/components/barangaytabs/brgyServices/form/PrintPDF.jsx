@@ -7,11 +7,9 @@ import {
   Document,
   StyleSheet,
 } from "@react-pdf/renderer";
-import logo from "../../../assets/header/montalban-logo.png";
-import id_picture from "../../../assets/sample/official.jpg";
-import Default from "../../../assets/sample-image/default-pfp.png";
-const PrintPDF = ({ users, tableHeader }) => {
-  console.log("table", users);
+import logo from "../../../../assets/header/montalban-logo.png";
+const PrintPDF = ({ services, tableHeader,brgy }) => {
+  console.log("table", services);
   const styles = StyleSheet.create({
     body: {
       padding: 35,
@@ -100,6 +98,14 @@ const PrintPDF = ({ users, tableHeader }) => {
         flex: 1, // Distributes space evenly across the row
         textAlign: "center", // Center-align text
       },
+      detailsCell: {
+        width: '30%', // Larger width for details cell
+        textAlign: 'center',
+        fontSize: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        color: "#333",
+      },
       userImage: {
         width: 30, // Set appropriate width
         height: 30, // Set appropriate height
@@ -120,13 +126,13 @@ const PrintPDF = ({ users, tableHeader }) => {
         fontSize: 8,
         textAlign: "center",
       },
-      registered: {
+      approved: {
         backgroundColor: "#4CAF50", // Green background
         borderRadius: 5,
         paddingHorizontal: 2,
         paddingVertical: 4,
       },
-      denied: {
+      disapproved: {
         backgroundColor: "#F44336", // Red background
         borderRadius: 5,
         padding: 4,
@@ -146,9 +152,10 @@ const PrintPDF = ({ users, tableHeader }) => {
         <Text style={styles.letterHead.republic}>
           Republic of the Philippines
         </Text>
-        <Text style={styles.letterHead.brgy}>
+        <Text style={styles.letterHead.municipality}>
           Municipality of Rodriguez, Rizal
         </Text>
+        <Text style={styles.letterHead.brgy}>BARANGAY {brgy}</Text>
         <Text style={styles.letterHead.address}>
           Barangay Hall, Dike Street, Rodriguez, Rizal | +63 (2) 8 948 0157
         </Text>
@@ -159,7 +166,7 @@ const PrintPDF = ({ users, tableHeader }) => {
 
   const Title = () => (
     <View style={styles.title.view1}>
-      <Text style={styles.title.req}>ADMIN ACCOUNT LIST</Text>
+      <Text style={styles.title.req}>SERVICES LIST</Text>
     </View>
   );
 
@@ -168,7 +175,7 @@ const PrintPDF = ({ users, tableHeader }) => {
       <View style={styles.table.tableHeader}>
         {tableHeader.map(
           (header, idx) =>
-            header !== "ACTIONS" && header !== "PROFILE" && (
+            header !== "ACTIONS" && header !== "DATE" &&(
               <Text key={idx} style={styles.table.tableHeaderCell}>
                 {header}
               </Text>
@@ -177,25 +184,25 @@ const PrintPDF = ({ users, tableHeader }) => {
       </View>
 
       <View>
-        {users.map((item, index) => (
+      {services.map((service, index) => (
           <View key={index} style={styles.table.tableRow}>
-            <Text style={styles.table.tableCell}>{item.user_id}</Text>
-            <Text style={styles.table.tableCell}>
-              {item.firstName + " " + item.middleName + " " + item.lastName}
-            </Text>
-            <Text style={styles.table.tableCell}>{item.contact}</Text>
+            <Text style={styles.table.tableCell}>{service.name}</Text>
+            <Text style={styles.table.detailsCell}>{service.details}</Text>
+            <Text style={styles.table.tableCell}>{service.type}</Text>
+            {/* Status handling */}
             <View style={styles.table.tableCell}>
-              {item.isApproved === "Registered" && (
+              {service.isApproved}
+              {service.isApproved === "Approved" && (
                 <View style={styles.table.registered}>
-                  <Text style={styles.table.statusText}>REGISTERED</Text>
+                  <Text style={styles.table.statusText}>APPROVED</Text>
                 </View>
               )}
-              {item.isApproved === "Denied" && (
+              {service.isApproved === "Disapproved" && (
                 <View style={styles.table.denied}>
-                  <Text style={styles.table.statusText}>DENIED</Text>
+                  <Text style={styles.table.statusText}>DISAPPROVED</Text>
                 </View>
               )}
-              {item.isApproved === "Pending" && (
+              {service.isApproved === "Pending" && (
                 <View style={styles.table.pending}>
                   <Text style={styles.table.statusText}>PENDING</Text>
                 </View>

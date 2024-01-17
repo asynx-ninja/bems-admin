@@ -72,6 +72,7 @@ const Inquiries = () => {
 
     fetch();
   }, [currentPage]);
+  
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };

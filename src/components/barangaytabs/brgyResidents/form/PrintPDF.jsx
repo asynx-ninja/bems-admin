@@ -7,10 +7,8 @@ import {
   Document,
   StyleSheet,
 } from "@react-pdf/renderer";
-import logo from "../../../assets/header/montalban-logo.png";
-import id_picture from "../../../assets/sample/official.jpg";
-import Default from "../../../assets/sample-image/default-pfp.png";
-const PrintPDF = ({ users, tableHeader }) => {
+import logo from "../../../../assets/header/montalban-logo.png";
+const PrintPDF = ({ users, tableHeader,brgy }) => {
   console.log("table", users);
   const styles = StyleSheet.create({
     body: {
@@ -100,6 +98,14 @@ const PrintPDF = ({ users, tableHeader }) => {
         flex: 1, // Distributes space evenly across the row
         textAlign: "center", // Center-align text
       },
+      detailsCell: {
+        width: '30%', // Larger width for details cell
+        textAlign: 'center',
+        fontSize: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        color: "#333",
+      },
       userImage: {
         width: 30, // Set appropriate width
         height: 30, // Set appropriate height
@@ -146,9 +152,10 @@ const PrintPDF = ({ users, tableHeader }) => {
         <Text style={styles.letterHead.republic}>
           Republic of the Philippines
         </Text>
-        <Text style={styles.letterHead.brgy}>
+        <Text style={styles.letterHead.municipality}>
           Municipality of Rodriguez, Rizal
         </Text>
+        <Text style={styles.letterHead.brgy}>BARANGAY {brgy}</Text>
         <Text style={styles.letterHead.address}>
           Barangay Hall, Dike Street, Rodriguez, Rizal | +63 (2) 8 948 0157
         </Text>
@@ -159,7 +166,7 @@ const PrintPDF = ({ users, tableHeader }) => {
 
   const Title = () => (
     <View style={styles.title.view1}>
-      <Text style={styles.title.req}>ADMIN ACCOUNT LIST</Text>
+      <Text style={styles.title.req}>RESIDENTS LIST</Text>
     </View>
   );
 
@@ -168,21 +175,22 @@ const PrintPDF = ({ users, tableHeader }) => {
       <View style={styles.table.tableHeader}>
         {tableHeader.map(
           (header, idx) =>
-            header !== "ACTIONS" && header !== "PROFILE" && (
+            header !== "ACTIONS" && header !== "PROFILE" &&(
               <Text key={idx} style={styles.table.tableHeaderCell}>
                 {header}
               </Text>
             )
         )}
       </View>
-
       <View>
-        {users.map((item, index) => (
+      {users.map((item, index) => (
           <View key={index} style={styles.table.tableRow}>
-            <Text style={styles.table.tableCell}>{item.user_id}</Text>
+            {/* <Text style={styles.table.tableCell}>{item.user_id}</Text> */}
             <Text style={styles.table.tableCell}>
               {item.firstName + " " + item.middleName + " " + item.lastName}
             </Text>
+            <Text style={styles.table.tableCell}>{item.age}</Text>
+            <Text style={styles.table.tableCell}>{item.sex}</Text>
             <Text style={styles.table.tableCell}>{item.contact}</Text>
             <View style={styles.table.tableCell}>
               {item.isApproved === "Registered" && (

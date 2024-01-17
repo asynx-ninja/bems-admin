@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import API_LINK from "../../config/API";
 import axios from "axios";
-
+import defaultPFP from "../../assets/sample-image/default-pfp.png";
 const Sidebar = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [userData, setUserData] = useState({});
@@ -32,9 +32,11 @@ const Sidebar = () => {
         const res = await axios.get(`${API_LINK}/users/specific/${id}`);
         if (res.status === 200) {
           setUserData(res.data[0]);
-          var pfpSrc = document.getElementById("sidebarPFP");
+          var pfpSrc = document.getElementById("sidepfp");
           pfpSrc.src =
-            res.data[0].profile.link !== "" ? res.data[0].profile.link : null;
+            res.data[0].profile.link !== ""
+              ? res.data[0].profile.link
+              : defaultPFP;
         } else {
         }
       } catch (error) {
@@ -85,7 +87,7 @@ const Sidebar = () => {
               <div className="flex flex-row items-center justify-between w-full">
                 <div className="w-4/12">
                   <img
-                    id="sidebarPFP"
+                    id="sidepfp"
                     className=" w-[60px] h-[60px]  mx-auto rounded-full border-[2px] border-[#295141] object-cover"
                   />
                 </div>
@@ -119,12 +121,14 @@ const Sidebar = () => {
                   >
                     <BiSolidDashboard size={15} />
                     Dashboard
-                    <span className="flex relative ">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
-                      <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
-                       {servicesReq.length}
+                    {servicesReq.length > 0 && (
+                      <span className="flex relative ">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
+                        <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
+                          {servicesReq.length}
+                        </span>
                       </span>
-                    </span>
+                    )}
                   </Link>
                 </li>
                 <li>
@@ -324,7 +328,7 @@ const Sidebar = () => {
                     </Link>
                   </div>
                 </li>
-                {userData.type === "Admin" && (
+                {userData.type === "Head Admin" && (
                   <>
                     <li>
                       <Link
