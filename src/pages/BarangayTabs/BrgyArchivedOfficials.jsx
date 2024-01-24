@@ -12,6 +12,7 @@ import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
+import noData from "../../assets/image/no-data.png";
 const ArchivedOfficials = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [officials, setOfficials] = useState([]);
@@ -358,10 +359,18 @@ const ArchivedOfficials = () => {
               <tbody className="odd:bg-slate-100">
                 {filteredOfficials.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="text-center py-10 text-gray-400">
-                      No data found
-                    </td>
-                  </tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
+                  </td>
+                </tr>
                 ) : (
                   filteredOfficials.map((item, index) => (
                     <tr key={index} className="odd:bg-slate-100 text-center">

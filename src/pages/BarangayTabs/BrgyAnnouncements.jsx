@@ -14,6 +14,7 @@ import GenerateReportsModal from "../../components/barangaytabs/brgyAnnouncement
 import ViewArchivedAnnouncementModal from "../../components/barangaytabs/brgyAnnouncements/ViewArchivedAnnouncement";
 import PrintPDF from "../../components/barangaytabs/brgyAnnouncements/form/PrintPDF";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import noData from "../../assets/image/no-data.png";
 const BrgyAnnouncement = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -376,9 +377,17 @@ const BrgyAnnouncement = () => {
             </thead>
             <tbody className="odd:bg-slate-100">
               {filteredAnnouncements.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="text-center py-10 text-gray-400">
-                    No data found
+                  <tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
                   </td>
                 </tr>
               ) : (
