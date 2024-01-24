@@ -5,6 +5,7 @@ function Profit() {
     <div>
       <div className="flex flex-col">
         <div className="-m-1.5 overflow-auto max-h-[660px]">
+<<<<<<< HEAD
           <div className="flex flex-col-reverse lg:flex-row">
             {/* Table Title */}
           {/*<div className="bg-[#013D74] py-2 lg:py-5 xl:py-3.5 px-5 md:px-10 lg:px-3 xl:px-10 rounded-tr-lg w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
@@ -27,6 +28,8 @@ function Profit() {
             </div> */}
           </div>
 
+=======
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
           <div className="p-1.5 min-w-full inline-block align-middle">
             <div className=" overflow-x-hidden">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -75,35 +78,51 @@ function Profit() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700 ">
-                  {Array(20)
+                  {Array(5)
                     .fill("")
                     .map((_, index) => (
                       <tr className="hover-bg-gray-50 border">
                         <td className="w-[20%] sm:w-1/5 whitespace-nowrap border">
                           <div className="px-2 sm:px-6 py-2">
                             <span className="text-xs sm:text-lg text-black">
+<<<<<<< HEAD
                               Barangay Clearance
+=======
+                              2
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                             </span>
                           </div>
                         </td>
                         <td className="w-[20%] sm:w-1/5 whitespace-nowrap border">
                           <div className="px-2 sm:px-6 py-2">
                             <span className="text-xs sm:text-lg text-black">
+<<<<<<< HEAD
                               Lorem, ipsum dolor sit amet c
+=======
+                            2
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                             </span>
                           </div>
                         </td>
                         <td className="w-[20%] sm:w-1/5 whitespace-nowrap border">
                           <div className="px-2 sm:px-6 py-2">
                             <span className="text-xs sm:text-lg text-black">
+<<<<<<< HEAD
                             Lorem, ipsum dolor sit amet 
+=======
+                              2
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                             </span>
                           </div>
                         </td>
                         <td className="w-[20%] sm:w-1/5 whitespace-nowrap border">
                           <div className="px-2 sm:px-6 py-2">
                             <span className="text-xs sm:text-lg text-black">
+<<<<<<< HEAD
                             Lorem, ipsum dolor sit amet consectetur 
+=======
+                              2
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                             </span>
                           </div>
                         </td>

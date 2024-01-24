@@ -24,6 +24,8 @@ const Officials = () => {
   const [selectedOfficial, setSelectedOfficial] = useState({});
   const [sortOrder, setSortOrder] = useState("desc");
   const [sortColumn, setSortColumn] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   const handleSort = (sortBy) => {
   const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -81,14 +83,15 @@ useEffect(() => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `${API_LINK}/brgyofficial/?brgy=${brgy}&archived=false`
+        `${API_LINK}/brgyofficial/?brgy=${brgy}&archived=false&page=${currentPage}`
       );
 
       if (response.status === 200) {
-        const officialsData = response.data || [];
+        const officialsData = response.data.result || [];
 
         if (officialsData.length > 0) {
           setOfficials(officialsData);
+          setPageCount(response.data.pageCount);
         } else {
           setOfficials([]);
           console.log(`No officials found for Barangay ${brgy}`);
@@ -104,7 +107,10 @@ useEffect(() => {
   };
 
   fetchData();
-}, [brgy]);
+}, [currentPage, brgy]);
+const handlePageChange = ({ selected }) => {
+  setCurrentPage(selected);
+};
 
 const handleEditClick = async (official) => {
   setSelectedOfficial(official);
@@ -180,7 +186,6 @@ const dateFormat = (fromYear, toYear) => {
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
-                    data-hs-overlay="#hs-modal-add"
                     className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm text-center inline-flex items-center"
                   >
                     <FaArchive size={24} style={{ color: "#ffffff" }} />
@@ -298,21 +303,6 @@ const dateFormat = (fromYear, toYear) => {
               <div className="hs-tooltip inline-block w-full">
                 <button
                   type="button"
-                  data-hs-overlay="#hs-generate-reports-modal"
-                  className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                >
-                  <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                  <span
-                    className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                    role="tooltip"
-                  >
-                    Generate Report
-                  </span>
-                </button>
-              </div>
-              <div className="hs-tooltip inline-block w-full">
-                <button
-                  type="button"
                   data-hs-overlay="#hs-archive-official-modal"
                   className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md  bg-pink-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
                 >
@@ -357,7 +347,14 @@ const dateFormat = (fromYear, toYear) => {
             </tr>
           </thead>
           <tbody className="odd:bg-slate-100">
-            {officials.map((item, index) => (
+          {officials.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+            officials.map((item, index) => (
               <tr key={index} className="odd:bg-slate-100 text-center">
                 <td className="px-6 py-3">
                   <div className="flex justify-center items-center">
@@ -421,28 +418,45 @@ const dateFormat = (fromYear, toYear) => {
                   </div>
                 </td>
               </tr>
-            ))}
+           ))
+           )}
           </tbody>
         </table>
       </div>
     </div>
     <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
-      <span className="font-medium text-white sm:text-xs text-sm">
-        Showing 1 out of 15 pages
-      </span>
-      <ReactPaginate
-        breakLabel="..."
-        nextLabel=">>"
-        onPageChange={() => {}}
-        pageRangeDisplayed={3}
-        pageCount={15}
-        previousLabel="<<"
-        className="flex space-x-3 text-white font-bold "
-        activeClassName="text-yellow-500"
-        disabledLinkClassName="text-gray-300"
-        renderOnZeroPageCount={null}
-      />
-    </div>
+          <span className="font-medium text-white sm:text-xs text-sm">
+            Showing {currentPage + 1} out of {pageCount} pages
+          </span>
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
+            onPageChange={handlePageChange}
+            pageRangeDisplayed={3}
+            pageCount={pageCount}
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
+            className="flex space-x-3 text-white font-bold"
+            activeClassName="text-yellow-500"
+            disabledLinkClassName="text-gray-300"
+            renderOnZeroPageCount={null}
+          />
+        </div>
     <CreateOfficialModal brgy={brgy} />
     <GenerateReportsModal />
     <ArchiveOfficialModal selectedItems={selectedItems} />

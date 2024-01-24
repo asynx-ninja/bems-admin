@@ -36,7 +36,11 @@ function BarangayDetails() {
       <div className="px-4 py-4 items-center bg-gray-100">
       <button
         type="button"
+<<<<<<< HEAD
         className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 inline-flex uppercase font-bold items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-[#295141] to-[#408D51] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+=======
+        className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 uppercase inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-[#295141] to-[#408D51] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
         id="hs-basic-collapse"
         data-hs-collapse="#hs-basic-collapse-heading"
         onClick={() => setCollapseOpen(!collapseOpen)}
@@ -46,7 +50,7 @@ function BarangayDetails() {
         {activeTab === 3 && 'Services'}
         {activeTab === 4 && 'Service Requests'}
         {activeTab === 5 && 'Residents'}
-        {activeTab === 6 && 'Announcements'}
+        {activeTab === 6 && 'Events'}
         {activeTab === 7 && 'Inquiries'}
         {activeTab === 8 && 'Profits'}
         <svg
@@ -81,7 +85,7 @@ function BarangayDetails() {
           >
             <button
               type="button"
-              className="hs-tab-active:font-semibold mx-1 my-1 font-bold hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active"
+              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active"
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-1"
               aria-controls="basic-tabs-1"
@@ -92,7 +96,7 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold mx-1 font-bold my-1 hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className="hs-tab-active:font-semibold uppercase mx-1 font-bold my-1 hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-2"
               aria-controls="basic-tabs-2"
@@ -103,7 +107,7 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-3"
               aria-controls="basic-tabs-3"
@@ -114,7 +118,7 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold  mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-4"
               aria-controls="basic-tabs-4"
@@ -125,7 +129,7 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold  mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-5"
               aria-controls="basic-tabs-5"
@@ -136,18 +140,18 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold mx-1  my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className="hs-tab-active:font-semibold uppercase mx-1  my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-6"
               aria-controls="basic-tabs-6"
               role="tab"
               onClick={() => handleTabChange(6)}
             >
-              Announcements
+              Events
             </button>{" "}
             <button
               type="button"
-              className="hs-tab-active:font-semibold mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-7"
               aria-controls="basic-tabs-7"
@@ -158,7 +162,7 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-8"
               aria-controls="basic-tabs-8"

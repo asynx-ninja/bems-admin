@@ -12,6 +12,7 @@ const ChangePassword = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  
   const client_email = atob(location.pathname.split("/")[2]);
   const [password, setPassword] = useState({
     enter: "",

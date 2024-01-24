@@ -22,6 +22,8 @@ const Inquiries = () => {
   const [status, setStatus] = useState({});
   const [sortOrder, setSortOrder] = useState("desc");
   const [sortColumn, setSortColumn] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -54,50 +56,30 @@ const Inquiries = () => {
     const fetch = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/inquiries/staffinquiries/?brgy=${brgy}&to=${to}&archived=false`
+          `${API_LINK}/inquiries/staffinquiries/?brgy=${brgy}&to=${to}&archived=false&page=${currentPage}`
         );
-        if (response.status === 200) setInquiries(response.data);
+        if (response.status === 200) {
+          setPageCount(response.data.pageCount);
+          setInquiries(response.data.result);
+
+        }
         else setInquiries([]);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         setInquiries([]);
       }
     };
-  
+
     fetch();
-  }, []);
+  }, [currentPage]);
+  
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   console.log(inquiries);
 
-  const checkboxHandler = (e) => {
-    let isSelected = e.target.checked;
-    let value = e.target.value;
-
-    if (isSelected) {
-      setSelectedItems([...selectedItems, value]);
-    } else {
-      setSelectedItems((prevData) => {
-        return prevData.filter((id) => {
-          return id !== value;
-        });
-      });
-    }
-  };
-
-  const checkAllHandler = () => {
-    if (inquiries.length === selectedItems.length) {
-      setSelectedItems([]);
-    } else {
-      const postIds = inquiries.map((item) => {
-        return item._id;
-      });
-
-      setSelectedItems(postIds);
-    }
-  };
-
   const tableHeader = [
-    "Inquiry id",
     "name",
     "e-mail",
     "date",
@@ -124,10 +106,10 @@ const Inquiries = () => {
 
   return (
     <div className="">
-    {/* Body */}
-    <div>
-      {/* Header */}
-      <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
+      {/* Body */}
+      <div>
+        {/* Header */}
+        <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
               className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-[2.1rem] xxxl:text-4xl xxxl:mt-1 text-white"
@@ -241,7 +223,7 @@ const Inquiries = () => {
                 </li>
               </ul>
             </div>
-            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
+            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">
                 <button className=" bg-[#295141] p-3 rounded-l-md">
                   <div className="w-full overflow-hidden">
@@ -271,23 +253,7 @@ const Inquiries = () => {
                   placeholder="Search for items"
                 />
               </div>
-              <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-modal-archive"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Generate Report
-                    </span>
-                  </button>
-                </div>
-              </div>
+            
             </div>
           </div>
         </div>
@@ -296,16 +262,6 @@ const Inquiries = () => {
           <table className="w-full ">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
-                <th scope="col" className="px-6 py-4">
-                  <div className="flex justify-center items-center">
-                    <input
-                      type="checkbox"
-                      name=""
-                      onClick={checkAllHandler}
-                      id=""
-                    />
-                  </div>
-                </th>
                 {tableHeader.map((item, idx) => (
                   <th
                     scope="col"
@@ -318,24 +274,16 @@ const Inquiries = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {inquiries.map((item, index) => (
+            {inquiries.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+              inquiries.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                    <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        value={item._id}
-                        onChange={checkboxHandler}
-                        id=""
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                      {item.inq_id}
-                    </span>
-                  </td>
+                 
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
@@ -358,7 +306,7 @@ const Inquiries = () => {
                     </div>
                   </td>
 
-                  <td className="px-6 py-3">
+                  <td className="px-6 py-3 xxl:w-4/12">
                     <div className="flex justify-center items-center">
                       {item.isApproved === "Completed" && (
                         <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
@@ -367,10 +315,10 @@ const Inquiries = () => {
                           </span>
                         </div>
                       )}
-                      {item.isApproved === "Not Responded" && (
+                      {item.isApproved === "Pending" && (
                         <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
                           <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
-                            NOT RESPONDED
+                            PENDING
                           </span>
                         </div>
                       )}
@@ -405,26 +353,42 @@ const Inquiries = () => {
                           View Inquiry
                         </span>
                       </div>
-                   
                     </div>
                   </td>
                 </tr>
-              ))}
+               ))
+               )}
             </tbody>
           </table>
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
-            onPageChange={() => {}}
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
-            previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            pageCount={pageCount}
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}

@@ -38,14 +38,16 @@ const StatisticsDashboard = () => {
           `${API_LINK}/announcement/?brgy=${brgy}&archived=false`
         );
         setAnnouncements(
-          announcementsResponse.status === 200 ? announcementsResponse.data : []
+          announcementsResponse.status === 200
+            ? announcementsResponse.data.result
+            : []
         );
         const archivedAnnouncementsResponse = await axios.get(
           `${API_LINK}/announcement/?brgy=${brgy}&archived=true`
         );
         setArchivedAnnouncements(
           archivedAnnouncementsResponse.status === 200
-            ? archivedAnnouncementsResponse.data
+            ? archivedAnnouncementsResponse.data.result
             : []
         );
 
@@ -53,28 +55,66 @@ const StatisticsDashboard = () => {
           `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=false`
         );
         setInquiries(
-          inquiryresponse.status === 200 ? inquiryresponse.data : []
+          inquiryresponse.status === 200 ? inquiryresponse.data.result : []
         );
         const archivedinquiryresponse = await axios.get(
           `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=true`
         );
         setArchivedInquiries(
           archivedinquiryresponse.status === 200
-            ? archivedinquiryresponse.data
+            ? archivedinquiryresponse.data.result
             : []
         );
+        try {
+          const getUser = await axios.get(`${API_LINK}/admin/specific/${id}`);
+          setUserData(getUser.status === 200 ? getUser.data[0] : []);
+        } catch (err) {
+          console.log("err", err.message);
+        }
 
         const usersResponse = await axios.get(
           `${API_LINK}/users/?brgy=${brgy}&type=Admin`
         );
-        setUsers(usersResponse.status === 200 ? usersResponse.data : []);
+
+        setUsers(usersResponse.status === 200 ? usersResponse.data.result : []);
 
         const archivedUsersResponse = await axios.get(
           `${API_LINK}/users/showArchived/?brgy=${brgy}&type=Admin`
         );
         setArchivedUsers(
-          archivedUsersResponse.status === 200 ? archivedUsersResponse.data : []
+          archivedUsersResponse.status === 200 ? archivedUsersResponse.data.result : []
         );
+
+        try {
+          const officialsResponse = await axios.get(
+            `${API_LINK}/mofficials/?brgy=${brgy}&archived=false`
+          );
+          setOfficials(
+            officialsResponse.status === 200 ? officialsResponse.data.result : []
+          );
+        } catch (err) {
+          console.log("err", err.message);
+        }
+        try {
+          const response = await axios.get(`${API_LINK}/brgyinfo/allinfo`);
+          setBarangays(response.data);
+        } catch (error) {
+          console.error("Error fetching barangays:", error);
+        }
+
+        try {
+          const archivedOfficialsResponse = await axios.get(
+            `${API_LINK}/mofficials/?brgy=${brgy}&archived=true`
+          );
+          setArchivedOfficials(
+            archivedOfficialsResponse.status === 200
+              ? archivedOfficialsResponse.data.result
+              : []
+          );
+        } catch (err) {
+          setArchivedOfficials([]);
+          console.log("err", err.message);
+        }
 
         const servicesResponse = await axios.get(
           `${API_LINK}/services/allservices/?archived=false`
@@ -91,42 +131,7 @@ const StatisticsDashboard = () => {
             : []
         );
 
-        try {
-          const officialsResponse = await axios.get(
-            `${API_LINK}/mofficials/?brgy=${brgy}&archived=false`
-          );
-          setOfficials(
-            officialsResponse.status === 200 ? officialsResponse.data : []
-          );
-        } catch (err) {
-          console.log("err", err.message);
-        }
-
-        try {
-          const archivedOfficialsResponse = await axios.get(
-            `${API_LINK}/mofficials/?brgy=${brgy}&archived=true`
-          );
-          setArchivedOfficials(
-            archivedOfficialsResponse.status === 200
-              ? archivedOfficialsResponse.data
-              : []
-          );
-        } catch (err) {
-          setArchivedOfficials([])
-          console.log("err", err.message);
-        }
-        try {
-          const response = await axios.get(`${API_LINK}/brgyinfo/allinfo`);
-          setBarangays(response.data);
-        } catch (error) {
-          console.error("Error fetching barangays:", error);
-        }
-        try {
-          const getUser = await axios.get(`${API_LINK}/admin/specific/${id}`);
-          setUserData(getUser.status === 200 ? getUser.data[0] : []);
-        } catch (err) {
-          console.log("err", err.message);
-        }
+      
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -178,45 +183,45 @@ const StatisticsDashboard = () => {
       icon: <FaRegNoteSticky size={15} className="sm:block md:hidden" />,
     },
     {
-      title: "Service Requests",
+      title: "Barangay Services",
       active: services.length,
       archived: archivedServices.length,
-      activeLink: `/requests/?id=${id}&brgy=${brgy}`,
-      archivedLink: `/archivedrequests/?id=${id}&brgy=${brgy}`,
+      activeLink: `/barangaymenu/?id=${id}`,
+      archivedLink: `/barangaymenu/?id=${id}`,
       icon: <GoGitPullRequest size={15} className="sm:block md:hidden" />,
     },
     userData.type === "Head Admin"
-    ? 
-    {
-      title: "Admin Accounts",
-      active: users.length,
-      archived: archivedUsers.length,
-      activeLink: `/residents/?id=${id}&brgy=${brgy}`,
-      archivedLink: `/archivedresidents/?id=${id}&brgy=${brgy}`,
-      icon: <BsPeopleFill size={15} className="sm:block md:hidden" />,
-    }:null,
+      ? {
+          title: "Admin Accounts",
+          active: users.length,
+          archived: archivedUsers.length,
+          activeLink: `/accountmanagement/?id=${id}`,
+          archivedLink: `/archivedaccountmanagement/?id=${id}&brgy=${brgy}&archived=true`,
+          icon: <BsPeopleFill size={15} className="sm:block md:hidden" />,
+        }
+      : null,
 
     userData.type === "Head Admin"
-    ? 
-    {
-      title: "Officials",
-      active: officials.length,
-      archived: archivedOfficials.length,
-      activeLink: `/officials/?id=${id}&brgy=${brgy}`,
-      archivedLink: `/archived_officials/?id=${id}&brgy=${brgy}`,
-      icon: <FaPeopleGroup size={15} className="sm:block md:hidden" />,
-    }:null,
-  
+      ? {
+          title: "Officials",
+          active: officials.length,
+          archived: archivedOfficials.length,
+          activeLink: `/municipalityofficials/?id=${id}`,
+          archivedLink: `/archivedmunicipalityofficials/?id=${id}&brgy=${brgy}&archived=true`,
+          icon: <FaPeopleGroup size={15} className="sm:block md:hidden" />,
+        }
+      : null,
+
     {
       title: "Barangays",
       active: barangays.length, // Check if officials is defined before using it
       archived: "n/a",
-      activeLink: `/officials/?id=${id}&brgy=${brgy}`,
+      activeLink: `/barangaymenu/?id=${id}`,
       archivedLink: `/archived_officials/?id=${id}&brgy=${brgy}`,
       icon: <FaPeopleGroup size={15} className="sm:block md:hidden" />,
     },
   ];
-
+  console.log("a", userData.name);
   return (
     <div className="flex flex-col w-full">
       <b className="border-solid border-0 border-black border-b-2 pb-2 uppercase font-heavy text-lg md:text-xl">

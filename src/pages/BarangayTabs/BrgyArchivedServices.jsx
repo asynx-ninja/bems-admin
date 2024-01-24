@@ -24,6 +24,8 @@ function ArchiveServices() {
   const id = searchParams.get("id");
   const [service, setService] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
   const handleView = (service) => {
     setSelectedService(service);
   };
@@ -32,9 +34,10 @@ function ArchiveServices() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/services/?brgy=${brgy}&archived=true`
+          `${API_LINK}/services/?brgy=${brgy}&archived=true&page=${currentPage}`
         ); // Replace "/api/services" with the actual API endpoint URL for fetching all services
-        setServices(response.data);
+        setServices(response.data.result);
+        setPageCount(response.data.pageCount);
         console.log(response.data);
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -42,7 +45,10 @@ function ArchiveServices() {
     };
 
     fetchServices();
-  }, [brgy]);
+  }, [currentPage, brgy]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   const tableHeader = [
     "SERVICE NAME",
@@ -200,7 +206,14 @@ function ArchiveServices() {
                 </tr>
               </thead>
               <tbody className="odd:bg-slate-100">
-                {services.map((item, index) => (
+              {services.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+                services.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
                     <td className="px-6 py-3">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
@@ -259,27 +272,44 @@ function ArchiveServices() {
                       </div>
                     </td>
                   </tr>
-                ))}
+              ))
+              )}
               </tbody>
             </table>
           </div>
           <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
-            <span className="font-medium text-white sm:text-xs text-sm">
-              Showing 1 out of 15 pages
-            </span>
-            <ReactPaginate
-              breakLabel="..."
-              nextLabel=">>"
-              onPageChange={() => {}}
-              pageRangeDisplayed={3}
-              pageCount={15}
-              previousLabel="<<"
-              className="flex space-x-3 text-white font-bold "
-              activeClassName="text-yellow-500"
-              disabledLinkClassName="text-gray-300"
-              renderOnZeroPageCount={null}
-            />
-          </div>
+          <span className="font-medium text-white sm:text-xs text-sm">
+            Showing {currentPage + 1} out of {pageCount} pages
+          </span>
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
+            onPageChange={handlePageChange}
+            pageRangeDisplayed={3}
+            pageCount={pageCount}
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
+            className="flex space-x-3 text-white font-bold"
+            activeClassName="text-yellow-500"
+            disabledLinkClassName="text-gray-300"
+            renderOnZeroPageCount={null}
+          />
+        </div>
         </div>
       </div>
       <GenerateReportsModal/>

@@ -1,5 +1,9 @@
 import React from "react";
+<<<<<<< HEAD
 import Error from "../../assets/modals/Error.png";
+=======
+import Error from "../../../assets/modals/Error.png";
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
 
 function RequestRejectModal() {
   return (

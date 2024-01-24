@@ -18,23 +18,36 @@ const Residents = () => {
   const type = "Resident";
   const brgy = searchParams.get("brgy");
   const [user, setUser] = useState({});
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
+<<<<<<< HEAD
         `${API_LINK}/users/showArchived/?brgy=${brgy}&type=${type}`
+=======
+        `${API_LINK}/users/showArchived/?brgy=${brgy}&type=Resident`
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
       );
 
-      if (response.status === 200) setUsers(response.data);
+      if (response.status === 200) 
+      {
+        setPageCount(response.data.pageCount);
+        setUsers(response.data.result);
+      }
       else setUsers([]);
     };
 
     fetch();
-  }, []);
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
 
   const tableHeader = [
     "PROFILE",
-    "USER_ID",
     "NAME",
     "AGE",
     "GENDER",
@@ -180,7 +193,14 @@ const Residents = () => {
                 </tr>
               </thead>
               <tbody className="odd:bg-slate-100">
-                {users.map((item, index) => (
+              {users.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+                users.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
                     <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2">
@@ -197,11 +217,7 @@ const Residents = () => {
                       </div>
                     </span>
                   </td>
-                    <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                        {item.user_id}
-                      </span>
-                    </td>
+                 
                     <td className="px-6 py-3">
                       <span className="text-xs sm:text-sm text-black line-clamp-2 ">
                         {item.firstName +
@@ -271,23 +287,40 @@ const Residents = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+              ))
+              )}
               </tbody>
             </table>
           </div>
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
-            onPageChange={() => {}}
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
-            previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            pageCount={pageCount}
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}

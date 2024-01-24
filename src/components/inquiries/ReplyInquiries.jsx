@@ -9,6 +9,7 @@ function ReplyInquiryModal() {
           id="hs-modal-reply"
           className="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center"
         >
+          
           {/* Modal */}
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 md:px-0 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto lg:ml-96 xl:ml-[500px] xxl:ml-[600px] xxxl:ml-[850px]">
             <div className="flex flex-col bg-white rounded-xl shadow-sm ">

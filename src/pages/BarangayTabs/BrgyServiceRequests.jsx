@@ -6,15 +6,23 @@ import { BsPrinter } from "react-icons/bs";
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { AiOutlineSend } from "react-icons/ai";
 import { FaArchive } from "react-icons/fa";
+<<<<<<< HEAD
 import ReplyServiceModal from "../../components/barangaytabs/brgyserviceRequests/ReplyServiceModal";
 import ArchiveRequestsModal from "../../components/barangaytabs/brgyserviceRequests/ArchiveRequestsModal";
 import RequestsReportsModal from "../../components/barangaytabs/brgyserviceRequests/RequestsReportsModal";
 import imgSrc from "/imgs/bg-header.png";
+=======
+import ReactPaginate from "react-paginate";
+import { Link } from "react-router-dom";
+import RequestsReportsModal from "../../components/barangaytabs/brgyserviceRequests/RequestsReportsModal";
+import ReplyServiceModal from "../../components/barangaytabs/brgyserviceRequests/ReplyServiceModal"
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
 import ViewRequestModal from "../../components/barangaytabs/brgyserviceRequests/ViewRequestModal";
 import { useSearchParams } from "react-router-dom";
 import API_LINK from "../../config/API";
 import axios from "axios";
 
+<<<<<<< HEAD
 const Requests = () => {
   const [requests, setRequests] = useState([]);
   const [request, setRequest] = useState({ response: [{ file: [] }] });
@@ -24,41 +32,71 @@ const Requests = () => {
   const brgy = searchParams.get("brgy");
   const [sortOrder, setSortOrder] = useState("desc");
   const [sortColumn, setSortColumn] = useState(null);
+=======
+function ServiceRequests() {
+  const [searchParams] = useSearchParams();
+  const [requests, setRequests] = useState([]);
+  const [request, setRequest] = useState({ response: [{ file: [] }] });
+  const brgy = searchParams.get("brgy");
+  const id = searchParams.get("id");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortColumn, setSortColumn] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const response = await axios.get(
+<<<<<<< HEAD
           `${API_LINK}/requests/?brgy=${brgy}&archived=false`
         );
 
         if (response.status === 200) setRequests(response.data);
+=======
+          `${API_LINK}/requests/?brgy=${brgy}&archived=false&page=${currentPage}`
+        );
+        console.log(response)
+
+        if (response.status === 200)
+        {
+          setPageCount(response.data.pageCount);
+          setRequests(response.data.result);
+        }
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
       } catch (err) {
         console.log(err);
       }
     };
 
     fetch();
+<<<<<<< HEAD
   }, []);
+=======
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
 
   useEffect(() => {
     document.title = "Service Requests | Barangay E-Services Management";
   }, []);
+<<<<<<< HEAD
 
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
     let value = e.target.value;
+=======
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
 
-    if (isSelected) {
-      setSelectedItems([...selectedItems, value]);
-    } else {
-      setSelectedItems((prevData) => {
-        return prevData.filter((id) => {
-          return id !== value;
-        });
-      });
-    }
+
+  const handleView = (item) => {
+    setRequest(item);
   };
+<<<<<<< HEAD
 
   const checkAllHandler = () => {
     if (requests.length === selectedItems.length) {
@@ -72,6 +110,8 @@ const Requests = () => {
     }
   };
 
+=======
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
   const tableHeader = [
     "SERVICE NAME",
     "TYPE OF SERVICE",
@@ -80,10 +120,13 @@ const Requests = () => {
     "ACTIONS",
   ];
 
+<<<<<<< HEAD
   const handleView = (item) => {
     setRequest(item);
   };
 
+=======
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
@@ -111,8 +154,11 @@ const Requests = () => {
     setRequests(sortedData);
   };
 
+<<<<<<< HEAD
   console.log("req parent", requests);
 
+=======
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
   return (
     <div className="">
     {/* Body */}
@@ -130,7 +176,11 @@ const Requests = () => {
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">
             <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
               <div className="w-full rounded-lg ">
+<<<<<<< HEAD
                 <Link to={`/archivedrequests/?id=${id}&brgy=${brgy}`}>
+=======
+                <Link to={`/brgyarchivedservicesreq/?id=${id}&brgy=${brgy}`}>
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                   <div className="hs-tooltip inline-block w-full">
                     <button
                       type="button"
@@ -231,7 +281,7 @@ const Requests = () => {
                 </li>
               </ul>
             </div>
-            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
+            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">
                 <button className=" bg-[#295141] p-3 rounded-l-md">
                   <div className="w-full overflow-hidden">
@@ -261,6 +311,7 @@ const Requests = () => {
                   placeholder="Search for items"
                 />
               </div>
+<<<<<<< HEAD
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
                 <div className="hs-tooltip inline-block w-full">
                   <button
@@ -279,6 +330,9 @@ const Requests = () => {
                 </div>
                
               </div>
+=======
+             
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
             </div>
           </div>
         </div>
@@ -288,16 +342,6 @@ const Requests = () => {
           <table className="w-full ">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
-                <th scope="col" className="px-6 py-4">
-                  <div className="flex justify-center items-center">
-                    <input
-                      type="checkbox"
-                      name=""
-                      onClick={checkAllHandler}
-                      id=""
-                    />
-                  </div>
-                </th>
                 {tableHeader.map((item, idx) => (
                   <th
                     scope="col"
@@ -310,6 +354,7 @@ const Requests = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
+<<<<<<< HEAD
               {requests.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
                   <td className="px-6 py-3">
@@ -323,6 +368,18 @@ const Requests = () => {
                     </div>
                   </td>
                   <td className="px-6 py-3">
+=======
+            {requests.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+              requests.map((item, index) => (
+                <tr key={index} className="odd:bg-slate-100 text-center">
+                  <td className="px-6 py-3">
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                     <span className="text-xs sm:text-sm text-black line-clamp-2">
                       {item.service_name}
                     </span>
@@ -342,10 +399,17 @@ const Requests = () => {
                     </div>
                   </td>
                   <td className="px-6 py-3">
+<<<<<<< HEAD
                     {item.status === "Completed" && (
                       <div className="flex items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
                         <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
                           COMPLETED
+=======
+                    {item.status === "Transaction Completed" && (
+                      <div className="flex items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          TRANSACTION COMPLETED
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                         </span>
                       </div>
                     )}
@@ -363,6 +427,7 @@ const Requests = () => {
                         </span>
                       </div>
                     )}
+<<<<<<< HEAD
                     {item.status === "Not Responded" && (
                       <div className="flex items-center justify-center bg-pink-700 m-2 rounded-lg">
                         <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
@@ -370,6 +435,8 @@ const Requests = () => {
                         </span>
                       </div>
                     )}
+=======
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                     {item.status === "Paid" && (
                       <div className="flex items-center justify-center bg-violet-800 m-2 rounded-lg">
                         <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
@@ -415,7 +482,10 @@ const Requests = () => {
                           View Request
                         </span>
                       </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                       <div className="hs-tooltip inline-block">
                         <button
                           type="button"
@@ -438,10 +508,12 @@ const Requests = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+        ))
+        )}
             </tbody>
           </table>
         </div>
+<<<<<<< HEAD
       </div>
       <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
         <span className="font-medium text-white sm:text-xs text-sm">
@@ -466,6 +538,48 @@ const Requests = () => {
       <ReplyServiceModal request={request} setRequest={setRequest} />
       <ArchiveRequestsModal selectedItems={selectedItems}/>
       <RequestsReportsModal />
+=======
+        <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
+          <span className="font-medium text-white sm:text-xs text-sm">
+            Showing {currentPage + 1} out of {pageCount} pages
+          </span>
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
+            onPageChange={handlePageChange}
+            pageRangeDisplayed={3}
+            pageCount={pageCount}
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
+            className="flex space-x-3 text-white font-bold"
+            activeClassName="text-yellow-500"
+            disabledLinkClassName="text-gray-300"
+            renderOnZeroPageCount={null}
+          />
+        </div>
+      </div>
+      {Object.hasOwn(request, "service_id") ? (
+        <ViewRequestModal request={request} />
+      ) : null}
+      <RequestsReportsModal />
+      <ReplyServiceModal request={request} setRequest={setRequest} />
+
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
     </div>
   );
 };

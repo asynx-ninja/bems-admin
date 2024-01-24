@@ -14,6 +14,8 @@ import ReplyServiceModal from "../../components/barangaytabs/brgyServices/ReplyS
 import GenerateReportsModal from "../../components/barangaytabs/brgyServices/GenerateReportsModal";
 import StatusResident from "../../components/barangaytabs/brgyServices/StatusService";
 import API_LINK from "../../config/API";
+import PrintPDF from "../../components/barangaytabs/brgyServices/form/PrintPDF";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 function Services() {
   // const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,6 +24,8 @@ function Services() {
   const [status, setStatus] = useState({});
   const brgy = searchParams.get("brgy");
   const id = searchParams.get("id");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   console.log("sass", brgy);
   const handleView = (service) => {
@@ -48,17 +52,25 @@ function Services() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/services/?brgy=${brgy}&archived=false`
+          `${API_LINK}/services/?brgy=${brgy}&archived=false&page=${currentPage}`
         ); // Replace "/api/services" with the actual API endpoint URL for fetching all services
+<<<<<<< HEAD
         setServices(response.data);
         console.log("lah", response.data)
+=======
+        setServices(response.data.result);
+        setPageCount(response.data.pageCount);
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
       } catch (error) {
         console.error("Error fetching services:", error);
       }
     };
 
     fetchServices();
-  }, [brgy]);
+  }, [currentPage, brgy]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   return (
     <div className="">
@@ -139,7 +151,7 @@ function Services() {
                 </li>
               </ul>
             </div>
-            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
+            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">
                 <button className=" bg-[#295141] p-3 rounded-l-md">
                   <div className="w-full overflow-hidden">
@@ -169,12 +181,14 @@ function Services() {
                   placeholder="Search for items"
                 />
               </div>
-              <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
+              {/* <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
                 <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-generate-reports-modal"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
+                  <PDFDownloadLink
+                    document={
+                      <PrintPDF services={services} tableHeader={tableHeader} brgy={brgy}/>
+                    }
+                    fileName="SAMPLE.pdf"
+                    className="hs-tooltip-toggle sm:w-full md:w-full cursor-pointer text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
                   >
                     <BsPrinter size={24} style={{ color: "#ffffff" }} />
                     <span
@@ -183,9 +197,9 @@ function Services() {
                     >
                       Generate Report
                     </span>
-                  </button>
+                  </PDFDownloadLink>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -216,9 +230,19 @@ function Services() {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {services.map((service) => (
-                <tr key={service._id} className="odd:bg-slate-100 text-center">
-                  {/* <td className="px-6 py-3">
+              {services.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+                services.map((service) => (
+                  <tr
+                    key={service._id}
+                    className="odd:bg-slate-100 text-center"
+                  >
+                    {/* <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <input
                         type="checkbox"
@@ -228,91 +252,115 @@ function Services() {
                       />
                     </div>
                   </td> */}
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2">
-                      {service.name}
-                    </span>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
+                    <td className="px-6 py-3">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {service.details}
+                        {service.name}
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {service.type}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {new Date(service.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div
-                      className={`flex items-center justify-center ${
-                        service.isApproved === "Approved"
-                          ? "bg-custom-green-button3"
-                          : service.isApproved === "Pending"
-                          ? "bg-custom-yellow"
-                          : "bg-custom-red-button"
-                      } m-2`}
-                    >
-                      <span className="text-xs sm:text-sm text-white p-3 mx-5">
-                        {service.isApproved}
-                      </span>
-                    </div>
-                  </td>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {service.details}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {service.type}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {new Date(service.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3 w-4/12">
+                      {service.isApproved === "Approved" && (
+                        <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
+                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            APPROVED
+                          </span>
+                        </div>
+                      )}
+                      {service.isApproved === "Disapproved" && (
+                        <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
+                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            DISAPPROVED
+                          </span>
+                        </div>
+                      )}
+                      {service.isApproved === "Pending" && (
+                        <div className="flex w-full items-center justify-center bg-custom-amber m-2 rounded-lg">
+                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            PENDING
+                          </span>
+                        </div>
+                      )}
+                    </td>
 
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center space-x-1 sm:space-x-none">
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-tab-revision-modal"
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                        onClick={() => handleView({ ...service })}
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-modal-statusResident"
-                        onClick={() =>
-                          handleStatus({
-                            id: service._id,
-                            status: service.isApproved,
-                          })
-                        }
-                        className="text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <FiEdit size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center space-x-1 sm:space-x-none">
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-tab-revision-modal"
+                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                          onClick={() => handleView({ ...service })}
+                        >
+                          <AiOutlineEye
+                            size={24}
+                            style={{ color: "#ffffff" }}
+                          />
+                        </button>
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-modal-serviceStatus"
+                          onClick={() =>
+                            handleStatus({
+                              id: service._id,
+                              status: service.isApproved,
+                            })
+                          }
+                          className="text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                        >
+                          <FiEdit size={24} style={{ color: "#ffffff" }} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
       <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
         <span className="font-medium text-white sm:text-xs text-sm">
-          Showing 1 out of 15 pages
+          Showing {currentPage + 1} out of {pageCount} pages
         </span>
         <ReactPaginate
           breakLabel="..."
-          nextLabel=">>"
-          onPageChange={() => {}}
+          nextLabel={
+            pageCount > currentPage + 1 ? (
+              <span className="text-white">&gt;&gt;</span>
+            ) : (
+              <span className="text-gray-300 cursor-not-allowed">&gt;&gt;</span>
+            )
+          }
+          onPageChange={handlePageChange}
           pageRangeDisplayed={3}
-          pageCount={15}
-          previousLabel="<<"
-          className="flex space-x-3 text-white font-bold "
+          pageCount={pageCount}
+          previousLabel={
+            currentPage > 0 ? (
+              <span className="text-white"> &lt;&lt;</span>
+            ) : (
+              <span className="text-gray-300 cursor-not-allowed">&lt;&lt;</span>
+            )
+          }
+          className="flex space-x-3 text-white font-bold"
           activeClassName="text-yellow-500"
           disabledLinkClassName="text-gray-300"
           renderOnZeroPageCount={null}

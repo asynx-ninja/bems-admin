@@ -4,10 +4,10 @@ import { useLocation } from 'react-router-dom'
 const OccupationList = ({ handleChange, handleUserDataChange, occupation, editButton }) => {
   const location = useLocation()
   const page = location.pathname.split("/")[1]
-
+console.log("luh",occupation)
   return (
     <select
-      className="form-control dropdown py-3 px-4 block w-full text-black border-gray-200 rounded-md text-sm focus:border-green-500 focus:ring-green-500 dark:bg-white dark:border-gray-700"
+      className="form-control dropdown py-3 px-4 border block w-full text-black border-gray-200 rounded-md text-sm focus:border-green-500 focus:ring-green-500 "
       value={page === "settings" ? occupation : ""}
       disabled={page === "settings" ? editButton : false}
       id="occupation" name="occupation"

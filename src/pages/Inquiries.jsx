@@ -4,16 +4,16 @@ import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { FaArchive } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { BsPrinter } from "react-icons/bs";
-import ArchiveModal from "../components/inquiries/ArchiveInquiryModal";
-import ReplyModal from "../components/inquiries/ReplyInquiries";
-import ViewMessage from "../components/inquiries/ViewInquiriesModal";
+import StatusInquiryModal from "../components/inquiries/StatusInquiryModal";
+import ViewMessage from "../components/inquiries/ManageInquiries";
 import Status from "../components/inquiries/Status";
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import axios from "axios";
 import API_LINK from "../config/API";
 import { useSearchParams } from "react-router-dom";
-
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PrintPDF from "../components/inquiries/form/PrintPDF"
 const Inquiries = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,7 +25,9 @@ const Inquiries = () => {
   const [status, setStatus] = useState({});
   const [sortOrder, setSortOrder] = useState("desc");
   const [sortColumn, setSortColumn] = useState(null);
-
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+  const [showTooltip, setShowTooltip] = useState(false);
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
@@ -57,11 +59,13 @@ const Inquiries = () => {
     const fetchInquiries = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=false`
+          `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=false&page=${currentPage}`
         );
-        console.log(response.data)
-        if (response.status === 200) setInquiries(response.data);
-        else {
+
+        if (response.status === 200) {
+          setPageCount(response.data.pageCount);
+          setInquiries(response.data.result); // Update the state variable with the fetched inquiries
+        } else {
           // Handle error here
           console.error("Error fetching inquiries:", response.error);
         }
@@ -70,10 +74,13 @@ const Inquiries = () => {
         console.error("Uncaught error:", err.message);
       }
     };
-  
+
     fetchInquiries();
-  }, []);
-  
+  }, [currentPage]);
+
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   console.log(inquiries);
 
@@ -105,7 +112,6 @@ const Inquiries = () => {
   };
 
   const tableHeader = [
-    "Inquiry id",
     "name",
     "e-mail",
     "date",
@@ -129,10 +135,28 @@ const Inquiries = () => {
   const handleStatus = (status) => {
     setStatus(status);
   };
+  const isLatestResponseResident = (inquiry) => {
+    const { response, isApproved } = inquiry;
+    if (response && response.length > 0) {
+      const latestResponse = response[response.length - 1];
+      return (
+        latestResponse.type === "Resident" &&
+        !["Completed", "Pending"].includes(isApproved)
+      );
+    }
+    return false;
+  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowTooltip((prev) => !prev);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="mx-4 mt-[10rem] lg:mt-4 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
-    <div className="flex flex-col">
+      <div className="flex flex-col">
         <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
@@ -278,21 +302,21 @@ const Inquiries = () => {
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-modal-archive"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
+              {/* <div className="hs-tooltip inline-block w-full">
+                <PDFDownloadLink
+                  document={<PrintPDF inquiries={inquiries} tableHeader={tableHeader} />}
+                  fileName="SAMPLE.pdf"
+                  className="hs-tooltip-toggle sm:w-full md:w-full cursor-pointer text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
+                >
+                  <BsPrinter size={24} style={{ color: "#ffffff" }} />
                     <span
                       className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                       role="tooltip"
                     >
                       Generate Report
                     </span>
-                  </button>
-                </div>
+                </PDFDownloadLink>
+                </div> */}
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
@@ -304,7 +328,7 @@ const Inquiries = () => {
                       className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                       role="tooltip"
                     >
-                      Archived Selected Inquiries
+                      Complete selected inquiries
                     </span>
                   </button>
                 </div>
@@ -339,140 +363,162 @@ const Inquiries = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {inquiries.map((item, index) => (
-                <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                    <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        value={item._id}
-                        onChange={checkboxHandler}
-                        id=""
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                      {item.inq_id}
-                    </span>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {item.name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {item.email}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {DateFormat(item.compose.date) || ""}
-                      </span>
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      {item.isApproved === "Completed" && (
-                        <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
-                            COMPLETED
-                          </span>
-                        </div>
-                      )}
-                      {item.isApproved === "Not Responded" && (
-                        <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
-                            NOT RESPONDED
-                          </span>
-                        </div>
-                      )}
-                      {item.isApproved === "In Progress" && (
-                        <div className="flex w-full items-center justify-center bg-custom-amber m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
-                            IN PROGRESS
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center space-x-1 sm:space-x-none">
-                      <div className="hs-tooltip inline-block">
-                        <button
-                          type="button"
-                          data-hs-overlay="#hs-modal-viewInquiries"
-                          onClick={() => handleView({ ...item })}
-                          className="hs-tooltip-toggle text-white bg-teal-800  font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                        >
-                          <AiOutlineEye
-                            size={24}
-                            style={{ color: "#ffffff" }}
-                          />
-                        </button>
-                        <span
-                          className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                          role="tooltip"
-                        >
-                          View Inquiry
-                        </span>
-                      </div>
-                      <div className="hs-tooltip inline-block">
-                        <button
-                          type="button"
-                          data-hs-overlay="#hs-modal-status"
-                          onClick={() =>
-                            handleStatus({
-                              id: item._id,
-                              status: item.isApproved,
-                            })
-                          }
-                          className="hs-tooltip-toggle text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                        >
-                          <FiEdit size={24} style={{ color: "#ffffff" }} />
-                        </button>
-                        <span
-                          className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                          role="tooltip"
-                        >
-                          Edit Status
-                        </span>
-                      </div>
-                    </div>
+            {inquiries.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
                   </td>
                 </tr>
-              ))}
+              ) : (
+              
+              inquiries
+                .slice()
+                .sort(
+                  (a, b) => new Date(b.compose.date) - new Date(a.compose.date)
+                )
+                .map((item, index) => (
+                  <tr key={index} className="odd:bg-slate-100 text-center">
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(item._id)}
+                          value={item._id}
+                          onChange={checkboxHandler}
+                          disabled={item.isApproved === "Completed"}
+                        />
+                      </div>
+                    </td>
+                  
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.email}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {DateFormat(item.compose.date) || ""}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        {item.isApproved === "Completed" && (
+                          <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
+                            <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                              COMPLETED
+                            </span>
+                          </div>
+                        )}
+                        {item.isApproved === "Pending" && (
+                          <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
+                            <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                              PENDING
+                            </span>
+                          </div>
+                        )}
+                        {item.isApproved === "In Progress" && (
+                          <div className="flex w-full items-center justify-center bg-custom-amber m-2 rounded-lg">
+                            <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                              IN PROGRESS
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center space-x-1 sm:space-x-none">
+                        <div className="hs-tooltip inline-block relative">
+                          {isLatestResponseResident(item) && (
+                            <span className="tooltip absolute -top-2 left-8 z-10">
+                              <span className="animate-ping absolute inline-flex h-3 w-3 mt-1 rounded-full bg-red-400 opacity-75 dark:bg-red-600"></span>
+                              <span className="relative inline-flex rounded-full bg-red-500 text-white h-3 w-3"></span>
+                              {showTooltip && (
+                                <span className="tooltiptext bg-red-500 text-white text-xs py-1 px-2 rounded absolute -left-full top-1/2 transform -translate-y-1/2 -translate-x-full whitespace-nowrap">
+                                  You have a new reply
+                                </span>
+                              )}
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            data-hs-overlay="#hs-modal-viewInquiries"
+                            onClick={() => handleView({ ...item })}
+                            className={`hs-tooltip-toggle text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg ${
+                              item.isApproved === "Completed"
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            disabled={item.isApproved === "Completed"}
+                          >
+                            <AiOutlineEye
+                              size={24}
+                              style={{ color: "#ffffff" }}
+                            />
+                          </button>
+                          <span
+                            className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm"
+                            role="tooltip"
+                          >
+                            {item.isApproved === "Completed"
+                              ? "Inquiries already completed"
+                              : "View Inquiry"}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+          ))
+          )}
             </tbody>
           </table>
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
-            onPageChange={() => {}}
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
-            previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            pageCount={pageCount}
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}
           />
         </div>
-        <ArchiveModal selectedItems={selectedItems} />
-        <ReplyModal />
+        <StatusInquiryModal selectedItems={selectedItems} />
         <ViewMessage inquiry={inquiry} setInquiry={setInquiry} />
         <Status status={status} setStatus={setStatus} />
       </div>

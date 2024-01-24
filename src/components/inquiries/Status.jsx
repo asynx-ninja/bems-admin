@@ -1,9 +1,16 @@
 import React from "react";
 import axios from "axios";
 import API_LINK from "../../config/API";
+import { useState } from "react";
 
 function InquiryStatus({ status, setStatus }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerId, setTimerId] = useState(null);
   const handleSave = async (e) => {
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
     try {
       e.preventDefault();
 
@@ -16,11 +23,19 @@ function InquiryStatus({ status, setStatus }) {
       );
 
       if (response.status === 200) {
-        window.location.reload();
+        setTimerId(
+          setTimeout(() => {
+            setIsLoading(false);
+            HSOverlay.close(document.getElementById("hs-modal-status"));
+            window.location.reload();
+          }, 1000)
+        );
+      
       } else;
     } catch (err) {
       console.log(err);
     }
+   
   };
 
   const handleOnChange = (e) => {
@@ -32,11 +47,21 @@ function InquiryStatus({ status, setStatus }) {
 
   return (
     <div>
+        {isLoading && (
+        <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
+          <div className="loaders">
+            <div className="loader"></div>
+            <div className="loader"></div>
+            <div className="loader"></div>
+          </div>
+        </div>
+      )}
       <div className="">
         <div
           id="hs-modal-status"
           className="hs-overlay hidden fixed top-0 left-0 z-[60] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center"
         >
+        
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-xl">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto">
               {/* Header */}
@@ -67,7 +92,7 @@ function InquiryStatus({ status, setStatus }) {
                           value={status.status}
                         >
                           <option value="Completed">COMPLETED</option>
-                          <option value="Not Responded">NOT RESPONDED</option>
+                          <option value="Pending">PENDING</option>
                           <option value="In Progress">IN PROGRESS</option>
                         </select>
                       </div>
