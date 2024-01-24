@@ -72,6 +72,7 @@ const Inquiries = () => {
 
     fetch();
   }, [currentPage]);
+  
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -79,7 +80,6 @@ const Inquiries = () => {
   console.log(inquiries);
 
   const tableHeader = [
-    "Inquiry id",
     "name",
     "e-mail",
     "date",
@@ -274,13 +274,16 @@ const Inquiries = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {inquiries.map((item, index) => (
-                <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                      {item.inq_id}
-                    </span>
+            {inquiries.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
                   </td>
+                </tr>
+              ) : (
+              inquiries.map((item, index) => (
+                <tr key={index} className="odd:bg-slate-100 text-center">
+                 
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
@@ -353,7 +356,8 @@ const Inquiries = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+               ))
+               )}
             </tbody>
           </table>
         </div>
@@ -363,11 +367,27 @@ const Inquiries = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"

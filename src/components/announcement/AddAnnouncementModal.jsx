@@ -6,11 +6,10 @@ import Dropbox from "./Dropbox";
 import API_LINK from "../../config/API";
 import { CiImageOn } from "react-icons/ci";
 import AddLoader from "./loaders/AddLoader";
-function CreateAnnouncementModal() {
-  const brgy = "MUNISIPYO";
-  const [submitClicked, setSubmitClicked] = useState(false);
-  const [creationStatus, setCreationStatus] = useState(null);
-  const [error, setError] = useState(null);
+import { MdError } from "react-icons/md";
+import ErrorPopup from "./popup/ErrorPopup";
+
+function CreateAnnouncementModal({ brgy }) {
   const [announcement, setAnnouncement] = useState({
     title: "",
     details: "",
@@ -22,16 +21,12 @@ function CreateAnnouncementModal() {
   const [logo, setLogo] = useState();
   const [banner, setBanner] = useState();
   const [files, setFiles] = useState([]);
-
-  // useEffect(() => {
-  //   var logoSrc = document.getElementById("logo");
-  //   logoSrc.src =
-  //     "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
-
-  //   var bannerSrc = document.getElementById("banner");
-  //   bannerSrc.src =
-  //     "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
-  // }, []);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [creationStatus, setCreationStatus] = useState(null);
+  const [error, setError] = useState(null);
+  const [emptyFields, setEmptyFields] = useState([]);
+  const [empty, setEmpty] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogoChange = (e) => {
     setLogo(e.target.files[0]);
@@ -61,25 +56,41 @@ function CreateAnnouncementModal() {
     }));
   };
 
-  console.log(announcement);
-
   const handleFileChange = (e) => {
     e.preventDefault();
 
     setFiles([...files, ...e.target.files]);
   };
 
+  const clearForm = () => {
+    setAnnouncement({
+      title: "",
+      details: "",
+      date: "",
+      brgy: "",
+    });
+    setLogo(null);
+    setBanner(null);
+    setFiles([]);
+  };
+
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
       setSubmitClicked(true);
-      var formData = new FormData();
+      const emptyFieldsArr = checkEmptyFieldsForAnnouncement();
 
-      const arr1 = [banner, logo];
-      const newFiles = arr1.concat(files);
+      if (emptyFieldsArr.length > 0) {
+        setEmpty(true);
+        setSubmitClicked(false);
+        return;
+      }
 
-      for (let f = 0; f < newFiles.length; f += 1) {
-        formData.append("files", newFiles[f]);
+      const formData = new FormData();
+      const newFiles = [banner, logo, ...files].filter((file) => file);
+
+      for (const file of newFiles) {
+        formData.append("files", file);
       }
 
       const obj = {
@@ -95,60 +106,54 @@ function CreateAnnouncementModal() {
       const result = await axios.post(`${API_LINK}/announcement/`, formData);
 
       if (result.status === 200) {
-        var logoSrc = document.getElementById("logo");
-        logoSrc.src =
-          "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
-
-        var bannerSrc = document.getElementById("banner");
-        bannerSrc.src =
-          "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
-        setAnnouncement({
-          title: "",
-          details: "",
-          date: "",
-          brgy: "",
-        });
-        setLogo();
-        setBanner();
-        setFiles([]);
+        clearForm();
         setSubmitClicked(false);
         setCreationStatus("success");
         setTimeout(() => {
           window.location.reload();
         }, 3000);
-       
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setSubmitClicked(false);
-      setCreationStatus(null);
-      setError("An error occurred while creating the announcement.");
+      setCreationStatus("error");
+      setError(err.message);
     }
+  };
+
+  const checkEmptyFieldsForAnnouncement = () => {
+    let arr = [];
+    const keysToCheck = ["title", "details", "date"];
+    for (const key of keysToCheck) {
+      if (announcement[key] === "") {
+        arr.push(key);
+      }
+    }
+    setEmptyFields(arr);
+    return arr;
   };
 
   return (
     <div>
-       
       <div
         id="hs-modal-add"
         className="hs-overlay hidden fixed top-0 left-0 z-[80] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center "
       >
-
         {/* Modal */}
         <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
-            <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
-              {/* Header */}
-              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]  overflow-hidden rounded-t-2xl">
-                <h3
-                  className="font-bold text-white mx-auto md:text-xl text-center"
-                  style={{ letterSpacing: "0.3em" }}
-                >
-                  CREATE EVENTS
-                </h3>
-              </div>
+          <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
+            {/* Header */}
+            <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]  overflow-hidden rounded-t-2xl">
+              <h3
+                className="font-bold text-white mx-auto md:text-xl text-center"
+                style={{ letterSpacing: "0.3em" }}
+              >
+                CREATE BARANGAY EVENT
+              </h3>
+            </div>
 
-              <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
-                <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
+            <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+              <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
                 <div className="w-full">
                   <label
                     className="block text-gray-700 text-sm font-bold mb-2"
@@ -192,7 +197,7 @@ function CreateAnnouncementModal() {
                   </label>
                   <div className="flex flex-col items-center space-y-2 relative">
                     <div className="w-full border border-gray-300">
-                    <img
+                      <img
                         className={`${
                           banner ? "" : "hidden"
                         } w-[200px] md:w-[250px]  lg:w-full md:h-[140px] lg:h-[250px] object-cover`}
@@ -242,12 +247,17 @@ function CreateAnnouncementModal() {
                 </label>
                 <input
                   id="title"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                  className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    emptyFields.includes("details")
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline`}
                   name="title"
                   type="text"
                   value={announcement.title}
                   onChange={handleChange}
                   placeholder="Announcement title"
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -263,8 +273,13 @@ function CreateAnnouncementModal() {
                   name="details"
                   value={announcement.details}
                   onChange={handleChange}
-                  className="block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline "
+                  className={`block p-2.5 w-full text-sm text-gray-700 rounded-lg border ${
+                    emptyFields.includes("details")
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline`}
                   placeholder="Enter announcement details..."
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -275,12 +290,15 @@ function CreateAnnouncementModal() {
                   Date
                 </label>
                 <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                  className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    emptyFields.includes("date") && "border-red-500"
+                  }`}
                   id="date"
                   name="date"
                   type="date"
                   value={announcement.date}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <Dropbox
@@ -294,7 +312,7 @@ function CreateAnnouncementModal() {
               <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
                 <button
                   type="submit"
-                  className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-[#295141] text-white shadow-sm"
+                  className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-teal-900 text-white shadow-sm"
                   onClick={handleSubmit}
                 >
                   CREATE
@@ -310,6 +328,10 @@ function CreateAnnouncementModal() {
             </div>
           </div>
         </div>
+        {empty && (
+        <ErrorPopup />
+        )}
+        {/* <AddLoader /> */}
         {submitClicked && <AddLoader creationStatus="creating" />}
         {creationStatus && (
           <AddLoader creationStatus={creationStatus} error={error} />

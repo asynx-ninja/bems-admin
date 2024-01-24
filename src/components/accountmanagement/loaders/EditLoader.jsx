@@ -24,9 +24,9 @@ function EditLoader({ updatingStatus, error }) {
   }, [updatingStatus]);
 
   return (
-    <div className="absolute top-0 lg:top-0 lg:end-0 mb-20 lg:mr-5 z-[80]">
+    <div className="absolute top-0 lg:top-0 lg:right-0 mb-20 lg:mr-5 z-[80]">
     <div
-      className="w-screen md:w-auto bg-[#295141] border border-gray-200 rounded-xl shadow-lg"
+      className="w-full md:w-auto bg-[#295141] border border-gray-200 rounded-xl shadow-lg"
       role="alert"
       style={{ animation: "slideIn 0.3s ease-out" }}
     >
@@ -39,7 +39,7 @@ function EditLoader({ updatingStatus, error }) {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
+              <path
               d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
               fill="currentColor"
             />

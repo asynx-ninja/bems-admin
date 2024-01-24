@@ -11,7 +11,7 @@ const Breadcrumb = ({ id }) => {
             href={`/announcements/?id=${id}`}
             className="text-gray-600 font-bold hover:underline text-xs md:text-lg"
           >
-            EVENT
+            EVENT MANAGEMENT
           </a>
         </li>
         <li>

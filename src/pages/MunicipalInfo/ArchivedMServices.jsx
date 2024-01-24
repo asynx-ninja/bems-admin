@@ -11,7 +11,7 @@ import Breadcrumbs from "../../components/mservicesinfo/Breadcrumbs";
 import RestoreServicesInfoModal from "../../components/mservicesinfo/restoreServiceInfoModal";
 import GenerateReportsModal from "../../components/accountmanagement/GenerateReportsModal";
 import ViewArchivedServicesInfo from "../../components/mservicesinfo/viewArchivedServicesInfoModal"
-
+import noData from "../../assets/image/no-data.png";
 const ArchivedServicesInfo = () => {
   useEffect(() => {
     document.title = "Archived Municipal Services | Barangay E-Services Management";
@@ -222,7 +222,22 @@ const ArchivedServicesInfo = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {servicesinfo.map((item, index) => (
+            {servicesinfo.length === 0 ? (
+                   <tr>
+                   <td
+                     colSpan={tableHeader.length + 1}
+                     className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                   >
+                     <img
+                       src={noData}
+                       alt=""
+                       className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                     />
+                     <strong className="text-[#535353]">NO DATA FOUND</strong>
+                   </td>
+                 </tr>
+              ) : (
+              servicesinfo.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
@@ -287,7 +302,8 @@ const ArchivedServicesInfo = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+         ))
+         )}
             </tbody>
           </table>
         </div>
@@ -297,11 +313,27 @@ const ArchivedServicesInfo = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"

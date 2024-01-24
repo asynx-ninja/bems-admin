@@ -16,6 +16,7 @@ const Header = () => {
         const res = await axios.get(`${API_LINK}/users/specific/${id}`);
         if (res.status === 200) {
           setUserData(res.data[0]);
+          
         } else {
           setError("Invalid username or password");
         }

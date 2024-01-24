@@ -9,10 +9,17 @@ function ViewOfficialModal({
   console.log("selected", selectedOfficial);
   console.log("selected", officials);
   const dateFormat = (date) => {
-    const eventdate = date === undefined ? "" : date.substr(0, 7);
+    if (!date) {
+      // If date is null, undefined, or an empty string, return an empty string
+      return "";
+    }
+  
+    // Use substr only when date is a non-empty string
+    const eventdate = date.substr(0, 7);
     console.log(eventdate);
     return eventdate;
   };
+  
   return (
     <div>
       <div

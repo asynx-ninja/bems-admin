@@ -9,9 +9,9 @@ import {
 } from "@react-pdf/renderer";
 import logo from "../../../assets/header/montalban-logo.png";
 import id_picture from "../../../assets/sample/official.jpg";
-
+import Default from "../../../assets/sample-image/default-pfp.png";
 const PrintPDF = ({ users, tableHeader }) => {
-  console.log("table", tableHeader);
+  console.log("table", users);
   const styles = StyleSheet.create({
     body: {
       padding: 35,
@@ -50,7 +50,7 @@ const PrintPDF = ({ users, tableHeader }) => {
         fontFamily: "Times-Roman",
         fontSize: 12,
       },
-    },  
+    },
     title: {
       view1: {
         marginTop: 20,
@@ -101,7 +101,7 @@ const PrintPDF = ({ users, tableHeader }) => {
         textAlign: "center", // Center-align text
       },
       userImage: {
-        // width: 30, // Set appropriate width
+        width: 30, // Set appropriate width
         height: 30, // Set appropriate height
         borderRadius: 15, // Circular image
       },
@@ -114,7 +114,7 @@ const PrintPDF = ({ users, tableHeader }) => {
         alignItems: "center", // Aligns content vertically
         display: "flex", // Enables flexbox layout
       },
-      
+
       statusText: {
         color: "#fff", // White text color
         fontSize: 8,
@@ -168,7 +168,7 @@ const PrintPDF = ({ users, tableHeader }) => {
       <View style={styles.table.tableHeader}>
         {tableHeader.map(
           (header, idx) =>
-            header !== "ACTIONS" && (
+            header !== "ACTIONS" && header !== "PROFILE" && (
               <Text key={idx} style={styles.table.tableHeaderCell}>
                 {header}
               </Text>
@@ -179,14 +179,6 @@ const PrintPDF = ({ users, tableHeader }) => {
       <View>
         {users.map((item, index) => (
           <View key={index} style={styles.table.tableRow}>
-            {/* <Text style={styles.table.tableCell}>
-              {item.profile.link ? (
-                <Image src={item.profile.link} style={styles.table.userImage} />
-              ) : (
-                <Image src={logo} style={styles.table.userIcon} />
-              )}
-            </Text> */}
-            <Image src={logo} style={styles.table.userIcon} />
             <Text style={styles.table.tableCell}>{item.user_id}</Text>
             <Text style={styles.table.tableCell}>
               {item.firstName + " " + item.middleName + " " + item.lastName}
@@ -218,7 +210,7 @@ const PrintPDF = ({ users, tableHeader }) => {
     <Document>
       <Page size="LEGAL" style={styles.body}>
         <LetterHead />
-        <Title/>
+        <Title />
         <Table />
       </Page>
     </Document>

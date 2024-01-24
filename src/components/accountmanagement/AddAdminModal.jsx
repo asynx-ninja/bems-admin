@@ -59,6 +59,28 @@ function AddAdminModal({ brgy, occupation, type }) {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+
+      if (
+        !user.firstName.trim() ||
+        !user.lastName.trim() ||
+        !user.firstName.trim() ||
+        !user.birthday.trim() ||
+        !user.email.trim() ||
+        !user.contact.trim() ||
+        !user.gender ||
+        !user.civil_status ||
+        !user.religion ||
+        !user.isVoter ||
+        !user.isHead ||
+        !user.isArchived ||
+        !user.street ||
+        !user.username ||
+        !user.password
+      ) {
+        setError("Please fill out all required fields.");
+        return; // Prevent further execution of handleSubmit
+      }
+
       setSubmitClicked(true);
       const calculatedAge = calculateAge(user.birthday);
 
@@ -117,7 +139,6 @@ function AddAdminModal({ brgy, occupation, type }) {
         setTimeout(() => {
           window.location.reload();
         }, 3000);
-       
       }
     } catch (err) {
       console.log(err);
@@ -161,10 +182,32 @@ function AddAdminModal({ brgy, occupation, type }) {
 
     return age;
   };
-
+  const resetForm = () => {
+    setUser({
+      user_id: "",
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      suffix: "",
+      religion: "",
+      email: "",
+      birthday: "",
+      age: "",
+      contact: "",
+      sex: "",
+      address: "",
+      civil_status: "",
+      type: type,
+      isVoter: "",
+      isHead: "",
+      username: "",
+      password: "",
+    });
+    setError(null);
+   
+  };
   return (
     <div>
-    
       <div className="">
         <div
           id="hs-modal-addAdmin"
@@ -184,6 +227,33 @@ function AddAdminModal({ brgy, occupation, type }) {
               </div>
 
               <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+              {error && (
+                 <div
+                 className="max-w-full border mb-4 border-[#bd4444] rounded-xl shadow-lg bg-[#43973d]"
+                 role="alert"
+               >
+                 <div className="flex p-4">
+                   <div className="flex-shrink-0">
+                     <svg
+                       className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                       xmlns="http://www.w3.org/2000/svg"
+                       width={16}
+                       height={16}
+                       fill="currentColor"
+                       viewBox="0 0 16 16"
+                     >
+                       <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                     </svg>
+                   </div>
+                   <div className="ms-3">
+                     <p className="text-sm text-white ">
+                     {error}
+                     </p>
+                   </div>
+                 </div>
+               </div>
+               
+                )}
                 <form>
                   <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
                     <div className="flex flex-col mb-1 w-full">
@@ -207,9 +277,16 @@ function AddAdminModal({ brgy, occupation, type }) {
                               id="firstName"
                               name="firstName"
                               onChange={handleChange}
-                              className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                                error && !user.firstName ? "border-red-500" : ""
+                              }`}
                               placeholder=""
                             />
+                            {error && !user.firstName && (
+                              <p className="text-red-500 text-xs italic">
+                                Please enter a first name.
+                              </p>
+                            )}
                           </div>
 
                           <div className="flex flex-col mt-2 w-full">
@@ -224,9 +301,18 @@ function AddAdminModal({ brgy, occupation, type }) {
                               id="middleName"
                               name="middleName"
                               onChange={handleChange}
-                              className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                                error && !user.middleName
+                                  ? "border-red-500"
+                                  : ""
+                              }`}
                               placeholder=""
                             />
+                            {error && !user.middleName && (
+                              <p className="text-red-500 text-xs italic">
+                                Please enter a middle name.
+                              </p>
+                            )}
                           </div>
 
                           <div className="flex flex-col mt-2 w-full">
@@ -241,9 +327,16 @@ function AddAdminModal({ brgy, occupation, type }) {
                               id="lastName"
                               name="lastName"
                               onChange={handleChange}
-                              className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                                error && !user.lastName ? "border-red-500" : ""
+                              }`}
                               placeholder=""
                             />
+                            {error && !user.lastName && (
+                              <p className="text-red-500 text-xs italic">
+                                Please enter a last name.
+                              </p>
+                            )}
                           </div>
                         </div>
 
@@ -277,10 +370,17 @@ function AddAdminModal({ brgy, occupation, type }) {
                               id="birthday"
                               name="birthday"
                               onChange={handleChange}
-                              className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                              placeholder="mm/dd/yyyy"
+                              className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              placeholder="mm/dd/yyyy ${
+                                error && !user.birthday ? "border-red-500" : ""
+                              }`}
                               value={birthdayFormat(user.birthday) || ""}
                             />
+                            {error && !user.birthday && (
+                              <p className="text-red-500 text-xs italic">
+                                Please enter a birthday.
+                              </p>
+                            )}
                           </div>
 
                           <div className="flex flex-col  ml-2 mt-0 md:ml-2 md:w-[30%]">
@@ -314,9 +414,16 @@ function AddAdminModal({ brgy, occupation, type }) {
                               id="email"
                               name="email"
                               onChange={handleChange}
-                              className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                                error && !user.email ? "border-red-500" : ""
+                              }`}
                               placeholder=""
                             />
+                            {error && !user.email && (
+                              <p className="text-red-500 text-xs italic">
+                                Please enter an email.
+                              </p>
+                            )}
                           </div>
 
                           <div className="flex flex-col mt-2 md:mt-0 md:ml-2 w-full md:w-[27%] lg:w-[32%]">
@@ -331,9 +438,16 @@ function AddAdminModal({ brgy, occupation, type }) {
                               id="contact"
                               name="contact"
                               onChange={handleChange}
-                              className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                                error && !user.contact ? "border-red-500" : ""
+                              }`}
                               placeholder=""
                             />
+                            {error && !user.contact && (
+                              <p className="text-red-500 text-xs italic">
+                                Please enter a contact.
+                              </p>
+                            )}
                           </div>
 
                           <div className="w-full md:ml-4 md:w-[20%]">
@@ -367,6 +481,11 @@ function AddAdminModal({ brgy, occupation, type }) {
                                 Female
                               </label>
                             </div>
+                            {error && !user.gender && (
+                              <p className="text-red-500 text-xs italic">
+                                Please select a gender.
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -388,7 +507,11 @@ function AddAdminModal({ brgy, occupation, type }) {
                               id="civil_status"
                               name="civil_status"
                               onChange={handleChange}
-                              className="shadow border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              className={`shadow border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                                error && !user.civil_status
+                                  ? "border-red-500"
+                                  : ""
+                              }`}
                             >
                               <option>-- Select Status --</option>
                               <option value="Single">Single</option>
@@ -398,6 +521,11 @@ function AddAdminModal({ brgy, occupation, type }) {
                               </option>
                               <option value="Widowed">Widowed</option>
                             </select>
+                            {error && !user.civil_status && (
+                              <p className="text-red-500 text-xs italic">
+                                Please select a status.
+                              </p>
+                            )}
                           </div>
 
                           <div className="flex flex-col w-full mt-2 md:mt-0">
@@ -410,7 +538,9 @@ function AddAdminModal({ brgy, occupation, type }) {
                             <select
                               name="religion"
                               onChange={handleChange}
-                              className="shadow border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              className={`shadow border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                                error && !user.religion ? "border-red-500" : ""
+                              }`}
                             >
                               <option value="">-- Select Religion --</option>
                               {religions.map((religion, index) => (
@@ -419,6 +549,11 @@ function AddAdminModal({ brgy, occupation, type }) {
                                 </option>
                               ))}
                             </select>
+                            {error && !user.religion && (
+                              <p className="text-red-500 text-xs italic">
+                                Please enter a religion.
+                              </p>
+                            )}
                           </div>
                         </div>
 
@@ -451,9 +586,16 @@ function AddAdminModal({ brgy, occupation, type }) {
                               id="street"
                               name="street"
                               onChange={handleChange}
-                              className="shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              className={`shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                                error && !user.street ? "border-red-500" : ""
+                              }`}
                               placeholder=""
                             />
+                            {error && !user.street && (
+                              <p className="text-red-500 text-xs italic">
+                                Please enter a street.
+                              </p>
+                            )}
                           </div>
 
                           <div className="flex flex-col w-full mt-2 md:mt-0 md:ml-3">
@@ -525,6 +667,11 @@ function AddAdminModal({ brgy, occupation, type }) {
                                 No
                               </label>
                             </div>
+                            {error && !user.isVoter && (
+                              <p className="text-red-500 text-xs italic">
+                                Please answer this first.
+                              </p>
+                            )}
                           </div>
 
                           <div className="w-full">
@@ -558,6 +705,11 @@ function AddAdminModal({ brgy, occupation, type }) {
                                 No
                               </label>
                             </div>
+                            {error && !user.isHead && (
+                              <p className="text-red-500 text-xs italic">
+                                Please answer this first.
+                              </p>
+                            )}
                           </div>
 
                           <div className="w-full">
@@ -595,6 +747,11 @@ function AddAdminModal({ brgy, occupation, type }) {
                                 No
                               </label>
                             </div>
+                            {error && !user.isArchived && (
+                              <p className="text-red-500 text-xs italic">
+                                Please answer this first.
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -616,9 +773,16 @@ function AddAdminModal({ brgy, occupation, type }) {
                             id="username"
                             name="username"
                             onChange={handleChange}
-                            className="shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                            className={`shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline  ${
+                              error && !user.username ? "border-red-500" : ""
+                            }`}
                             placeholder=""
                           />
+                          {error && !user.username && (
+                            <p className="text-red-500 text-xs italic">
+                              Please enter a username.
+                            </p>
+                          )}
                         </div>
 
                         <div className="flex flex-col mt-2 md:mt-0 md:ml-2 w-full">
@@ -648,10 +812,17 @@ function AddAdminModal({ brgy, occupation, type }) {
                               name="password"
                               id="password"
                               onChange={handleChange}
-                              className="shadow appearance-none border w-full p-2 text-sm text-black rounded-r-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                              className={`shadow appearance-none border w-full p-2 text-sm text-black rounded-r-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                                error && !user.password ? "border-red-500" : ""
+                              }`}
                               value={user.password}
                             />
                           </div>
+                          {error && !user.password && (
+                            <p className="text-red-500 text-xs italic">
+                              Please enter a password.
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -665,7 +836,6 @@ function AddAdminModal({ brgy, occupation, type }) {
                     type="button"
                     onClick={handleSubmit}
                     className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-[#295141]  text-white shadow-sm"
-                    data-hs-overlay="#hs-modal-addAdmin"
                   >
                     ADD
                   </button>
@@ -673,6 +843,7 @@ function AddAdminModal({ brgy, occupation, type }) {
                     type="button"
                     className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-pink-800 text-white shadow-sm"
                     data-hs-overlay="#hs-modal-addAdmin"
+                    onClick={resetForm}
                   >
                     CLOSE
                   </button>

@@ -11,7 +11,8 @@ import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
 import ViewArchivedResident from "../../components/barangaytabs/brgyarchivedResidents/ViewArchivedResident";
-
+import PrintPDF from "../../components/barangaytabs/brgyResidents/form/PrintPDF";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 const Residents = () => {
   const [users, setUsers] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -244,7 +245,25 @@ const Residents = () => {
                   onChange={handleSearch}
                 />
               </div>
-            
+              {/* <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
+                <div className="hs-tooltip inline-block w-full">
+                  <PDFDownloadLink
+                    document={
+                      <PrintPDF users={users} tableHeader={tableHeader} brgy={brgy}/>
+                    }
+                    fileName="SAMPLE.pdf"
+                    className="hs-tooltip-toggle sm:w-full md:w-full cursor-pointer text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
+                  >
+                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
+                    <span
+                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                      role="tooltip"
+                    >
+                      Generate Report
+                    </span>
+                  </PDFDownloadLink>
+                </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -266,7 +285,14 @@ const Residents = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {sortedAndFilteredUsers.map((item, index) => (
+            {sortedAndFilteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+              sortedAndFilteredUsers.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
                   <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2">
@@ -350,7 +376,8 @@ const Residents = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>
@@ -361,11 +388,27 @@ const Residents = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"

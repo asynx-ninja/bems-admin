@@ -1,7 +1,7 @@
 import { createBrowserRouter, Outlet } from "react-router-dom";
 import Error404 from "../config/Error404";
 import Dashboard from "../pages/Dashboard";
-import Announcements from "../pages/Announcements";
+import Announcements from "../pages/Events/Announcements";
 //import AnimationLayout from "../components/global/AnimationLayout";
 import Navbar from "../components/global/Navbar";
 import Inquiries from "../pages/Inquiries";
@@ -12,7 +12,7 @@ import Login from "../pages/login/Login";
 import ForgotPassword from "../pages/login/ForgotPassword";
 import SecurityPin from "../pages/login/SecurityPin";
 import ChangePassword from "../pages/login/ChangePassword";
-import ArchivedAnnouncements from "../pages/ArchivedAnnouncements";
+import ArchivedAnnouncements from "../pages/Events/ArchivedAnnouncements";
 import ArchivedInquiries from "../pages/ArchivedInquiries";
 import ArchivedResidents from "../pages/BarangayTabs/BrgyArchivedResidents";
 import ArchivedServices from "../pages/BarangayTabs/BrgyArchivedServices";
@@ -24,14 +24,17 @@ import BrgyArchivedAnnouncement from "../pages/BarangayTabs/BrgyArchivedAnnounce
 import BrgyArchivedInquiries from "../pages/BarangayTabs/BrgyArchivedInquiries";
 import AccountManagement from "../pages/AccountManagement";
 import ArchivedAccountManagement from "../pages/ArchivedAccountManagement";
-import MunicipalityOffcials from "../pages/MunicipalityOffcials";
-import ArchivedMunicipalityOfficials from "../pages/ArchivedMunicipalityOfficials";
+import MunicipalityOffcials from "../pages/MunicipalInfo/MunicipalityOffcials";
+import ArchivedMunicipalityOfficials from "../pages/MunicipalInfo/ArchivedMunicipalityOfficials";
 import MAboutusInfo from "../pages/MunicipalInfo/MAboutusInfo";
 import ArchivedAboutusInfo from "../pages/MunicipalInfo/ArchivedMAboutus"
 import MServicesInfo from "../pages/MunicipalInfo/MServicesInfo";
 import ArchivedServicesInfo from "../pages/MunicipalInfo/ArchivedMServices"
 import MTouristSpot from "../pages/MunicipalInfo/MTouristSpot";
 import ArchivedTouristSpot from "../pages/MunicipalInfo/ArchivedTouristSpot";
+import EventsRegistrations from "../pages/Events/EventsApplication";
+import ArchivedRegistrations from "../pages/Events/ArchivedApplication";
+import Reports from "../pages/Reports";
 const pages = [
   {
     path: "/",
@@ -53,6 +56,10 @@ const pages = [
     path: "/dashboard",
     element: <Navbar comp={<Dashboard />} />,
   },
+  {
+    path: "/reports",
+    element: <Navbar comp={<Reports />} />,
+  },
 
   {
     path: "/announcements",
@@ -61,6 +68,14 @@ const pages = [
   {
     path: "/archivedannoucements",
     element: <Navbar comp={<ArchivedAnnouncements />} />,
+  },
+  {
+    path: "/archived_registrations",
+    element: <Navbar comp={<ArchivedRegistrations />} />,
+  },
+  {
+    path: "/events_registration",
+    element: <Navbar comp={<EventsRegistrations />} />,
   },
   {
     path: "/inquiries",

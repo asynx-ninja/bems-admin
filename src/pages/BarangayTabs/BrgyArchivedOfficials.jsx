@@ -11,7 +11,7 @@ import ViewOfficialModal from "../../components/barangaytabs/brgyarchivedOfficia
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
-
+import {  FaUserCircle } from "react-icons/fa";
 const ArchivedOfficials = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [officials, setOfficials] = useState([]);
@@ -87,7 +87,7 @@ const ArchivedOfficials = () => {
         const response = await axios.get(
           `${API_LINK}/brgyofficial/?brgy=${brgy}&archived=true&page=${currentPage}`
         );
-
+console.log("ss",response)
         if (response.status === 200) {
           const officialsData = response.data.result || [];
 
@@ -319,7 +319,14 @@ const ArchivedOfficials = () => {
                 </tr>
               </thead>
               <tbody className="odd:bg-slate-100">
-                {officials.map((item, index) => (
+              {officials.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+                officials.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
@@ -386,7 +393,8 @@ const ArchivedOfficials = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                ))
+                )}
               </tbody>
             </table>
           </div>
@@ -397,11 +405,27 @@ const ArchivedOfficials = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"

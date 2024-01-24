@@ -7,7 +7,7 @@ import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { AiOutlineSend } from "react-icons/ai";
 import { FaArchive } from "react-icons/fa";
 import RequestsReportsModal from "../../components/barangaytabs/brgyserviceRequests/RequestsReportsModal";
-import ReplyServiceModal from "../../components/barangaytabs/brgyserviceRequests/ReplyServiceModal"
+import ReplyServiceModal from "../../components/barangaytabs/brgyserviceRequests/ReplyServiceModal";
 import ViewRequestModal from "../../components/barangaytabs/brgyserviceRequests/ViewRequestModal";
 import { useSearchParams } from "react-router-dom";
 import API_LINK from "../../config/API";
@@ -24,17 +24,15 @@ function ServiceRequests() {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
 
-
   useEffect(() => {
     const fetch = async () => {
       try {
         const response = await axios.get(
           `${API_LINK}/requests/?brgy=${brgy}&archived=false&page=${currentPage}`
         );
-        console.log(response)
+        console.log(response);
 
-        if (response.status === 200)
-        {
+        if (response.status === 200) {
           setPageCount(response.data.pageCount);
           setRequests(response.data.result);
         }
@@ -100,10 +98,10 @@ function ServiceRequests() {
   ];
   return (
     <div className="">
-    {/* Body */}
-    <div>
-      {/* Header */}
-      <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full">
+      {/* Body */}
+      <div>
+        {/* Header */}
+        <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
               className="text-center mx-auto font-bold text-xs md:text-xl lg:text-[16px] xl:text-[20px] xxl:text-3xl xxxl:text-3xl xxxl:mt-1 text-white"
@@ -299,70 +297,77 @@ function ServiceRequests() {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {requests.map((item, index) => (
-                <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item.id)}
-                        value={item.id}
-                        onChange={checkboxHandler}
-                      />
-                    </div>
+              {requests.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
                   </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2">
-                      {item.service_name}
-                    </span>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
+                </tr>
+              ) : (
+                requests.map((item, index) => (
+                  <tr key={index} className="odd:bg-slate-100 text-center">
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(item.id)}
+                          value={item.id}
+                          onChange={checkboxHandler}
+                        />
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.type}
+                        {item.service_name}
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {new Date(item.createdAt).toISOString().split("T")[0]}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.date}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    {item.status === "approved" && (
-                      <div className="flex items-center justify-center bg-custom-green-button3 m-2">
-                        <span className="text-xs sm:text-sm text-white p-3 mx-5">
-                          APPROVED
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.type}
                         </span>
                       </div>
-                    )}
-                    {item.status === "Rejected" && (
-                      <div className="flex items-center justify-center bg-custom-red-button m-2 rounded-lg">
-                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
-                          REJECTED
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {new Date(item.createdAt).toISOString().split("T")[0]}
                         </span>
                       </div>
-                    )}
-                    {item.status === "Pending" && (
-                      <div className="flex items-center justify-center bg-custom-amber m-2 rounded-lg">
-                        <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
-                          PENDING
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.date}
                         </span>
                       </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center space-x-1 sm:space-x-none">
-                      {/* <button
+                    </td>
+                    <td className="px-6 py-3">
+                      {item.status === "approved" && (
+                        <div className="flex items-center justify-center bg-custom-green-button3 m-2">
+                          <span className="text-xs sm:text-sm text-white p-3 mx-5">
+                            APPROVED
+                          </span>
+                        </div>
+                      )}
+                      {item.status === "Rejected" && (
+                        <div className="flex items-center justify-center bg-custom-red-button m-2 rounded-lg">
+                          <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                            REJECTED
+                          </span>
+                        </div>
+                      )}
+                      {item.status === "Pending" && (
+                        <div className="flex items-center justify-center bg-custom-amber m-2 rounded-lg">
+                          <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                            PENDING
+                          </span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center space-x-1 sm:space-x-none">
+                        {/* <button
                         type="button"
                         data-hs-overlay="#hs-view-request-modal"
                         className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
@@ -370,17 +375,21 @@ function ServiceRequests() {
                         <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
                       </button> */}
 
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-view-request-modal"
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-view-request-modal"
+                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                        >
+                          <AiOutlineEye
+                            size={24}
+                            style={{ color: "#ffffff" }}
+                          />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -390,12 +399,28 @@ function ServiceRequests() {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
-            onPageChange={() => {}}
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
-            previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            pageCount={pageCount}
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}
@@ -406,6 +431,6 @@ function ServiceRequests() {
       <ViewServiceReqModal />
     </div>
   );
-};
+}
 
 export default ServiceRequests;

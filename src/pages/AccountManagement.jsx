@@ -16,7 +16,8 @@ import ReactPaginate from "react-paginate";
 import axios from "axios";
 import API_LINK from "../config/API";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import PrintPDF from "../components/accountmanagement/form/PrintPDF";
+import PrintPDF from "../components/accountmanagement/form/PrintPDF"
+import noData from "../assets/image/no-data.png";
 const AccountManagement = () => {
   useEffect(() => {
     document.title = "Account Management | Barangay E-Services Management";
@@ -62,7 +63,6 @@ const AccountManagement = () => {
 
   const tableHeader = [
     "PROFILE",
-    "USER_ID",
     "NAME",
     // "AGE",
     // "GENDER",
@@ -75,7 +75,7 @@ const AccountManagement = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/users/?brgy=${brgy}&type=Admin&page=${currentPage}`
+          `${API_LINK}/users/?brgy=${brgy}&page=${currentPage}`
         );
 
         if (response.status === 200) {
@@ -232,36 +232,22 @@ const AccountManagement = () => {
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                <div className="hs-tooltip inline-block w-full">
-                  <PDFDownloadLink
-                    document={
-                      <PrintPDF users={users} tableHeader={tableHeader} />
-                    }
-                    fileName="SAMPLE.pdf"
-                    className="hs-tooltip-toggle sm:w-full md:w-full cursor-pointer text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
+           
+                {/* <div className="hs-tooltip inline-block w-full">
+                <PDFDownloadLink
+                  document={<PrintPDF users={users} tableHeader={tableHeader} />}
+                  fileName="SAMPLE.pdf"
+                  className="hs-tooltip-toggle sm:w-full md:w-full cursor-pointer text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
+                >
+                  <BsPrinter size={24} style={{ color: "#ffffff" }} />
                     <span
                       className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                       role="tooltip"
                     >
                       Generate Report
                     </span>
-                  </PDFDownloadLink>
-                  {/* <button
-                    type="button"
-                    data-hs-overlay="#hs-generate-reports-modal"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Generate Report
-                    </span>
-                  </button> */}
-                </div>
+                </PDFDownloadLink>
+                </div> */}
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
@@ -307,7 +293,22 @@ const AccountManagement = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {users.map((item, index) => (
+            {users.length === 0 ? (
+                <tr>
+                <td
+                  colSpan={tableHeader.length + 1}
+                  className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                >
+                  <img
+                    src={noData}
+                    alt=""
+                    className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                  />
+                  <strong className="text-[#535353]">NO DATA FOUND</strong>
+                </td>
+              </tr>
+              ) : (
+              users.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
@@ -327,7 +328,7 @@ const AccountManagement = () => {
                           <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
                             <img
                               referrerPolicy="no-referrer"
-                              src={`https://drive.google.com/thumbnail?id=${item.profile.id}&sz=w1000`}
+                              src={item.profile.link}
                               alt="picture"
                               className="w-full h-full object-cover"
                             />
@@ -338,11 +339,7 @@ const AccountManagement = () => {
                       </div>
                     </span>
                   </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                      {item.user_id}
-                    </span>
-                  </td>
+                
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
@@ -410,7 +407,8 @@ const AccountManagement = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+                 ))
+                 )}
             </tbody>
           </table>
         </div>
@@ -420,11 +418,27 @@ const AccountManagement = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"

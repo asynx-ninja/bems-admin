@@ -65,11 +65,7 @@ function BarangayMenu() {
             to={`/barangayinformation/?id=${id}&brgy=${barangay.brgy}`}
             className="h-[12rem] bg-[#295141] shadow-lg rounded-2xl flex justify-center items-center text-white font-bold text-lg flex-col hover:bg-[#2b6950] transition duration-300"
           >
-            <img
-              src={`https://drive.google.com/thumbnail?id=${barangay.logo}&sz=w1000`}
-              alt={barangay.brgy}
-              className="h-[8rem]"
-            />
+            <img src={barangay.logo} alt={barangay.brgy} className="h-[8rem]" />
             <h1 className="mt-1 px-4 text-md uppercase md:text-sm xl:text-lg">
               Barangay {barangay.brgy}
             </h1>

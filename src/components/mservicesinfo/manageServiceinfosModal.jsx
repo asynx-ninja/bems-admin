@@ -12,18 +12,16 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
   const [submitClicked, setSubmitClicked] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(null);
   const [error, setError] = useState(null);
- 
+
   const handleChange = (e) => {
     if (e.target.name === "icon") {
-      
       const file = e.target.files[0];
       setIcon(file);
       const reader = new FileReader();
       reader.addEventListener("load", () => {
-        editIconRef.current.src=reader.result;
+        editIconRef.current.src = reader.result;
       });
       reader.readAsDataURL(e.target.files[0]);
-
     } else {
       setServicesInfos((prev) => ({
         ...prev,
@@ -33,13 +31,31 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitClicked(true);
-    const formData = new FormData();
-    formData.append("file", icon);
-    console.log([...formData]);
-    formData.append("servicesinfo", JSON.stringify(servicesinfos));
     try {
+      e.preventDefault();
+      if (!servicesinfos.name.trim() || !servicesinfos.details.trim() || !icon) {
+        // Highlight empty fields with red border
+        if (!servicesinfos.name.trim()) {
+          document.getElementById("name");
+        }
+        if (!servicesinfos.details.trim()) {
+          document.getElementById("details");
+        }
+        if (!icon) {
+          document.getElementById("iconInput");
+        }
+        setError("Please fill out all required fields.");
+
+        return; // Prevent further execution of handleSubmit
+      }
+
+      setSubmitClicked(true);
+      setError(null)
+      const formData = new FormData();
+      formData.append("file", icon);
+      console.log([...formData]);
+      formData.append("servicesinfo", JSON.stringify(servicesinfos));
+
       const result = await axios.patch(
         `${API_LINK}/services_info/manage/?doc_id=${servicesinfos._id}`,
         formData
@@ -48,13 +64,12 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
         // Handle successful update
         console.log("Update successful");
         setTimeout(() => {
-        setSubmitClicked(false);
+          setSubmitClicked(false);
           setUpdatingStatus("success");
           setTimeout(() => {
             window.location.reload();
           }, 3000);
         }, 1000);
-       
       }
     } catch (err) {
       console.log(err);
@@ -67,7 +82,11 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
   const handleOnEdit = () => {
     setEdit(!edit);
   };
-
+  const resetForm = () => {
+    setError(null);
+    setSubmitClicked(false);
+    setCreationStatus(null);
+  };
   return (
     <div>
       <div
@@ -88,6 +107,32 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
             </div>
 
             <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+            {error && (
+                  <div
+                    className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
+                    role="alert"
+                  >
+                    <div className="flex p-4">
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                        </svg>
+                      </div>
+                      <div className="ms-3">
+                        <p className="text-sm text-gray-700 font-medium ">
+                          {error}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
                 <div className="w-full">
                   <label
@@ -101,7 +146,11 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
                       <img
                         className="w-[200px] md:w-[250px] mx-auto lg:w-full md:h-[140px] lg:h-[250px] object-cover"
                         ref={editIconRef}
-                        src={servicesinfos.length === 0 ? "" : servicesinfos.icon.link}
+                        src={
+                          servicesinfos.length === 0
+                            ? ""
+                            : servicesinfos.icon.link
+                        }
                         alt="Current profile photo"
                       />
                     </div>
@@ -125,11 +174,13 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="titnamele"
                 >
-                  ARTICLE TITLE
+                  SERVICE TITLE
                 </label>
                 <input
                   id="name"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    error && !servicesinfos.name.trim() ? "border-red-500" : ""
+                  }`}
                   name="name"
                   type="text"
                   value={servicesinfos.name || ""}
@@ -137,6 +188,11 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
                   onChange={handleChange}
                   placeholder="Article name"
                 />
+                 {error && !servicesinfos.name.trim() && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter a service name.
+                  </p>
+                )}
               </div>
               <div className="mb-4">
                 <label
@@ -152,9 +208,16 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
                   value={servicesinfos.details || ""}
                   disabled={!edit}
                   onChange={handleChange}
-                  className="block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline "
+                  className={`block p-2.5 w-full text-sm text-gray-700  rounded-lg border focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    error && !servicesinfos.details.trim() ? "border-red-500" : ""
+                  }`}
                   placeholder="Enter article details..."
                 />
+                 {error && !servicesinfos.details.trim() && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter a service details.
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700">
@@ -187,7 +250,10 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
                   <button
                     type="button"
                     className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-pink-800 text-white shadow-sm"
-                    onClick={handleOnEdit}
+                    onClick={() => {
+                      handleOnEdit();
+                      resetForm();
+                    }}
                   >
                     CANCEL
                   </button>
@@ -198,9 +264,9 @@ function ManageServicesInfo({ brgy, servicesinfos, setServicesInfos }) {
         </div>
       </div>
       {submitClicked && <EditLoader updatingStatus="updating" />}
-        {updatingStatus && (
-          <EditLoader updatingStatus={updatingStatus} error={error} />
-        )}
+      {updatingStatus && (
+        <EditLoader updatingStatus={updatingStatus} error={error} />
+      )}
     </div>
   );
 }
