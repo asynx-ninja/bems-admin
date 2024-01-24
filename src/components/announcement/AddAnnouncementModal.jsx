@@ -5,9 +5,12 @@ import axios from "axios";
 import Dropbox from "./Dropbox";
 import API_LINK from "../../config/API";
 import { CiImageOn } from "react-icons/ci";
-
+import AddLoader from "./loaders/AddLoader";
 function CreateAnnouncementModal() {
   const brgy = "MUNISIPYO";
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [creationStatus, setCreationStatus] = useState(null);
+  const [error, setError] = useState(null);
   const [announcement, setAnnouncement] = useState({
     title: "",
     details: "",
@@ -19,7 +22,6 @@ function CreateAnnouncementModal() {
   const [logo, setLogo] = useState();
   const [banner, setBanner] = useState();
   const [files, setFiles] = useState([]);
-  const navigate = useNavigate();
 
   // useEffect(() => {
   //   var logoSrc = document.getElementById("logo");
@@ -70,7 +72,7 @@ function CreateAnnouncementModal() {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       var formData = new FormData();
 
       const arr1 = [banner, logo];
@@ -109,19 +111,29 @@ function CreateAnnouncementModal() {
         setLogo();
         setBanner();
         setFiles([]);
-        window.location.reload();
+        setSubmitClicked(false);
+        setCreationStatus("success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+       
       }
     } catch (err) {
       console.log(err);
+      setSubmitClicked(false);
+      setCreationStatus(null);
+      setError("An error occurred while creating the announcement.");
     }
   };
 
   return (
     <div>
+       
       <div
         id="hs-modal-add"
         className="hs-overlay hidden fixed top-0 left-0 z-[80] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center "
       >
+
         {/* Modal */}
         <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
@@ -131,7 +143,7 @@ function CreateAnnouncementModal() {
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
                 >
-                  CREATE ANNOUNCEMENT
+                  CREATE EVENTS
                 </h3>
               </div>
 
@@ -298,6 +310,10 @@ function CreateAnnouncementModal() {
             </div>
           </div>
         </div>
+        {submitClicked && <AddLoader creationStatus="creating" />}
+        {creationStatus && (
+          <AddLoader creationStatus={creationStatus} error={error} />
+        )}
       </div>
     </div>
   );

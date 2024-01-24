@@ -22,20 +22,34 @@ const ArchivedAccountManagement = () => {
   const id = searchParams.get("id");
   const brgy = "MUNISIPYO";
   const [user, setUser] = useState({});
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
-    const fetch = async () => {
-      const response = await axios.get(
-        `${API_LINK}/users/showArchivedAdmin/?brgy=${brgy}`
-      );
-
-      if (response.status === 200) setUsers(response.data);
-      else setUsers([]);
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/users/showArchived/?brgy=${brgy}&type=Admin&page=${currentPage}`
+        );
+  
+        if (response.status === 200) {
+          setPageCount(response.data.pageCount);
+          setUsers(response.data.result); // Update the state variable with the fetched users
+        } else {
+          // Handle error here
+          console.error("Error fetching users:", response.error);
+        }
+      } catch (err) {
+        // Handle uncaught error here
+        console.error("Uncaught error:", err.message);
+      }
     };
-
-    fetch();
-  }, []);
-
+  
+    fetchUsers();
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
     let value = e.target.value;
@@ -69,8 +83,8 @@ const ArchivedAccountManagement = () => {
     "PROFILE",
     "USER_ID",
     "NAME",
-    "AGE",
-    "GENDER",
+    // "AGE",
+    // "GENDER",
     "CONTACT",
     "ACCOUNT STATUS",
     "ACTIONS",
@@ -158,7 +172,7 @@ const ArchivedAccountManagement = () => {
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                <div className="hs-tooltip inline-block w-full">
+                {/* <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
                     data-hs-overlay="#hs-generate-reports-modal"
@@ -172,7 +186,7 @@ const ArchivedAccountManagement = () => {
                       Generate Report
                     </span>
                   </button>
-                </div>
+                </div> */}
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     data-hs-overlay="#hs-modal-restoreAdmin"
@@ -264,7 +278,7 @@ const ArchivedAccountManagement = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-3">
+                  {/* <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
                         {item.age}
@@ -277,7 +291,7 @@ const ArchivedAccountManagement = () => {
                         {item.sex}
                       </span>
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
@@ -327,16 +341,16 @@ const ArchivedAccountManagement = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}

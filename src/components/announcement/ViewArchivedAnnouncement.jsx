@@ -37,7 +37,7 @@ function ViewArchivedAnnouncementModal({ announcement, setAnnouncement }) {
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
                 >
-                  VIEW ARCHIVED ANNOUNCEMENT
+                  VIEW ARCHIVED EVENT
                 </h3>
               </div>
 

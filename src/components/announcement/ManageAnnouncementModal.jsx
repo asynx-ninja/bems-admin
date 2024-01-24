@@ -4,14 +4,16 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import EditDropbox from "./EditDropbox";
 import API_LINK from "../../config/API";
+import EditLoader from "./loaders/EditLoader";
 function ManageAnnouncementModal({ announcement, setAnnouncement }) {
   const [logo, setLogo] = useState();
   const [banner, setBanner] = useState();
   const [files, setFiles] = useState([]);
   const [edit, setEdit] = useState(false);
   const navigate = useNavigate();
-
-
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
   const dateFormat = (date) => {
     const eventdate = date === undefined ? "" : date.substr(0, 10);
     return eventdate;
@@ -81,7 +83,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       var formData = new FormData();
 
       const arr1 = [banner, logo];
@@ -111,8 +113,8 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
       formData.append("announcement", JSON.stringify(announcement));
 
       const result = await axios.patch(
-        `${API_LINK}/api/announcement/${announcement._id}/`,
-        formData, 
+        `${API_LINK}/announcement/${announcement._id}/`,
+        formData
       );
 
       if (result.status === 200) {
@@ -128,18 +130,23 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
         // setBanner();
         // setFiles([]);
         // navigate("/");
-        
-
         setTimeout(() => {
-          HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
-          window.location.reload();
+          // HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
         }, 1000);
+       
       }
     } catch (err) {
       console.log(err);
+      setSubmitClicked(false);
+      setUpdatingStatus(null);
+      setError("An error occurred while updating the announcement.");
     }
   };
-
 
   return (
     <div>
@@ -148,6 +155,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
           id="hs-modal-editAnnouncement"
           className="hs-overlay hidden fixed top-0 bottom-0 left-0 z-[60] w-full h-full flex items-center justify-center"
         >
+
           {/* Modal */}
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
@@ -157,7 +165,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
                 >
-                  MANAGE ANNOUNCEMENT
+                  MANAGE EVENTS
                 </h3>
               </div>
 
@@ -340,6 +348,10 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
             </div>
           </div>
         </div>
+        {submitClicked && <EditLoader updatingStatus="updating" />}
+        {updatingStatus && (
+          <EditLoader updatingStatus={updatingStatus} error={error} />
+        )}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import API_LINK from "../../config/API";
 const SecurityPin = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
   const email = atob(location.pathname.split("/")[2]);
   const { remainingSeconds, isCountdownRunning, startCountdown } =
     useCountdown(30);

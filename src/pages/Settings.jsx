@@ -16,6 +16,8 @@ import banner from "../assets/image/1.png";
 import OccupationList from "../components/occupations/OccupationList";
 
 const Settings = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerId, setTimerId] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
   const fileInputRef = useRef();
@@ -189,6 +191,10 @@ const Settings = () => {
   // console.log(userSocials)
 
   const saveChanges = async (e) => {
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
     const obj = {
       firstName: userData.firstName,
       middleName: userData.middleName,
@@ -220,11 +226,10 @@ const Settings = () => {
     };
 
     try {
-      console.log(pfp);
       var formData = new FormData();
       formData.append("users", JSON.stringify(obj));
       formData.append("file", pfp);
-      const response = await axios.patch(`${API_LINK}/users/${id}`, formData);
+      const response = await axios.patch(`${API_LINK}/users/?doc_id=${id}`, formData);
 
       // CHANGE USER CREDENTIALS
 
@@ -262,30 +267,44 @@ const Settings = () => {
           twitter: response.data.socials.twitter,
         });
         setEditButton(true);
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 3000);
       } else {
         console.error("Update failed. Status:", response.status);
       }
     } catch (error) {
       console.error("Error saving changes:", error);
+    }finally {
+      setTimerId(
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 3000)
+      );
     }
   };
 
   const changeCredentials = async (
+    
     oldUsername,
     newUsername,
     oldPassword,
     newPassword
   ) => {
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
     const user = {
       username: newUsername !== oldUsername ? newUsername : oldUsername,
       password: newPassword !== "" ? newPassword : oldPassword,
     };
 
-    console.log(user);
+    console.log("mm",user);
 
     try {
       const response = await axios.get(
-        `${API_LINK}/auth/${oldUsername}/${oldPassword}/${userData.type}`
+        `${API_LINK}/auth/${oldUsername}/${oldPassword}`
       );
 
       console.log(response);
@@ -298,6 +317,9 @@ const Settings = () => {
           error: false,
           message: "Success!",
         });
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 3000);
       }
     } catch (err) {
       setMessage({
@@ -306,6 +328,12 @@ const Settings = () => {
         error: true,
         message: "The password you entered is incorrect",
       });
+    }finally {
+      setTimerId(
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 3000)
+      );
     }
   };
 
@@ -353,7 +381,17 @@ const Settings = () => {
 
   return (
 
-      <div className="mx-4 mt-[10rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+     <div>
+         {isLoading && (
+        <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
+          <div className="loaders">
+            <div className="loader"></div>
+            <div className="loader"></div>
+            <div className="loader"></div>
+          </div>
+        </div>
+      )}
+       <div className="mx-4 mt-[10rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
         <div className="flex flex-col">
         <div className="relative w-full">
           <div className="relative">
@@ -1224,6 +1262,7 @@ const Settings = () => {
         )}
       </div>
     </div>
+     </div>
   );
 };
 

@@ -20,17 +20,28 @@ const Announcement = () => {
   const [announcement, setAnnouncement] = useState([]);
   const [status, setStatus] = useState({});
 
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+
   useEffect(() => {
-    const fetch = async () => {
-      const response = await axios.get(
-        `${API_LINK}/announcement/?brgy=${brgy}&archived=true`
-      );
-      if (response.status === 200) setAnnouncements(response.data);
-      else setAnnouncements([]);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/announcement/?brgy=${brgy}&archived=true&page=${currentPage}`
+        );
+        setAnnouncements(response.data.result);
+        setPageCount(response.data.pageCount);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
-    fetch();
-  }, []);
+    fetchData();
+  }, [currentPage]);
+
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
@@ -69,7 +80,7 @@ const Announcement = () => {
   ];
 
   useEffect(() => {
-    document.title = "Announcement | Barangay E-Services Management";
+    document.title = "Events | Barangay E-Services Management";
   }, []);
 
   const dateFormat = (date) => {
@@ -91,7 +102,7 @@ const Announcement = () => {
               className="sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-[1.3rem] xxxl:text-2xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
-              ARCHIVED ANNOUNCEMENT
+              ARCHIVED EVENTS
             </h1>
           </div>
           <div className="lg:w-3/5 flex flex-row justify-end items-center "></div>
@@ -165,7 +176,7 @@ const Announcement = () => {
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                <div className="hs-tooltip inline-block w-full">
+                {/* <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
                     data-hs-overlay="#hs-modal-archive"
@@ -179,7 +190,7 @@ const Announcement = () => {
                       Generate Report
                     </span>
                   </button>
-                </div>
+                </div> */}
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
@@ -225,81 +236,87 @@ const Announcement = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {announcements.map((item, index) => (
-                <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        value={item._id}
-                        onChange={checkboxHandler}
-                        id=""
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                      {item.event_id}
-                    </span>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {item.title}
+              {announcements
+                .slice() // Create a shallow copy to avoid mutating the original array
+                .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by date descending
+                .map((item, index) => (
+                  <tr key={index} className="odd:bg-slate-100 text-center">
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(item._id)}
+                          value={item._id}
+                          onChange={checkboxHandler}
+                          id=""
+                        />
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
+                        {item.event_id}
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {item.details}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {dateFormat(item.date) || ""}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.attendees.length}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center space-x-1 sm:space-x-none">
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-modal-viewArchivedAnnouncement"
-                        onClick={() => handleView({ ...item })}
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.title}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.details}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {dateFormat(item.date) || ""}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.attendees.length}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center space-x-1 sm:space-x-none">
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-modal-viewArchivedAnnouncement"
+                          onClick={() => handleView({ ...item })}
+                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                        >
+                          <AiOutlineEye
+                            size={24}
+                            style={{ color: "#ffffff" }}
+                          />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}

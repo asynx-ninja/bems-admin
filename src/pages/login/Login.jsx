@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import login from "../../assets/login/login.png";
 import montalban_logo from "../../assets/login/montalban-logo.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,6 +6,8 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import axios from "axios";
 import API_LINK from "../../config/API";
 const Login = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [timerId, setTimerId] = useState(null);
   const [eye, isEye] = useState(true);
   const navigate = useNavigate();
   const [data, setData] = useState({
@@ -16,6 +18,10 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
+    setIsLoading(true);
+
+    // Clear any existing timer
+    clearTimeout(timerId);
     const obj = {
       username: data.username,
       password: data.password,
@@ -30,7 +36,9 @@ const Login = () => {
       if (res.status === 200) {
         if (res.data[0].type === "Head Admin" || res.data[0].type === "Admin") {
           const id = res.data[0]._id;
-          navigate(`/dashboard/?id=${res.data[0]._id}`);
+          setTimeout(() => {
+            navigate(`/dashboard/?id=${res.data[0]._id}`);
+          }, 2000);
         } else {
           setErrorMessage(
             "Your user credentials is not available. Please contact an administrator."
@@ -45,6 +53,10 @@ const Login = () => {
       } else {
         setErrorMessage("Error: " + error.message);
       }
+      // }finally {
+      //   setTimerId(setTimeout(() => {
+      //     setIsLoading(false);
+      //   }, 3000)); // Hide loader after 3 seconds
     }
   };
 
@@ -56,6 +68,16 @@ const Login = () => {
 
   return (
     <div className='bg-[url("/imgs/login-bg.jpg")] bg-cover bg-center bg-no-repeat md:px-[3rem] md:py-[3rem] lg:px-[7rem] lg:py-[4rem] h-screen flex sm:flex-col md:flex-row sm:space-y-5 md:space-y-0'>
+    {isLoading && (
+      <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
+        <div className="loaders">
+          <div className="loader"></div>
+          <div className="loader"></div>
+          <div className="loader"></div>
+        </div>
+      </div>
+    )}
+
       <div className="sm:block md:hidden h-[320px] border-[5px] border-t-0 border-[#1C8058] bg-[url('/imgs/login.png)] flex flex-col w-full rounded-b-full overflow-hidden shadow-[0px_4px_4px_rgba(0,0,0,0.51)]">
         <img
           src={login}

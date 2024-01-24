@@ -8,8 +8,11 @@ import { IoIosAttach } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
 import Dropbox from "./Dropbox";
 import ViewDropbox from "./ViewDropbox";
-
+import ReplyLoader from "./loaders/ReplyLoader";
 function ViewInquiriesModal({ inquiry, setInquiry }) {
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [replyStatus, setReplyStatus] = useState(null);
+  const [error, setError] = useState(null);
   const [reply, setReply] = useState(false);
   const [upload, setUpload] = useState(false);
   const [expandedIndexes, setExpandedIndexes] = useState([]);
@@ -103,7 +106,7 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
   const handleOnSend = async (e) => {
     e.preventDefault();
     console.log(newMessage);
-
+    setSubmitClicked(true);
     try {
       const obj = {
         sender: newMessage.sender,
@@ -121,10 +124,18 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
         `${API_LINK}/inquiries/?inq_id=${inquiry._id}`,
         formData
       );
-
-      window.location.reload();
+      setTimeout(() => {
+        setSubmitClicked(false);
+        setReplyStatus("success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      }, 1000);
     } catch (error) {
       console.log(error);
+      setSubmitClicked(false);
+      setReplyStatus(null);
+      setError("An error occurred while creating the announcement.");
     }
   };
 
@@ -473,6 +484,8 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
             </div>
           </div>
         </div>
+        {submitClicked && <ReplyLoader replyStatus="replying" />}
+        {replyStatus && <ReplyLoader replyStatus={replyStatus} error={error} />}
       </div>
     </div>
   );

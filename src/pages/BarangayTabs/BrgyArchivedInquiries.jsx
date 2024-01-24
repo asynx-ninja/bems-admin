@@ -14,52 +14,32 @@ import { useSearchParams } from "react-router-dom";
 import Tabss from "../../pages/BarangayInfoExt"
 
 const BrgyArchivedInquiries = () => {
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
   const to = "Staff";
   const [inquiries, setInquiries] = useState([]);
   const [inquiry, setInquiry] = useState([]);
-
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
-        `${API_LINK}/inquiries/staffinquiries/?brgy=${brgy}&to=${to}&archived=true`
+        `${API_LINK}/inquiries/staffinquiries/?brgy=${brgy}&to=${to}&archived=true&page=${currentPage}`
       );
-      if (response.status === 200) setInquiries(response.data);
+      if (response.status === 200) {
+        setPageCount(response.data.pageCount);
+        setInquiries(response.data.result);
+
+      }
       else setInquiries([]);
     };
 
     fetch();
-  }, []);
-
-  const checkboxHandler = (e) => {
-    let isSelected = e.target.checked;
-    let value = e.target.value;
-
-    if (isSelected) {
-      setSelectedItems([...selectedItems, value]);
-    } else {
-      setSelectedItems((prevData) => {
-        return prevData.filter((id) => {
-          return id !== value;
-        });
-      });
-    }
-  };
-
-  const checkAllHandler = () => {
-    if (inquiries.length === selectedItems.length) {
-      setSelectedItems([]);
-    } else {
-      const postIds = inquiries.map((item) => {
-        return item._id;
-      });
-
-      setSelectedItems(postIds);
-    }
-  };
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  }
 
   const tableHeader = [
     "Inquiry id",
@@ -225,16 +205,6 @@ const BrgyArchivedInquiries = () => {
           <table className="w-full ">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
-                <th scope="col" className="px-6 py-4">
-                  <div className="flex justify-center items-center">
-                    <input
-                      type="checkbox"
-                      name=""
-                      onClick={checkAllHandler}
-                      id=""
-                    />
-                  </div>
-                </th>
                 {tableHeader.map((item, idx) => (
                   <th
                     scope="col"
@@ -249,17 +219,6 @@ const BrgyArchivedInquiries = () => {
             <tbody className="odd:bg-slate-100">
               {inquiries.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        value={item._id}
-                        onChange={checkboxHandler}
-                        id=""
-                      />
-                    </div>
-                  </td>
                   <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2 ">
                       {item.inq_id}
@@ -342,16 +301,16 @@ const BrgyArchivedInquiries = () => {
         </div>
         <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
-            Showing 1 out of 15 pages
+            Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
             nextLabel=">>"
-            onPageChange={() => {}}
+            onPageChange={handlePageChange}
             pageRangeDisplayed={3}
-            pageCount={15}
+            pageCount={pageCount}
             previousLabel="<<"
-            className="flex space-x-3 text-white font-bold "
+            className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}

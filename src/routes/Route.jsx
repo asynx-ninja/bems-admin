@@ -26,6 +26,12 @@ import AccountManagement from "../pages/AccountManagement";
 import ArchivedAccountManagement from "../pages/ArchivedAccountManagement";
 import MunicipalityOffcials from "../pages/MunicipalityOffcials";
 import ArchivedMunicipalityOfficials from "../pages/ArchivedMunicipalityOfficials";
+import MAboutusInfo from "../pages/MunicipalInfo/MAboutusInfo";
+import ArchivedAboutusInfo from "../pages/MunicipalInfo/ArchivedMAboutus"
+import MServicesInfo from "../pages/MunicipalInfo/MServicesInfo";
+import ArchivedServicesInfo from "../pages/MunicipalInfo/ArchivedMServices"
+import MTouristSpot from "../pages/MunicipalInfo/MTouristSpot";
+import ArchivedTouristSpot from "../pages/MunicipalInfo/ArchivedTouristSpot";
 const pages = [
   {
     path: "/",
@@ -57,16 +63,36 @@ const pages = [
     element: <Navbar comp={<ArchivedAnnouncements />} />,
   },
   {
-    path: "/archivedinquiries",
-    element: <Navbar comp={<ArchivedInquiries />} />,
-  },
-  {
     path: "/inquiries",
     element: <Navbar comp={<Inquiries />} />,
   },
   {
     path: "/archivedinquiries",
     element: <Navbar comp={<ArchivedInquiries/>} />,
+  },
+  {
+    path: "/aboutus_info",
+    element: <Navbar comp={<MAboutusInfo />} />,
+  },
+  {
+    path: "/archived_aboutus_info",
+    element: <Navbar comp={<ArchivedAboutusInfo />} />,
+  },
+  {
+    path: "/services_info",
+    element: <Navbar comp={<MServicesInfo />} />,
+  },
+  {
+    path: "/archived_services_info",
+    element: <Navbar comp={<ArchivedServicesInfo />} />,
+  },
+  {
+    path: "/tourist_spot",
+    element: <Navbar comp={<MTouristSpot />} />,
+  },
+  {
+    path: "/archived_tourist_spot",
+    element: <Navbar comp={<ArchivedTouristSpot />} />,
   },
   {
     path: "/municipalityofficials",

@@ -5,10 +5,12 @@ import API_LINK from "../../config/API";
 import { LiaRandomSolid } from "react-icons/lia";
 import { FaFacebookSquare, FaInstagram } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
-
+import EditLoader from "./loaders/EditLoader";
 function ManageAdminModal({ user, setUser }) {
   const [edit, setEdit] = useState(false);
-
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
   const handleOnEdit = () => {
     setEdit(!edit);
   };
@@ -58,23 +60,34 @@ function ManageAdminModal({ user, setUser }) {
   const handleSave = async (e) => {
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       var formData = new FormData();
       formData.append("users", JSON.stringify(user));
 
       const response = await axios.patch(
-        `${API_LINK}/users/${user._id}`,
+        `${API_LINK}/users/?doc_id=${user._id}`,
         formData
       );
 
       if (response.status === 200) {
         console.log("Update successful:", response.data);
-        window.location.reload();
+        setTimeout(() => {
+          // HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }, 1000);
+
       } else {
         console.error("Update failed. Status:", response.status);
       }
     } catch (err) {
       console.log(err);
+      setSubmitClicked(false);
+      setUpdatingStatus(null);
+      setError("An error occurred while creating the announcement.");
     }
   };
 
@@ -100,6 +113,7 @@ function ManageAdminModal({ user, setUser }) {
 
   return (
     <div>
+       
       <div className="">
         <div
           id="hs-modal-editAdmin"
@@ -801,6 +815,10 @@ function ManageAdminModal({ user, setUser }) {
             </div>
           </div>
         </div>
+        {submitClicked && <EditLoader updatingStatus="updating" />}
+        {updatingStatus && (
+          <EditLoader updatingStatus={updatingStatus} error={error} />
+        )}
       </div>
     </div>
   );

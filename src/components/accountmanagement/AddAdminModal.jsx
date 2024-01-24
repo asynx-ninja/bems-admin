@@ -3,9 +3,11 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import API_LINK from "../../config/API";
 import { LiaRandomSolid } from "react-icons/lia";
-
-
+import AddLoader from "./loaders/AddLoader";
 function AddAdminModal({ brgy, occupation, type }) {
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [creationStatus, setCreationStatus] = useState(null);
+  const [error, setError] = useState(null);
   const [user, setUser] = useState({
     user_id: "",
     firstName: "",
@@ -31,7 +33,7 @@ function AddAdminModal({ brgy, occupation, type }) {
     city: "Rodriguez, Rizal",
     brgy: brgy,
   });
-console.log(type)
+  console.log(type);
   const handleButtonClick = (e) => {
     e.preventDefault();
     setUser((prev) => ({
@@ -57,7 +59,7 @@ console.log(type)
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       const calculatedAge = calculateAge(user.birthday);
 
       const obj = {
@@ -110,10 +112,18 @@ console.log(type)
           city: "Rodriguez, Rizal",
           brgy: brgy,
         });
-        window.location.reload();
+        setSubmitClicked(false);
+        setCreationStatus("success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+       
       }
     } catch (err) {
       console.log(err);
+      setSubmitClicked(false);
+      setCreationStatus(null);
+      setError("An error occurred while creating the announcement.");
     }
   };
 
@@ -154,6 +164,7 @@ console.log(type)
 
   return (
     <div>
+    
       <div className="">
         <div
           id="hs-modal-addAdmin"
@@ -649,7 +660,7 @@ console.log(type)
               </div>
               {/* Buttons */}
               <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700">
-               <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
+                <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
                   <button
                     type="button"
                     onClick={handleSubmit}
@@ -670,6 +681,10 @@ console.log(type)
             </div>
           </div>
         </div>
+        {submitClicked && <AddLoader creationStatus="creating" />}
+        {creationStatus && (
+          <AddLoader creationStatus={creationStatus} error={error} />
+        )}
       </div>
     </div>
   );

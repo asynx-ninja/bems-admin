@@ -24,6 +24,8 @@ const Residents = () => {
   const [sortBy, setSortBy] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   const sortedAndFilteredUsers = useMemo(() => {
     let filteredUsers = [...users];
@@ -78,19 +80,24 @@ const Residents = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await axios.get(`${API_LINK}/users/?brgy=${brgy}&type=${type}`);
-      if (response.status === 200) setUsers(response.data);
+      const response = await axios.get(`${API_LINK}/users/?brgy=${brgy}&type=Resident&page=${currentPage}`);
+      if (response.status === 200) {
+        setPageCount(response.data.pageCount);
+        setUsers(response.data.result);
+      }
       else setUsers([]);
 
       console.log(response);
     };
 
     fetch();
-  }, []);
+  }, [currentPage]);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   const tableHeader = [
     "PROFILE",
-    "USER_ID",
     "NAME",
     "AGE",
     "GENDER",
@@ -205,7 +212,7 @@ const Residents = () => {
               </ul>
             </div>
 
-            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
+            <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">
                 <button className="bg-[#295141] p-3 rounded-l-md">
                   <div className="w-full overflow-hidden">
@@ -237,23 +244,7 @@ const Residents = () => {
                   onChange={handleSearch}
                 />
               </div>
-              <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-generate-reports-modal"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Generate Report
-                    </span>
-                  </button>
-                </div>
-              </div>
+            
             </div>
           </div>
         </div>
@@ -292,11 +283,7 @@ const Residents = () => {
                       </div>
                     </span>
                   </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-3 ">
-                      {item.user_id}
-                    </span>
-                  </td>
+                
                   <td className="px-6 py-3">
                     <span className="text-xs sm:text-sm text-black line-clamp-2 ">
                       {item.lastName +
@@ -369,22 +356,22 @@ const Residents = () => {
         </div>
       </div>
       <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
-        <span className="font-medium text-white sm:text-xs text-sm">
-          Showing 1 out of 15 pages
-        </span>
-        <ReactPaginate
-          breakLabel="..."
-          nextLabel=">>"
-          onPageChange={() => {}}
-          pageRangeDisplayed={3}
-          pageCount={15}
-          previousLabel="<<"
-          className="flex space-x-3 text-white font-bold "
-          activeClassName="text-yellow-500"
-          disabledLinkClassName="text-gray-300"
-          renderOnZeroPageCount={null}
-        />
-      </div>
+          <span className="font-medium text-white sm:text-xs text-sm">
+            Showing {currentPage + 1} out of {pageCount} pages
+          </span>
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel=">>"
+            onPageChange={handlePageChange}
+            pageRangeDisplayed={3}
+            pageCount={pageCount}
+            previousLabel="<<"
+            className="flex space-x-3 text-white font-bold"
+            activeClassName="text-yellow-500"
+            disabledLinkClassName="text-gray-300"
+            renderOnZeroPageCount={null}
+          />
+        </div>
       <GenerateReportsModal />
       <ViewArchivedResident user={user} setUser={setUser} />
     </div>

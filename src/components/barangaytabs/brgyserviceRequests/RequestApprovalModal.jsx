@@ -1,5 +1,5 @@
 import React from "react";
-import Error from "../../assets/modals/Error.png";
+import Error from "../../../assets/modals/Error.png";
 
 function RequestApprovalModal() {
   return (
