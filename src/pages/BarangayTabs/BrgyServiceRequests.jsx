@@ -72,8 +72,6 @@ function ServiceRequests() {
   const handleResetFilter = () => {
     setStatusFilter("all");
     setRequestFilter("all");
-    setRequest();
-    setSearchQuery("");
   };
 
 

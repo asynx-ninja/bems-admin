@@ -70,14 +70,14 @@ const BrgyAnnouncement = () => {
     setAnnouncement(item);
   };
 
- const DateFormat = (date) => {
+  const DateFormat = (date) => {
     const dateFormat = date === undefined ? "" : date.substr(0, 10);
     return dateFormat;
   };
 
   const handleResetFilter = () => {
     setSearchQuery("");
-    setAnnouncements();
+    setAnnouncements([]);
   };
 
   const filters = (choice, selectedDate) => {
@@ -156,7 +156,7 @@ const BrgyAnnouncement = () => {
       setFilteredAnnouncements(filters(selected, date))
     }
   };
-  
+
   return (
     <div className="">
       <div>
@@ -200,7 +200,7 @@ const BrgyAnnouncement = () => {
 
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
-          <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
+            <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
               {/* <span className="font-medium text-[#292929]  justify-center flex text-center my-auto mx-2">
                 SORT BY:{" "}
               </span> */}
@@ -328,12 +328,13 @@ const BrgyAnnouncement = () => {
                   className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500 "
                   placeholder="Search for items"
                   value={searchQuery}
-                  onChange={(e) => {setSearchQuery(e.target.value)
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
                     const Announcements = announcements.filter(
                       (item) =>
                         item.title.toLowerCase().includes(e.target.value.toLowerCase())
                     );
-                    setFilteredAnnouncements (Announcements)
+                    setFilteredAnnouncements(Announcements)
                   }}
                 />
               </div>
@@ -377,7 +378,7 @@ const BrgyAnnouncement = () => {
             </thead>
             <tbody className="odd:bg-slate-100">
               {filteredAnnouncements.length === 0 ? (
-                  <tr>
+                <tr>
                   <td
                     colSpan={tableHeader.length + 1}
                     className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"

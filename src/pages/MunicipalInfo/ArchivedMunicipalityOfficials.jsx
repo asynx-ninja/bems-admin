@@ -26,6 +26,8 @@ const ArchivedOfficials = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [positionFilter, setPositionFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filteredOfficials, setFilteredOfficials] = useState([]);
 
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -82,8 +84,7 @@ const ArchivedOfficials = () => {
   };
 
   useEffect(() => {
-    document.title =
-      "Archived Barangay Officials | Barangay E-Services Management";
+    document.title = "Barangay Officials | Barangay E-Services Management";
 
     const fetchData = async () => {
       try {
@@ -92,21 +93,15 @@ const ArchivedOfficials = () => {
         );
 
         if (response.status === 200) {
-          const officialsData = response.data.result || [];
-          setPageCount(response.data.pageCount);
-          if (officialsData.length > 0) {
-            setOfficials(officialsData);
-          } else {
-            setOfficials([]);
-            console.log(`No officials found for Barangay ${brgy}`);
-          }
+          setPageCount(response.data.pageCount)
+          setOfficials(response.data.result)
+          setFilteredOfficials(response.data.result)
         } else {
-          setOfficials([]);
-          console.error("Failed to fetch officials:", response.status);
+          // Handle error here
+          console.error("Error fetching users:", response.error);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        setOfficials([]);
       }
     };
 
@@ -270,6 +265,25 @@ const ArchivedOfficials = () => {
                   id="hs-table-with-pagination-search"
                   className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500 "
                   placeholder="Search for items"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+
+                    if (e.target.value.trim() === '') {
+                      // If the search input is empty, fetch all data
+                      setFilteredOfficials(officials);
+                    } else {
+                      // If the search input is not empty, filter the data
+                      const Officials = officials.filter(
+                        (item) =>
+                          item.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                          item.lastName.toLowerCase().includes(e.target.value.toLowerCase())
+                      );
+                      setFilteredOfficials(Officials);
+                    }
+
+                    console.log("Officials Fetched", officials);
+                  }}
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
@@ -335,14 +349,14 @@ const ArchivedOfficials = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-            {officials.length === 0 ? (
+            {filteredOfficials.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-10 text-gray-400">
                     No data found
                   </td>
                 </tr>
               ) : (
-                officials.map((item, index) => (
+                filteredOfficials.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">

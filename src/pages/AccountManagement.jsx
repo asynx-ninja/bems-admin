@@ -18,6 +18,7 @@ import API_LINK from "../config/API";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PrintPDF from "../components/accountmanagement/form/PrintPDF"
 import noData from "../assets/image/no-data.png";
+
 const AccountManagement = () => {
   useEffect(() => {
     document.title = "Account Management | Barangay E-Services Management";
@@ -34,6 +35,8 @@ const AccountManagement = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [adminFilter, setAdminFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filteredUser, setFilteredUser] = useState([]);
 
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
@@ -81,6 +84,7 @@ const AccountManagement = () => {
         if (response.status === 200) {
           setPageCount(response.data.pageCount);
           setUsers(response.data.result); // Update the state variable with the fetched users
+          setFilteredUser(response.data.result)
         } else {
           // Handle error here
           console.error("Error fetching users:", response.error);
@@ -95,9 +99,10 @@ const AccountManagement = () => {
   }, [currentPage, adminFilter]);
 
 
-const handleAdminFilter = (type) => {
-  setAdminFilter(type);
-};
+  const handleAdminFilter = (type) => {
+    setAdminFilter(type);
+  };
+
 
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
@@ -111,7 +116,7 @@ const handleAdminFilter = (type) => {
   };
 
   const handleResetFilter = () => {
-      setAdminFilter("all");
+    setAdminFilter("all");
   }
 
   return (
@@ -215,7 +220,7 @@ const handleAdminFilter = (type) => {
                   <a
                     onClick={() => handleAdminFilter("Head Admin")}
                     class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    
+
                   >
                     HEAD ADMIN
                   </a>
@@ -223,9 +228,9 @@ const handleAdminFilter = (type) => {
                     onClick={() => handleAdminFilter("Admin")}
                     class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
                   >
-                   ADMIN
+                    ADMIN
                   </a>
-                 
+
                 </ul>
               </div>
             </div>
@@ -257,6 +262,25 @@ const handleAdminFilter = (type) => {
                   id="hs-table-with-pagination-search"
                   className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500 "
                   placeholder="Search for items"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+
+                    if (e.target.value.trim() === '') {
+                      // If the search input is empty, fetch all data
+                      setUsers(users);
+                    } else {
+                      // If the search input is not empty, filter the data
+                      const Users = users.filter(
+                        (item) =>
+                          item.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                          item.lastName.toLowerCase().includes(e.target.value.toLowerCase())
+                      );
+                      setFilteredUser(Users);
+                    }
+
+                    console.log("Officials Fetched", officials);
+                  }}
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
@@ -321,22 +345,22 @@ const handleAdminFilter = (type) => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {users.length === 0 ? (
+              {filteredUser.length === 0 ? (
                 <tr>
-                <td
-                  colSpan={tableHeader.length + 1}
-                  className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
-                >
-                  <img
-                    src={noData}
-                    alt=""
-                    className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
-                  />
-                  <strong className="text-[#535353]">NO DATA FOUND</strong>
-                </td>
-              </tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
+                  </td>
+                </tr>
               ) : (
-                users.map((item, index) => (
+                filteredUser.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">

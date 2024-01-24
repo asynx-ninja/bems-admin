@@ -117,9 +117,7 @@ const Inquiries = () => {
     setInquiry(item);
   };
 
-  const handleStatus = (status) => {
-    setStatus(status);
-  };
+
 
   const handleStatusFilter = (status) => {
     setStatusFilter(status);
@@ -127,8 +125,7 @@ const Inquiries = () => {
 
   const handleResetFilter = () => {
     setStatusFilter("all");
-    setSearchQuery("");
-    setFilteredInquiries();
+    setFilteredInquiries([]);
   };
 
   const filters = (choice, selectedDate) => {

@@ -53,7 +53,7 @@ function Services() {
     document.title = "Services | Barangay E-Services Management";
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
         `${API_LINK}/services/?brgy=${brgy}&archived=false&status=${statusFilter}&type=${serviceFilter}&page=${currentPage}`
@@ -72,7 +72,7 @@ function Services() {
     setCurrentPage(selected);
   };
 
- const Services = services.filter(
+  const Services = services.filter(
     (item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.service_id.toLowerCase().includes(searchQuery.toLowerCase())
@@ -91,7 +91,7 @@ function Services() {
     setDateFilter(null);
     setSearchQuery("");
   };
-  
+
   return (
     <div className="">
       {/* Body */}
@@ -136,7 +136,7 @@ function Services() {
 
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
-          <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
+            <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
               {/* Status Sort */}
               <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
                 <button
@@ -146,7 +146,7 @@ function Services() {
                 >
                   STATUS
                   <svg
-                    className= "w-2.5 h-2.5 text-white"
+                    className="w-2.5 h-2.5 text-white"
                     width="16"
                     height="16"
                     viewBox="0 0 16 16"
@@ -206,7 +206,7 @@ function Services() {
                 >
                   SERVICE TYPE
                   <svg
-                    className= "w-2.5 h-2.5 text-white"
+                    className="w-2.5 h-2.5 text-white"
                     width="16"
                     height="16"
                     viewBox="0 0 16 16"
@@ -383,19 +383,19 @@ function Services() {
             </thead>
             <tbody className="odd:bg-slate-100">
               {filteredServices.length === 0 ? (
-               <tr>
-               <td
-                 colSpan={tableHeader.length + 1}
-                 className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
-               >
-                 <img
-                   src={noData}
-                   alt=""
-                   className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
-                 />
-                 <strong className="text-[#535353]">NO DATA FOUND</strong>
-               </td>
-             </tr>
+                <tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
+                  </td>
+                </tr>
               ) : (
                 filteredServices.map((service) => (
                   <tr
