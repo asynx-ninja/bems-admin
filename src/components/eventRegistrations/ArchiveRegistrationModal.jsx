@@ -10,7 +10,7 @@ function ArchiveRegistrationModal({ selectedItems }) {
 
       for (let i = 0; i < selectedItems.length; i++) {
         const response = await axios.patch(
-          `${API_LINK}/requests/archived/${selectedItems[i]}/true`
+          `${API_LINK}/application/archived/${selectedItems[i]}/true`
         );
       }
 
@@ -25,7 +25,7 @@ function ArchiveRegistrationModal({ selectedItems }) {
       id="hs-archive-requests-modal"
       className="z-[100] hs-overlay hidden w-full h-full fixed top-0 left-0 z-60 overflow-x-hidden overflow-y-auto"
     >
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-300 bg-opacity-0 lg:ml-72">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-300 bg-opacity-0 ">
         <div className="bg-white sm:w-5/6 sm:h-[18rem] md:w-2/4 md:h-[18rem]  lg:w-[40rem] lg:h-[22rem] rounded-3xl shadow-lg relative flex flex-col items-center justify-center">
           <img
             src={Error}
@@ -41,7 +41,7 @@ function ArchiveRegistrationModal({ selectedItems }) {
             <button
               type="button"
               data-hs-overlay="#hs-archive-requests-modal"
-              onClick={handleSave} // Call the handleArchive function
+              onClick={handleSave} 
               className=" w-[6rem] lg:w-[12rem] px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600"
             >
               Yes

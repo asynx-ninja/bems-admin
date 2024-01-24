@@ -4,14 +4,12 @@ import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
 import EditDropbox from "./EditDropbox";
-import ViewDropbox from "./ViewDropbox";
 
 function ViewArchivedModal({ inquiry, setInquiry }) {
   const [expandedIndexes, setExpandedIndexes] = useState([]);
   const [files, setFiles] = useState([]);
   const [createFiles, setCreateFiles] = useState([]);
-  const [viewFiles, setViewFiles] = useState([]);
-console.log("wew",inquiry.name)
+
   useEffect(() => {
     setFiles(inquiry.length === 0 ? [] : inquiry.compose.file);
   }, [inquiry]);
@@ -49,22 +47,9 @@ console.log("wew",inquiry.name)
 
   // Initialize with the last index expanded
   useEffect(() => {
-    setFiles(inquiry.length === 0 ? [] : inquiry.compose.file);
-  }, [inquiry]);
-
-  useEffect(() => {
-    if (inquiry && inquiry.response && inquiry.response.length > 0) {
-      const lastResponse = inquiry.response[inquiry.response.length - 1];
-
-      if (lastResponse.file && lastResponse.file.length > 0) {
-        setViewFiles(lastResponse.file);
-      } else {
-        setViewFiles([]);
-      }
-    } else {
-      setViewFiles([]);
-    }
-  }, [inquiry]);
+    const lastIndex = inquiry.response ? inquiry.response.length - 1 : 0;
+    setExpandedIndexes([lastIndex]);
+  }, [inquiry.response]);
 
   const fileInputRef = useRef();
 
@@ -91,7 +76,7 @@ console.log("wew",inquiry.name)
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
               {/* Header */}
-              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]  overflow-hidden rounded-t-2xl">
+              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#4b7c80] to-[#21556d] overflow-hidden rounded-t-2xl">
                 <h3
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
@@ -100,7 +85,7 @@ console.log("wew",inquiry.name)
                 </h3>
               </div>
 
-              <div className="flex flex-col mx-auto w-full pt-5 px-5 overflow-y-auto relative max-h-[470px]">
+              <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb flex flex-col mx-auto w-full pt-5 px-5 overflow-y-auto relative max-h-[470px]">
                 <b className="border-solid border-0 border-black/50 border-b-2  uppercase font-medium text-lg md:text-lg mb-4">
                   Inquiry Details
                 </b>
@@ -251,12 +236,6 @@ console.log("wew",inquiry.name)
                                   </p>
                                 </div>
                               </div>
-                              {viewFiles.length > 0 && (
-                                <ViewDropbox
-                                  viewFiles={responseItem.file || []}
-                                  setViewFiles={setViewFiles}
-                                />
-                              )}
                             </div>
                           )}
                         </div>

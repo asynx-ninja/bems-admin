@@ -4,12 +4,15 @@ import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import API_LINK from "../config/API";
 import Chart from "react-apexcharts";
-
+import DatePicker from "react-datepicker"; // Import the date picker component
+import "react-datepicker/dist/react-datepicker.css";
 import SRT from "../components/reports/SRT";
 import RRM from "../components/reports/RRM";
 import RRB from "../components/reports/RRB";
 import RIB from "../components/reports/RIB";
 import TRB from "../components/reports/TRB";
+import moment from "moment";
+
 const Reports = () => {
   const [services, setServices] = useState({});
   const [requests, setRequests] = useState([]);
@@ -341,6 +344,7 @@ const Reports = () => {
   };
 
   const [series, setSeries] = useState([]);
+
   const [options, setOptions] = useState({
     chart: { type: "bar" },
     xaxis: { categories: [] },
@@ -352,14 +356,49 @@ const Reports = () => {
   });
 
   const [timeRange, setTimeRange] = useState("today");
+  const [specificDate, setSpecificDate] = useState(() => {
+    return new Date(); // Initializes the state to today's date as a Date object
+  });
+  const [specificYear, setSpecificYear] = useState(new Date().getFullYear());
+  const [specificMonth, setSpecificMonth] = useState(
+    `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(
+      2,
+      "0"
+    )}`
+  );
 
+  const [specificWeek, setSpecificWeek] = useState(""); // Default to current date
   useEffect(() => {
     const fetchFeeSummary = async () => {
       try {
+        const params = { timeRange: timeRange };
+        if (timeRange === "specific") {
+          // specificDate is already in ISO format (YYYY-MM-DD)
+          params.specificDate = specificDate;
+        }
+
+        if (timeRange === "weekly" && specificWeek) {
+          // Send only the start of the week to the backend
+          const [year, weekNumber] = specificWeek.split("-W");
+          const weekStart = moment()
+            .isoWeekYear(year)
+            .isoWeek(weekNumber)
+            .startOf("isoWeek")
+            .toISOString();
+          params.week = weekStart;
+        }
+        if (timeRange === "monthly" && specificMonth) {
+          const [year, month] = specificMonth.split("-");
+          params.year = parseInt(year);
+          params.month = parseInt(month);
+        }
+
+        if (timeRange === "annual") {
+          params.year = specificYear;
+        }
+        // Make the API request
         const response = await axios.get(`${API_LINK}/requests/get_revenue`, {
-          params: {
-            timeRange: timeRange,
-          },
+          params: params,
         });
         const data = response.data;
 
@@ -400,12 +439,8 @@ const Reports = () => {
     };
 
     fetchFeeSummary();
-  }, [timeRange]);
+  }, [timeRange, specificDate, specificWeek, specificMonth, specificYear]);
 
-
-  const handleTimeRangeChange = (newTimeRange) => {
-    setTimeRange(newTimeRange);
-  };
   const barangays = [
     "Balite",
     "Burgos",
@@ -419,16 +454,17 @@ const Reports = () => {
     "San Jose",
     "San Rafael",
   ];
+
   const [chartData, setChartData] = useState({
     options: {
-      chart: { id: 'fee-summary' },
+      chart: { id: "fee-summary" },
       xaxis: {
         categories: barangays,
       },
     },
     series: [
       {
-        name: 'Total Fee',
+        name: "Total Fee",
         data: new Array(barangays.length).fill(0), // Initialize with 0s
       },
     ],
@@ -437,16 +473,41 @@ const Reports = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_LINK}/requests/est_revenue/`, {
-          params: {
-            timeRange: timeRange,
-          },
+        const params = { timeRange: timeRange };
+        if (timeRange === "specific") {
+          // specificDate is already in ISO format (YYYY-MM-DD)
+          params.specificDate = specificDate;
+        }
+        if (timeRange === "weekly" && specificWeek) {
+          // Send only the start of the week to the backend
+          const [year, weekNumber] = specificWeek.split("-W");
+          const weekStart = moment()
+            .isoWeekYear(year)
+            .isoWeek(weekNumber)
+            .startOf("isoWeek")
+            .toISOString();
+          params.week = weekStart;
+        }
+        if (timeRange === "monthly" && specificMonth) {
+          const [year, month] = specificMonth.split("-");
+          params.year = parseInt(year);
+          params.month = parseInt(month);
+        }
+
+        if (timeRange === "annual") {
+          params.year = specificYear;
+        }
+        // Make the API request
+        const response = await axios.get(`${API_LINK}/requests/est_revenue`, {
+          params: params,
         });
         const data = response.data;
-console.log("jj", data)
+        console.log("jj", data);
         // Map API data to barangay array, filling in zeros where no data exists
-        const feeData = barangays.map(brgy => {
-          const item = data.find(d => d._id.toUpperCase() === brgy.toUpperCase());
+        const feeData = barangays.map((brgy) => {
+          const item = data.find(
+            (d) => d._id.toUpperCase() === brgy.toUpperCase()
+          );
           return item ? item.totalFee : 0;
         });
 
@@ -455,35 +516,42 @@ console.log("jj", data)
           series: [{ ...chartData.series[0], data: feeData }],
         });
       } catch (error) {
-        console.error('Error fetching fee summary data:', error);
+        console.error("Error fetching fee summary data:", error);
       }
     };
 
     fetchData();
-  }, [timeRange]);
+  }, [timeRange, specificDate, specificWeek, specificMonth, specificYear]);
+  const handleTimeRangeChange = (newTimeRange) => {
+    setTimeRange(newTimeRange);
+  };
 
-
+  // Function to handle specific date change
+  const handleSpecificDateChange = (date) => {
+    setSpecificDate(date);
+    // You can perform additional logic here if needed
+  };
   return (
     <div className="mx-4 mt-[10rem] md:mt-[2rem] p-2 lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div className="flex flex-col scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb  h-[calc(100vh_-_95px)]">
-        <div className="flex flex-col lg:flex-row justify-between items-center w-full mb-3">
-          <h2 className="text-lg lg:text-4xl font-bold mb-3 lg:mb-0 uppercase">
+        <div className="flex flex-col lg:flex-col justify-start items-start w-full mb-3">
+          {/* <h2 className="text-lg lg:text-4xl font-bold mb-3 lg:mb-0 uppercase">
             Analytic Reports
-          </h2>
+          </h2> */}
           <div className="flex lg:justify-end mb-3 w-full lg:w-auto">
             <div className="flex flex-col w-full lg:w-auto">
-              <div className="flex flex-col w-full">
+              <div className="flex flex-col justify-start  w-full">
                 <div
                   id="toggle-count"
-                  className="flex gap-2 p-1.5  rounded-lg w-full lg:w-auto items-center overflow-x-auto lg:overflow-x-hidden"
+                  className="flex gap-2 p-2 rounded-lg bg-gray-500 w-full lg:w-auto justify-start items-start overflow-x-auto lg:overflow-x-hidden"
                 >
                   <button
                     className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
-                      isSpecificSelected
+                      timeRange === "specific"
                         ? "bg-green-700 text-white"
                         : "bg-gray-200 text-gray-800"
                     }`}
-                    onClick={handleSpecificToggle}
+                    onClick={() => handleTimeRangeChange("specific")}
                   >
                     Specific
                   </button>
@@ -528,63 +596,73 @@ console.log("jj", data)
                     Annual
                   </button>
                 </div>
+                {timeRange === "specific" && (
+                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-2 mt-4">
+                    <label className="mr-4 text-lg font-medium text-gray-700">
+                      Select Specific Date:
+                    </label>
+                    <input
+                      type="date"
+                      value={specificDate.toISOString().split("T")[0]}
+                      onChange={(e) =>
+                        setSpecificDate(new Date(e.target.value))
+                      }
+                      className="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg text-gray-700"
+                    />
+                  </div>
+                )}
 
-                {/* DATE INPUTS */}
-                <div className="w-full">
-                  {isSpecificSelected && (
-                    <div className="flex flex-col">
-                      <select
-                        className="bg-gray-200 text-gray-800 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-gray-400 focus:outline-none focus:ring focus:border-blue-300"
-                        onChange={onSelect}
-                        defaultValue={selected}
-                      >
-                        <option value="date">Specific Date</option>
-                        <option value="week">Week</option>
-                        <option value="month">Month</option>
-                        <option value="year">Year</option>
-                      </select>
-                      {selected === "date" && (
-                        <input
-                          className="bg-gray-200 text-gray-800 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-gray-400 focus:outline-none focus:ring focus:border-blue-300"
-                          type="date"
-                          id="date"
-                          name="date"
-                          onChange={onChangeDate}
-                        />
-                      )}
-                      {selected === "week" && (
-                        <input
-                          className="bg-gray-200 text-gray-800 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-gray-400 focus:outline-none focus:ring focus:border-blue-300"
-                          type="week"
-                          id="week"
-                          name="week"
-                          onChange={onChangeWeek}
-                        />
-                      )}
-                      {selected === "month" && (
-                        <input
-                          className="bg-gray-200 text-gray-800 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-gray-400 focus:outline-none focus:ring focus:border-blue-300"
-                          type="month"
-                          id="month"
-                          name="month"
-                          onChange={onChangeMonth}
-                        />
-                      )}
-                      {selected === "year" && (
-                        <input
-                          className="bg-gray-200 text-gray-800 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-gray-400 focus:outline-none focus:ring focus:border-blue-300"
-                          type="number"
-                          id="year"
-                          name="year"
-                          placeholder="YEAR"
-                          onChange={onChangeYear}
-                          min={1990}
-                          max={new Date().getFullYear() + 10}
-                        />
-                      )}
+                {timeRange === "weekly" && (
+                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-4 mt-4">
+                    <label className="mr-4 text-lg font-medium text-gray-700">
+                      Select Specific Week:
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="week"
+                        value={specificWeek}
+                        onChange={(e) => setSpecificWeek(e.target.value)}
+                        className="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg text-gray-700"
+                      />
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
+
+                {timeRange === "monthly" && (
+                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-4 mt-4">
+                    <label className="mr-4 text-lg font-medium text-gray-700">
+                      Select Month:
+                    </label>
+                    <input
+                      className="text-gray-400 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+                      type="month"
+                      id="month"
+                      name="month"
+                      value={specificMonth} // Directly use specificMonth as value
+                      onChange={(e) => setSpecificMonth(e.target.value)} // Update specificMonth with the input's value directly
+                    />
+                  </div>
+                )}
+
+                {timeRange === "annual" && (
+                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-4 mt-4">
+                    <label className="mr-4 text-lg font-medium text-gray-700">
+                      Select Year:
+                    </label>
+                    <input
+                      type="number"
+                      value={specificYear}
+                      min="1950"
+                      max={new Date().getFullYear() + 10}
+                      onChange={(e) =>
+                        setSpecificYear(parseInt(e.target.value))
+                      }
+                      className="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg text-gray-700"
+                    />
+                  </div>
+                )}
+
+                {/* END OF DATE INPUTS */}
               </div>
             </div>
           </div>
@@ -606,32 +684,6 @@ console.log("jj", data)
             </h4>
             <p className="text-xl text-[#408D51] font-bold">{totalUsersSum}</p>
           </div>
-
-          {/* <div className="bg-gray-200 rounded-lg shadow-lg p-6">
-            <h4 className="text-lg font-bold mb-3">
-              EST. OVERALL REVENUE FROM BARANGAYS
-            </h4>
-            <div className="flex items-center">
-              <span className="text-lg text-[#408D51]  font-bold mr-1">
-                PHP
-              </span>
-              <p className="text-xl text-[#408D51]  font-bold">
-                {filteredEstimatedRevenue}
-              </p>
-            </div>
-          </div> */}
-
-          {/* <div className="bg-gray-200 rounded-lg shadow-lg p-6">
-            <h4 className="text-lg font-bold mb-3">
-              CURRENT REVENUE FROM BARANGAYS
-            </h4>
-            <div className="flex items-center">
-              <span className="text-lg text-[#408D51]  font-bold mr-1">
-                PHP
-              </span>
-              <p className="text-xl text-[#408D51]  font-bold">{totalFees}</p>
-            </div>
-          </div> */}
         </div>
 
         {/* CHARTS */}
@@ -653,17 +705,15 @@ console.log("jj", data)
           </div>
           <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5 justify-center items-center">
             <h1 className="mt-5 ml-5 font-medium text-black">
-              EST Service Revenue per Barangay
+              Est. Service Revenue per Barangay
             </h1>
             <div className="flex rounded-xl">
-             
-                <Chart
-                  options={chartData.options}
-                  series={chartData.series}
-                  type="bar"
-                  className="flex w-11/12 rounded-xl"
-                />
-            
+              <Chart
+                options={chartData.options}
+                series={chartData.series}
+                type="bar"
+                className="flex w-11/12 rounded-xl"
+              />
             </div>
           </div>
         </div>

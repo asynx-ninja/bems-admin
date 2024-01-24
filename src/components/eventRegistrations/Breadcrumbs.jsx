@@ -10,17 +10,17 @@ const Breadcrumbs = ({ id }) => {
       <BiMessageSquareDetail size={22} />
       <li>
         <a
-          href={`/announcements/?id=${id}`}
+          href={`/events_registration/?id=${id}`}
           className="text-gray-600 font-bold hover:underline text-xs md:text-lg"
         >
-            EVENTS REGISTRATION
+            EVENTS APPLICATION
         </a>
       </li>
       <li>
         <GrFormNext size={24} style={{ color: "#ffffff" }} />
       </li>
       <li className="text-[10px] md:text-lg text-[#295141] font-bold">
-        ARCHIVED REGISTRATIONS
+        ARCHIVED APPLICATIONS
       </li>
     </ol>
   </nav>

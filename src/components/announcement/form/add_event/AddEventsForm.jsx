@@ -95,33 +95,65 @@ const AddEventsForm = ({ announcement_id, brgy }) => {
 
   const handleSubmit = async (e) => {
     try {
-      setSubmitClicked(true);
 
-      const response = await axios.post(
-        `http://localhost:8800/api/event_form/?brgy=${brgy}&event_id=${announcement_id}&checked=${checked}`,
-        {
-          form: form,
-          section: section,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+      // Prepare the request payload
+      const requestData = {
+        form: form,
+        section: section,
+      };
+
+      
+      if (checked) {
+        // Check if there's an active form
+        const activeFormResponse = await axios.get(
+          `http://localhost:8800/api/event_form/check/?brgy=${brgy}&event_id=${announcement_id}`
+        );
+         console.log(activeFormResponse)
+        if (activeFormResponse.data.length > 0) {
+          throw new Error("There's an active form. Please turn it off before updating the new form.");
+        } else {
+          setSubmitClicked(true);
+          const response = await axios.post(
+            `http://localhost:8800/api/event_form/?brgy=${brgy}&event_id=${announcement_id}&checked=${checked}`,
+            requestData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          setSubmitClicked(false);
+          setCreationStatus("success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
         }
-      );
-
-      setSubmitClicked(false);
-      setCreationStatus("success");
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      } else {
+        setSubmitClicked(true);
+        // Make the POST request
+        const response = await axios.post(
+          `http://localhost:8800/api/event_form/?brgy=${brgy}&event_id=${announcement_id}&checked=${checked}`,
+          requestData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setSubmitClicked(false);
+        setCreationStatus("success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      }
     } catch (err) {
-      console.log(err.message);
+      console.error(err.message);
       setSubmitClicked(false);
-      setCreationStatus(null);
-      setError("An error occurred while creating the announcement.");
+      setCreationStatus("error");
+      setError(err.message || "An error occurred while creating/updating the announcement.");
     }
   };
+
 
   console.log("Section in Add Events", section);
 
@@ -135,7 +167,7 @@ const AddEventsForm = ({ announcement_id, brgy }) => {
         <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
           <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
             {/* Header */}
-            <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#4b7c80] to-[#21556d] overflow-hidden rounded-t-2xl">
+            <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]  overflow-hidden rounded-t-2xl">
               <h3
                 className="font-bold text-white mx-auto md:text-xl text-center"
                 style={{ letterSpacing: "0.3em" }}

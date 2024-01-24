@@ -5,15 +5,17 @@ import { useNavigate } from "react-router-dom";
 import EditDropbox from "./EditDropbox";
 import API_LINK from "../../config/API";
 import EditLoader from "./loaders/EditLoader";
+
 function ManageAnnouncementModal({ announcement, setAnnouncement }) {
   const [logo, setLogo] = useState();
   const [banner, setBanner] = useState();
   const [files, setFiles] = useState([]);
   const [edit, setEdit] = useState(false);
-  const navigate = useNavigate();
   const [submitClicked, setSubmitClicked] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(null);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
   const dateFormat = (date) => {
     const eventdate = date === undefined ? "" : date.substr(0, 10);
     return eventdate;
@@ -25,6 +27,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
 
   useEffect(() => {
     setFiles(announcement.length === 0 ? [] : announcement.collections.file);
+
     var logoSrc = document.getElementById("edit_logo");
     logoSrc.src =
       announcement.length === 0 ? "" : announcement.collections.logo.link;
@@ -84,6 +87,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
     try {
       e.preventDefault();
       setSubmitClicked(true);
+
       var formData = new FormData();
 
       const arr1 = [banner, logo];
@@ -113,7 +117,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
       formData.append("announcement", JSON.stringify(announcement));
 
       const result = await axios.patch(
-        `${API_LINK}/announcement/${announcement._id}/`,
+        `${API_LINK}/announcement/${announcement._id}`,
         formData
       );
 
@@ -125,11 +129,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
         var bannerSrc = document.getElementById("banner");
         bannerSrc.src =
           "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
-        // setService({});
-        // setLogo();
-        // setBanner();
-        // setFiles([]);
-        // navigate("/");
+
         setTimeout(() => {
           // HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
           setSubmitClicked(false);
@@ -138,13 +138,12 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
             window.location.reload();
           }, 3000);
         }, 1000);
-       
       }
     } catch (err) {
       console.log(err);
       setSubmitClicked(false);
-      setUpdatingStatus(null);
-      setError("An error occurred while updating the announcement.");
+      setUpdatingStatus("error");
+      setError("An error occurred while creating the announcement.");
     }
   };
 
@@ -153,23 +152,22 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
       <div className="">
         <div
           id="hs-modal-editAnnouncement"
-          className="hs-overlay hidden fixed top-0 bottom-0 left-0 z-[60] w-full h-full flex items-center justify-center"
+          className="hs-overlay hidden fixed top-0 left-0 z-[80] w-full h-full overflow-x-hidden overflow-y-auto flex items-center justify-center r"
         >
-
           {/* Modal */}
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
               {/* Header */}
-              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]  overflow-hidden rounded-t-2xl">
+              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#4b7c80] to-[#21556d] overflow-hidden rounded-t-2xl">
                 <h3
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
                 >
-                  MANAGE EVENTS
+                  MANAGE BARANGAY EVENT
                 </h3>
               </div>
 
-              <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+              <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
                 <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
                   <div className="w-full">
                     <label
@@ -191,10 +189,10 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                         <input
                           type="file"
                           onChange={handleLogoChange}
-                          disabled={!edit}
                           name="logo"
                           accept="image/*"
                           value={!logo ? "" : logo.originalname}
+                          disabled={!edit}
                           className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4  file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
                         />
                       </label>
@@ -295,6 +293,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                     name="date"
                     value={announcement && dateFormat(announcement.date)}
                     disabled={!edit}
+                    onChange={handleChange}
                   />
                 </div>
 
@@ -313,7 +312,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                   <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
                     <button
                       type="button"
-                      className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-[#295141] text-white shadow-sm"
+                      className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-teal-900 text-white shadow-sm"
                       onClick={handleOnEdit}
                     >
                       EDIT
@@ -331,7 +330,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                     <button
                       type="submit"
                       onClick={handleSubmit}
-                      className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-[#295141] text-white shadow-sm"
+                      className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-teal-900 text-white shadow-sm"
                     >
                       SAVE CHANGES
                     </button>
@@ -347,11 +346,11 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
               </div>
             </div>
           </div>
+          {submitClicked && <EditLoader updatingStatus="updating" />}
+          {updatingStatus && (
+            <EditLoader updatingStatus={updatingStatus} error={error} />
+          )}
         </div>
-        {submitClicked && <EditLoader updatingStatus="updating" />}
-        {updatingStatus && (
-          <EditLoader updatingStatus={updatingStatus} error={error} />
-        )}
       </div>
     </div>
   );
