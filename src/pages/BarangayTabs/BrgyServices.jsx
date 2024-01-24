@@ -31,7 +31,7 @@ function Services() {
   const [serviceFilter, setServiceFilter] = useState("all");
   const [filteredServices, setFilteredServices] = useState([])
 
-  console.log("sss", id);
+  console.log("sass", brgy);
   const handleView = (service) => {
     setSelectedService(service);
   };

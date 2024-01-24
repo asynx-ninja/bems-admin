@@ -73,6 +73,14 @@ const AccountManagement = () => {
 
 
   useEffect(() => {
+<<<<<<< HEAD
+    const fetch = async () => {
+      const response = await axios.get(`${API_LINK}/users/admin/?brgy=${brgy}`);
+      if (response.status === 200) setUsers(response.data);
+      else setUsers([]);
+
+      console.log("rr",response.data);
+=======
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
@@ -89,6 +97,7 @@ const AccountManagement = () => {
         // Handle uncaught error here
         console.error("Uncaught error:", err.message);
       }
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
     };
 
     fetchUsers();

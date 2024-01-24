@@ -1,5 +1,9 @@
 import React from "react";
 import Error from "../../../assets/modals/Error.png";
+<<<<<<< HEAD
+
+function ArchiveRequestsModal() {
+=======
 import axios from "axios";
 import API_LINK from "../../../config/API";
 
@@ -20,6 +24,7 @@ function ArchiveRequestsModal({ selectedItems }) {
     }
   };
 
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
   return (
     <div
       id="hs-archive-requests-modal"
@@ -41,7 +46,10 @@ function ArchiveRequestsModal({ selectedItems }) {
             <button
               type="button"
               data-hs-overlay="#hs-archive-requests-modal"
+<<<<<<< HEAD
+=======
               onClick={handleSave} // Call the handleArchive function
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
               className=" w-[6rem] lg:w-[12rem] px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600"
             >
               Yes

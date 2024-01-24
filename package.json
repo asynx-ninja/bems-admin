@@ -14,8 +14,12 @@
     "@fullcalendar/daygrid": "^6.1.9",
     "@fullcalendar/interaction": "^6.1.9",
     "@fullcalendar/react": "^6.1.9",
+<<<<<<< HEAD
+    "@react-pdf/renderer": "^3.1.14",
+=======
     "@react-pdf/image": "^2.2.2",
     "@react-pdf/renderer": "^3.1.15",
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
     "axios": "^1.6.1",
     "chart.js": "^4.4.1",
     "framer-motion": "^10.16.4",

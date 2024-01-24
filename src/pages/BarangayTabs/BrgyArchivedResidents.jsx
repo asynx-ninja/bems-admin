@@ -15,6 +15,7 @@ const Residents = () => {
   const [users, setUsers] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
+  const type = "Resident";
   const brgy = searchParams.get("brgy");
   const [user, setUser] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
@@ -26,7 +27,15 @@ const Residents = () => {
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
+<<<<<<< HEAD
         `${API_LINK}/users/showArchived/?brgy=${brgy}&type=Resident&status=${statusFilter}`
+=======
+<<<<<<< HEAD
+        `${API_LINK}/users/showArchived/?brgy=${brgy}&type=${type}`
+=======
+        `${API_LINK}/users/showArchived/?brgy=${brgy}&type=Resident`
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
+>>>>>>> b8d7d191b156d472253b25a582b9910c02952c10
       );
 
       if (response.status === 200) {

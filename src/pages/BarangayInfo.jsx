@@ -36,7 +36,11 @@ function BarangayDetails() {
       <div className="px-4 py-4 items-center bg-gray-100">
       <button
         type="button"
+<<<<<<< HEAD
+        className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 inline-flex uppercase font-bold items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-[#295141] to-[#408D51] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+=======
         className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 uppercase inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-[#295141] to-[#408D51] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
         id="hs-basic-collapse"
         data-hs-collapse="#hs-basic-collapse-heading"
         onClick={() => setCollapseOpen(!collapseOpen)}

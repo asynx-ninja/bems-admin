@@ -353,7 +353,11 @@ function ReplyServiceModal({ request, setRequest }) {
                       <div
                         key={index}
                         className={`flex flex-col lg:flex-row h-16 mb-2 border-b ${
+<<<<<<< HEAD
+                          expandedIndexes.includes(index)
+=======
                           expandedIndexes.includes(index) 
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                             ? "h-auto border-b"
                             : ""
                         }`}
@@ -404,6 +408,9 @@ function ReplyServiceModal({ request, setRequest }) {
                                 setViewFiles={setViewFiles}
                               />
                             )}
+<<<<<<< HEAD
+                           
+=======
                             {index === request.response.length - 1 && (
                               <div className="flex flex-row items-center">
                                 <button
@@ -599,6 +606,7 @@ function ReplyServiceModal({ request, setRequest }) {
                                 )}
                               </div>
                             )}
+>>>>>>> 819adb521167538e86d310bf12a723a31d31fa06
                           </div>
                         )}
                       </div>
