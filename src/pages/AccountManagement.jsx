@@ -33,7 +33,8 @@ const AccountManagement = () => {
   const [status, setStatus] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
-  
+  const [adminFilter, setAdminFilter] = useState("all");
+
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
     let value = e.target.value;
@@ -64,20 +65,19 @@ const AccountManagement = () => {
   const tableHeader = [
     "PROFILE",
     "NAME",
-    // "AGE",
-    // "GENDER",
+    "TYPE",
     "CONTACT",
     "ACCOUNT STATUS",
     "ACTIONS",
   ];
 
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/users/?brgy=${brgy}&page=${currentPage}`
+          `${API_LINK}/users/?brgy=${brgy}&page=${currentPage}&type=${adminFilter}`
         );
-  
         if (response.status === 200) {
           setPageCount(response.data.pageCount);
           setUsers(response.data.result); // Update the state variable with the fetched users
@@ -90,9 +90,14 @@ const AccountManagement = () => {
         console.error("Uncaught error:", err.message);
       }
     };
-  
+
     fetchUsers();
-  }, [currentPage]);
+  }, [currentPage, adminFilter]);
+
+
+const handleAdminFilter = (type) => {
+  setAdminFilter(type);
+};
 
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
@@ -104,6 +109,11 @@ const AccountManagement = () => {
   const handleStatus = (status) => {
     setStatus(status);
   };
+
+  const handleResetFilter = () => {
+      setAdminFilter("all");
+  }
+
   return (
     <div className="mx-4 mt-[10rem] lg:mt-4 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div className="flex flex-col">
@@ -166,40 +176,58 @@ const AccountManagement = () => {
         </div>
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
-            <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
-              <button
-                id="hs-dropdown"
-                type="button"
-                className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
-              >
-                SORT BY
-                <svg
-                  className="hs-dropdown-open:rotate-180 w-2.5 h-2.5 text-white"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+            <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
+              <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
+                <button
+                  id="hs-dropdown"
+                  type="button"
+                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
                 >
-                  <path
-                    d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-              <ul
-                className="bg-[#295141] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-md rounded-lg p-2 "
-                aria-labelledby="hs-dropdown"
-              >
-                <li className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ">
-                  TITLE
-                </li>
-                <li className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ">
-                  DATE
-                </li>
-              </ul>
+                  POSITION
+                  <svg
+                    className="w-2.5 h-2.5 text-white"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+                <ul
+                  className="bg-[#f8f8f8] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-xl rounded-xl p-2 "
+                  aria-labelledby="hs-dropdown"
+                >
+                  <a
+                    onClick={handleResetFilter}
+                    className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-2 text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 hover:rounded-[12px] focus:ring-2 focus:ring-blue-500"
+                    href="#"
+                  >
+                    RESET FILTERS
+                  </a>
+                  <hr className="border-[#4e4e4e] my-1" />
+                  <a
+                    onClick={() => handleAdminFilter("Head Admin")}
+                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                    
+                  >
+                    HEAD ADMIN
+                  </a>
+                  <a
+                    onClick={() => handleAdminFilter("Admin")}
+                    class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                  >
+                   ADMIN
+                  </a>
+                 
+                </ul>
+              </div>
             </div>
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
               <div className="flex flex-row w-full md:mr-2">
@@ -232,7 +260,7 @@ const AccountManagement = () => {
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-           
+
                 {/* <div className="hs-tooltip inline-block w-full">
                 <PDFDownloadLink
                   document={<PrintPDF users={users} tableHeader={tableHeader} />}
@@ -293,114 +321,121 @@ const AccountManagement = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-            {users.length === 0 ? (
+              {users.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-10 text-gray-400">
                     No data found
                   </td>
                 </tr>
               ) : (
-              users.map((item, index) => (
-                <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        value={item._id}
-                        onChange={checkboxHandler}
-                        id=""
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2">
-                      <div className="px-2 sm:px-6 py-2">
-                        {item.profile.link ? (
-                          <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
-                            <img
-                              referrerPolicy="no-referrer"
-                              src={item.profile.link}
-                              alt="picture"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <FaUserCircle className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4 border-[#013D74] rounded-full text-gray-500 mx-auto" />
-                        )}
+                users.map((item, index) => (
+                  <tr key={index} className="odd:bg-slate-100 text-center">
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(item._id)}
+                          value={item._id}
+                          onChange={checkboxHandler}
+                          id=""
+                        />
                       </div>
-                    </span>
-                  </td>
-                
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {item.firstName +
-                          " " +
-                          item.middleName +
-                          " " +
-                          item.lastName}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
+                    </td>
+                    <td className="px-6 py-3">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.contact}
+                        <div className="px-2 sm:px-6 py-2">
+                          {item.profile.link ? (
+                            <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
+                              <img
+                                referrerPolicy="no-referrer"
+                                src={item.profile.link}
+                                alt="picture"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <FaUserCircle className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4 border-[#013D74] rounded-full text-gray-500 mx-auto" />
+                          )}
+                        </div>
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    {item.isApproved === "Registered" && (
-                      <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2">
-                        <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
-                          REGISTERED
+                    </td>
+
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.firstName +
+                            " " +
+                            item.middleName +
+                            " " +
+                            item.lastName}
                         </span>
                       </div>
-                    )}
-                    {item.isApproved === "Denied" && (
-                      <div className="flex w-full items-center justify-center bg-custom-red-button m-2">
-                        <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
-                          DENIED
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.type}
                         </span>
                       </div>
-                    )}
-                    {item.isApproved === "Pending" && (
-                      <div className="flex w-full items-center justify-center bg-custom-amber m-2">
-                        <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
-                          PENDING
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.contact}
                         </span>
                       </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center space-x-1 sm:space-x-none">
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-modal-editAdmin"
-                        onClick={() => handleView({ ...item })}
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-modal-statusAdmin"
-                        className="text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                        onClick={() =>
-                          handleStatus({
-                            id: item._id,
-                            status: item.isApproved,
-                          })
-                        }
-                      >
-                        <FiEdit size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                 ))
-                 )}
+                    </td>
+                    <td className="px-6 py-3">
+                      {item.isApproved === "Registered" && (
+                        <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2">
+                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            REGISTERED
+                          </span>
+                        </div>
+                      )}
+                      {item.isApproved === "Denied" && (
+                        <div className="flex w-full items-center justify-center bg-custom-red-button m-2">
+                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            DENIED
+                          </span>
+                        </div>
+                      )}
+                      {item.isApproved === "Pending" && (
+                        <div className="flex w-full items-center justify-center bg-custom-amber m-2">
+                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            PENDING
+                          </span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center space-x-1 sm:space-x-none">
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-modal-editAdmin"
+                          onClick={() => handleView({ ...item })}
+                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                        >
+                          <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
+                        </button>
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-modal-statusAdmin"
+                          className="text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                          onClick={() =>
+                            handleStatus({
+                              id: item._id,
+                              status: item.isApproved,
+                            })
+                          }
+                        >
+                          <FiEdit size={24} style={{ color: "#ffffff" }} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -440,7 +475,7 @@ const AccountManagement = () => {
       </div>
       <ArchiveAccAdmin selectedItems={selectedItems} />
       {/* <StatusAccAdmin /> */}
-      <GenerateReportsModal user={user} setUser={setUser}  />
+      <GenerateReportsModal user={user} setUser={setUser} />
       <AddAdminModal brgy={brgy} occupation={occupation} type={type} />
       <ManageAdminModal user={user} setUser={setUser} />
       <StatusAccAdmin status={status} setStatus={setStatus} />

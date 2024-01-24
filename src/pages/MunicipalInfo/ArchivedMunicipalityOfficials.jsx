@@ -12,7 +12,7 @@ import ViewOfficialModal from "../../components/municipalityofficials/ViewOffici
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
-import {FaUserCircle} from "react-icons/fa"
+import { FaUserCircle } from "react-icons/fa"
 
 const ArchivedOfficials = () => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -25,6 +25,8 @@ const ArchivedOfficials = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
+  const [positionFilter, setPositionFilter] = useState("all");
+
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
@@ -83,37 +85,45 @@ const ArchivedOfficials = () => {
     document.title =
       "Archived Barangay Officials | Barangay E-Services Management";
 
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(
-            `${API_LINK}/mofficials/?brgy=${brgy}&archived=true&page=${currentPage}`
-          );
-    
-          if (response.status === 200) {
-            const officialsData = response.data.result || [];
-            setPageCount(response.data.pageCount);
-            if (officialsData.length > 0) {
-              setOfficials(officialsData);
-            } else {
-              setOfficials([]);
-              console.log(`No officials found for Barangay ${brgy}`);
-            }
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/mofficials/?brgy=${brgy}&archived=true&page=${currentPage}&position=${positionFilter}`
+        );
+
+        if (response.status === 200) {
+          const officialsData = response.data.result || [];
+          setPageCount(response.data.pageCount);
+          if (officialsData.length > 0) {
+            setOfficials(officialsData);
           } else {
             setOfficials([]);
-            console.error("Failed to fetch officials:", response.status);
+            console.log(`No officials found for Barangay ${brgy}`);
           }
-        } catch (error) {
-          console.error("Error fetching data:", error);
+        } else {
           setOfficials([]);
+          console.error("Failed to fetch officials:", response.status);
         }
-      };
-    
-      fetchData();
-    }, [brgy, currentPage]);
-  
-    const handlePageChange = ({ selected }) => {
-      setCurrentPage(selected);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setOfficials([]);
+      }
     };
+
+    fetchData();
+  }, [brgy, currentPage, positionFilter]);
+
+  const handlePositionFilter = (selectedPosition) => {
+    setPositionFilter(selectedPosition);
+  };
+
+  const handleResetFilter = () => {
+    setPositionFilter("all");
+  };
+
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
   const tableHeader = [
     "IMAGE",
     "NAME",
@@ -128,13 +138,13 @@ const ArchivedOfficials = () => {
 
     const startYearMonth = startDate
       ? `${startDate.toLocaleString("default", {
-          month: "short",
-        })} ${startDate.getFullYear()}`
+        month: "short",
+      })} ${startDate.getFullYear()}`
       : "";
     const endYearMonth = endDate
       ? `${endDate.toLocaleString("default", {
-          month: "short",
-        })} ${endDate.getFullYear()}`
+        month: "short",
+      })} ${endDate.getFullYear()}`
       : "";
 
     return `${startYearMonth} ${endYearMonth}`;
@@ -165,11 +175,10 @@ const ArchivedOfficials = () => {
                 type="button"
                 className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
               >
-                SORT BY
+                POSITION
                 <svg
-                  className={`hs-dropdown-open:rotate-${
-                    sortOrder === "asc" ? "180" : "0"
-                  } w-2.5 h-2.5 text-white`}
+                  className={`hs-dropdown-open:rotate-${sortOrder === "asc" ? "180" : "0"
+                    } w-2.5 h-2.5 text-white`}
                   width="16"
                   height="16"
                   viewBox="0 0 16 16"
@@ -185,39 +194,52 @@ const ArchivedOfficials = () => {
                 </svg>
               </button>
               <ul
-                className="bg-[#295141] border-2 border-[#ffb13c] hs-dropdown-menu w-96 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10 shadow-md rounded-lg p-2"
+                className="bg-[#f8f8f8] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-xl rounded-xl p-2 "
                 aria-labelledby="hs-dropdown"
               >
-                <li
-                  onClick={() => handleSort("name")}
-                  className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 "
+                <a
+                  onClick={handleResetFilter}
+                  className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-2 text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 hover:rounded-[12px] focus:ring-2 focus:ring-blue-500"
+                  href="#"
                 >
-                  NAME
-                  {sortColumn === "name" && (
-                    <span className="ml-auto">
-                      {sortOrder === "asc" ? (
-                        <span>DESC &darr;</span>
-                      ) : (
-                        <span>ASC &uarr;</span>
-                      )}
-                    </span>
-                  )}
-                </li>
-                <li
-                  onClick={() => handleSort("rendered_service")}
-                  className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 "
+                  RESET FILTERS
+                </a>
+                <hr className="border-[#4e4e4e] my-1" />
+                <a
+                  onClick={() => handlePositionFilter("City Mayor")}
+                  class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                  href="#"
                 >
-                  RENDERED SERVICE
-                  {sortColumn === "rendered_service" && (
-                    <span className="ml-auto">
-                      {sortOrder === "asc" ? (
-                        <span className="text-xs">OLD TO LATEST &darr;</span>
-                      ) : (
-                        <span className="text-xs">LATEST TO OLD &uarr;</span>
-                      )}
-                    </span>
-                  )}
-                </li>
+                  CITY MAYOR
+                </a>
+                <a
+                  onClick={() => handlePositionFilter("Vice Mayor")}
+                  class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                  href="#"
+                >
+                  VICE MAYOR
+                </a>
+                <a
+                  onClick={() => handlePositionFilter("Congressman")}
+                  class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                  href="#"
+                >
+                  CONGRESSMAN
+                </a>
+                <a
+                  onClick={() => handlePositionFilter("Councilors")}
+                  class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                  href="#"
+                >
+                  COUNCILORS
+                </a>
+                <a
+                  onClick={() => handlePositionFilter("Sangguniang Kabataan")}
+                  class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                  href="#"
+                >
+                  SANGGUNIANG KABATAAN
+                </a>
               </ul>
             </div>
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
@@ -313,116 +335,116 @@ const ArchivedOfficials = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-            {officials.length === 0 ? (
+              {officials.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-10 text-gray-400">
                     No data found
                   </td>
                 </tr>
               ) : (
-              officials.map((item, index) => (
-                <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        value={item._id}
-                        onChange={checkboxHandler}
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2">
-                      <div className="px-2 sm:px-6 py-2">
-                        {item.picture.link ? (
-                          <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
-                            <img
-                              src={item.picture.link}
-                              alt="picture"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <FaUserCircle className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4 border-[#013D74] rounded-full text-gray-500 mx-auto" />
-                        )}
+                officials.map((item, index) => (
+                  <tr key={index} className="odd:bg-slate-100 text-center">
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(item._id)}
+                          value={item._id}
+                          onChange={checkboxHandler}
+                        />
                       </div>
-                    </span>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2 capitalize">
-                        {item.lastName}, {item.firstName}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
+                    </td>
+                    <td className="px-6 py-3">
                       <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.position}
+                        <div className="px-2 sm:px-6 py-2">
+                          {item.picture.link ? (
+                            <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
+                              <img
+                                src={item.picture.link}
+                                alt="picture"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <FaUserCircle className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4 border-[#013D74] rounded-full text-gray-500 mx-auto" />
+                          )}
+                        </div>
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {dateFormat(item.fromYear) || ""} -{" "}
-                        {dateFormat(item.toYear) || ""}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center space-x-1 sm:space-x-none">
-                      <button
-                        onClick={() => handleView(item)}
-                        type="button"
-                        data-hs-overlay="#hs-view-archived-official-modal"
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-            ))
-            )}
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2 capitalize">
+                          {item.lastName}, {item.firstName}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.position}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {dateFormat(item.fromYear) || ""} -{" "}
+                          {dateFormat(item.toYear) || ""}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center space-x-1 sm:space-x-none">
+                        <button
+                          onClick={() => handleView(item)}
+                          type="button"
+                          data-hs-overlay="#hs-view-archived-official-modal"
+                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                        >
+                          <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
       <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
-          <span className="font-medium text-white sm:text-xs text-sm">
-            Showing {currentPage + 1} out of {pageCount} pages
-          </span>
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel={
-              pageCount > currentPage + 1 ? (
-                <span className="text-white">&gt;&gt;</span>
-              ) : (
-                <span className="text-gray-300 cursor-not-allowed">
-                  &gt;&gt;
-                </span>
-              )
-            }
-            onPageChange={handlePageChange}
-            pageRangeDisplayed={3}
-            pageCount={pageCount}
-            previousLabel={
-              currentPage > 0 ? (
-                <span className="text-white"> &lt;&lt;</span>
-              ) : (
-                <span className="text-gray-300 cursor-not-allowed">
-                  &lt;&lt;
-                </span>
-              )
-            }
-            className="flex space-x-3 text-white font-bold"
-            activeClassName="text-yellow-500"
-            disabledLinkClassName="text-gray-300"
-            renderOnZeroPageCount={null}
-          />
-        </div>
+        <span className="font-medium text-white sm:text-xs text-sm">
+          Showing {currentPage + 1} out of {pageCount} pages
+        </span>
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel={
+            pageCount > currentPage + 1 ? (
+              <span className="text-white">&gt;&gt;</span>
+            ) : (
+              <span className="text-gray-300 cursor-not-allowed">
+                &gt;&gt;
+              </span>
+            )
+          }
+          onPageChange={handlePageChange}
+          pageRangeDisplayed={3}
+          pageCount={pageCount}
+          previousLabel={
+            currentPage > 0 ? (
+              <span className="text-white"> &lt;&lt;</span>
+            ) : (
+              <span className="text-gray-300 cursor-not-allowed">
+                &lt;&lt;
+              </span>
+            )
+          }
+          className="flex space-x-3 text-white font-bold"
+          activeClassName="text-yellow-500"
+          disabledLinkClassName="text-gray-300"
+          renderOnZeroPageCount={null}
+        />
+      </div>
       <GenerateReportsModal />
       <RestoreOfficialModal selectedItems={selectedItems} />
       <ViewOfficialModal

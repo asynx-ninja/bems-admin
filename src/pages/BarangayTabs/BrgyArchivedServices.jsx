@@ -26,6 +26,8 @@ function ArchiveServices() {
   const [selectedService, setSelectedService] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
+  const [filteredServices, setFilteredServices] = useState([])
+  const [searchQuery, setSearchQuery] = useState("");
   const handleView = (service) => {
     setSelectedService(service);
   };
@@ -38,6 +40,7 @@ function ArchiveServices() {
         ); // Replace "/api/services" with the actual API endpoint URL for fetching all services
         setServices(response.data.result);
         setPageCount(response.data.pageCount);
+        setFilteredServices(response.data.result)
         console.log(response.data);
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -70,8 +73,8 @@ function ArchiveServices() {
         </h1>
       </div>
       <div className="flex items-center justify-start bg-gray-100">
-            <Breadcrumb brgy={brgy} id={id} />
-          </div>
+        <Breadcrumb brgy={brgy} id={id} />
+      </div>
       <div className="py-4 px-4">
         <div>
           {/* Header */}
@@ -151,6 +154,17 @@ function ArchiveServices() {
                     id="hs-table-with-pagination-search"
                     className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500 "
                     placeholder="Search for items"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      const Service = services.filter((item) =>
+                        item.name
+                          .toLowerCase()
+                          .includes(e.target.value.toLowerCase())
+                      );
+
+                      setFilteredServices(Service);
+                    }}
                   />
                 </div>
                 <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
@@ -190,8 +204,8 @@ function ArchiveServices() {
           </div>
 
           {/* Table */}
-         <div className="overflow-auto sm:overflow-x-auto h-[calc(100vh_-_315px)] xxxl:h-[calc(100vh_-_326px)]">
-          <table className="w-full ">
+          <div className="overflow-auto sm:overflow-x-auto h-[calc(100vh_-_315px)] xxxl:h-[calc(100vh_-_326px)]">
+            <table className="w-full ">
               <thead className="bg-[#295141] sticky top-0">
                 <tr className="">
                   {tableHeader.map((item, idx) => (
@@ -206,114 +220,113 @@ function ArchiveServices() {
                 </tr>
               </thead>
               <tbody className="odd:bg-slate-100">
-              {services.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="text-center py-10 text-gray-400">
-                    No data found
-                  </td>
-                </tr>
-              ) : (
-                services.map((item, index) => (
-                  <tr key={index} className="odd:bg-slate-100 text-center">
-                    <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.name}
-                      </span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {item.details}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {item.type}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {new Date(service.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div
-                        className={`flex items-center justify-center ${
-                          item.isApproved === "Approved"
-                            ? "bg-custom-green-button3"
-                            : item.isApproved === "Pending"
-                            ? "bg-custom-yellow"
-                            : "bg-custom-red-button"
-                        } m-2`}
-                      >
-                        <span className="text-xs sm:text-sm text-white p-3 mx-5">
-                          {item.isApproved}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center space-x-1 sm:space-x-none">
-                        <button
-                          type="button"
-                          data-hs-overlay="#hs-view-archived-service-modal"
-                          onClick={() => handleView({ ...item })}
-                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                        >
-                          <AiOutlineEye
-                            size={24}
-                            style={{ color: "#ffffff" }}
-                          />
-                        </button>
-                      </div>
+                {filteredServices.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="text-center py-10 text-gray-400">
+                      No data found
                     </td>
                   </tr>
-              ))
-              )}
+                ) : (
+                  filteredServices.map((item, index) => (
+                    <tr key={index} className="odd:bg-slate-100 text-center">
+                      <td className="px-6 py-3">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.name}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex justify-center items-center">
+                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                            {item.details}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex justify-center items-center">
+                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                            {item.type}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex justify-center items-center">
+                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                            {new Date(service.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div
+                          className={`flex items-center justify-center ${item.isApproved === "Approved"
+                              ? "bg-custom-green-button3"
+                              : item.isApproved === "Pending"
+                                ? "bg-custom-yellow"
+                                : "bg-custom-red-button"
+                            } m-2`}
+                        >
+                          <span className="text-xs sm:text-sm text-white p-3 mx-5">
+                            {item.isApproved}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex justify-center space-x-1 sm:space-x-none">
+                          <button
+                            type="button"
+                            data-hs-overlay="#hs-view-archived-service-modal"
+                            onClick={() => handleView({ ...item })}
+                            className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                          >
+                            <AiOutlineEye
+                              size={24}
+                              style={{ color: "#ffffff" }}
+                            />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
           <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
-          <span className="font-medium text-white sm:text-xs text-sm">
-            Showing {currentPage + 1} out of {pageCount} pages
-          </span>
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel={
-              pageCount > currentPage + 1 ? (
-                <span className="text-white">&gt;&gt;</span>
-              ) : (
-                <span className="text-gray-300 cursor-not-allowed">
-                  &gt;&gt;
-                </span>
-              )
-            }
-            onPageChange={handlePageChange}
-            pageRangeDisplayed={3}
-            pageCount={pageCount}
-            previousLabel={
-              currentPage > 0 ? (
-                <span className="text-white"> &lt;&lt;</span>
-              ) : (
-                <span className="text-gray-300 cursor-not-allowed">
-                  &lt;&lt;
-                </span>
-              )
-            }
-            className="flex space-x-3 text-white font-bold"
-            activeClassName="text-yellow-500"
-            disabledLinkClassName="text-gray-300"
-            renderOnZeroPageCount={null}
-          />
-        </div>
+            <span className="font-medium text-white sm:text-xs text-sm">
+              Showing {currentPage + 1} out of {pageCount} pages
+            </span>
+            <ReactPaginate
+              breakLabel="..."
+              nextLabel={
+                pageCount > currentPage + 1 ? (
+                  <span className="text-white">&gt;&gt;</span>
+                ) : (
+                  <span className="text-gray-300 cursor-not-allowed">
+                    &gt;&gt;
+                  </span>
+                )
+              }
+              onPageChange={handlePageChange}
+              pageRangeDisplayed={3}
+              pageCount={pageCount}
+              previousLabel={
+                currentPage > 0 ? (
+                  <span className="text-white"> &lt;&lt;</span>
+                ) : (
+                  <span className="text-gray-300 cursor-not-allowed">
+                    &lt;&lt;
+                  </span>
+                )
+              }
+              className="flex space-x-3 text-white font-bold"
+              activeClassName="text-yellow-500"
+              disabledLinkClassName="text-gray-300"
+              renderOnZeroPageCount={null}
+            />
+          </div>
         </div>
       </div>
-      <GenerateReportsModal/>
-      <ViewArchivedServices selectedService={selectedService} setSelectedService={setSelectedService}  />
+      <GenerateReportsModal />
+      <ViewArchivedServices selectedService={selectedService} setSelectedService={setSelectedService} />
     </div>
   );
 }

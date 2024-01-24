@@ -14,6 +14,7 @@ import API_LINK from "../config/API";
 import { useSearchParams } from "react-router-dom";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PrintPDF from "../components/inquiries/form/PrintPDF"
+
 const Inquiries = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,50 +24,26 @@ const Inquiries = () => {
   const [inquiries, setInquiries] = useState([]);
   const [inquiry, setInquiry] = useState([]);
   const [status, setStatus] = useState({});
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [sortColumn, setSortColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [showTooltip, setShowTooltip] = useState(false);
-  const handleSort = (sortBy) => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    setSortColumn(sortBy);
 
-    const sortedData = inquiries.slice().sort((a, b) => {
-      if (sortBy === "inquiries_id") {
-        return newSortOrder === "asc"
-          ? a.inquiries_id.localeCompare(b.inquiries_id)
-          : b.inquiries_id.localeCompare(a.inquiries_id);
-      } else if (sortBy === "lastName") {
-        return newSortOrder === "asc"
-          ? a.lastName.localeCompare(b.lastName)
-          : b.lastName.localeCompare(a.lastName);
-      } else if (sortBy === "isApproved") {
-        const order = { Completed: 1, "In Progress": 2, "Not Responded": 3 };
-        return newSortOrder === "asc"
-          ? order[a.isApproved] - order[b.isApproved]
-          : order[b.isApproved] - order[a.isApproved];
-      }
+  //status filtering
+  const [statusFilter, setStatusFilter] = useState("all");
 
-      return 0;
-    });
-
-    setInquiries(sortedData);
-  };
 
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=false&page=${currentPage}`
+          `${API_LINK}/inquiries/admininquiries/?to=${to}&archived=false&page=${currentPage}&archived=false&status=${statusFilter}`
         );
 
         if (response.status === 200) {
           setPageCount(response.data.pageCount);
           setInquiries(response.data.result); // Update the state variable with the fetched inquiries
         } else {
-          // Handle error here
+          setInquiries([]);
           console.error("Error fetching inquiries:", response.error);
         }
       } catch (err) {
@@ -76,8 +53,19 @@ const Inquiries = () => {
     };
 
     fetchInquiries();
-  }, [currentPage]);
+  }, [currentPage, statusFilter,]);
 
+  const handleStatusFilter = (status) => {
+    setStatusFilter(status);
+  };
+
+  const handleResetFilter = () => {
+    setStatusFilter("all");
+    setSearchQuery("");
+    setFilteredInquiries();
+  };
+
+  
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -195,82 +183,64 @@ const Inquiries = () => {
 
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
-            <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
-              <button
-                id="hs-dropdown"
-                type="button"
-                className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
-              >
-                SORT BY
-                <svg
-                  className={`hs-dropdown-open:rotate-${
-                    sortOrder === "asc" ? "180" : "0"
-                  } w-2.5 h-2.5 text-white`}
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-              <ul
-                className="bg-[#295141] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-md rounded-lg p-2 "
-                aria-labelledby="hs-dropdown"
-              >
-                <li
-                  onClick={() => handleSort("inquiries_id")}
-                  className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 "
-                >
-                  SERVICE ID
-                  {sortColumn === "inquiries_id" && (
-                    <span className="ml-auto">
-                      {sortOrder === "asc" ? (
-                        <span>DESC &darr;</span>
-                      ) : (
-                        <span>ASC &uarr;</span>
-                      )}
-                    </span>
-                  )}
-                </li>
-                <li
-                  onClick={() => handleSort("date")}
-                  className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 "
-                >
-                  Date
-                  {sortColumn === "date" && (
-                    <span className="ml-auto">
-                      {sortOrder === "asc" ? (
-                        <span>OLD TO LATEST &darr;</span>
-                      ) : (
-                        <span>LATEST TO OLD &uarr;</span>
-                      )}
-                    </span>
-                  )}
-                </li>
-                <li
-                  onClick={() => handleSort("isApproved")}
-                  className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 "
+          <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
+                <button
+                  id="hs-dropdown"
+                  type="button"
+                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
                 >
                   STATUS
-                  {sortColumn === "isApproved" && (
-                    <span className="ml-auto">
-                      {sortOrder === "asc" ? (
-                        <span>DESC &darr;</span>
-                      ) : (
-                        <span>ASC &uarr;</span>
-                      )}
-                    </span>
-                  )}
-                </li>
-              </ul>
-            </div>
+                  <svg
+                    className={`hs-dropdown w-2.5 h-2.5 text-white`}
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+                <ul
+                  className="bg-[#f8f8f8] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-xl rounded-xl p-2 "
+                  aria-labelledby="hs-dropdown"
+                >
+                  <a
+                    onClick={handleResetFilter}
+                    className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-2 text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 hover:rounded-[12px] focus:ring-2 focus:ring-blue-500"
+                    href="#"
+                  >
+                    RESET FILTERS
+                  </a>
+                  <hr className="border-[#4e4e4e] my-1" />
+                  <a
+                    onClick={() => handleStatusFilter("Pending")}
+                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                    href="#"
+                  >
+                    PENDING
+                  </a>
+                  <a
+                    onClick={() => handleStatusFilter("In Progress")}
+                    class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                    href="#"
+                  >
+                    IN PROGRESS
+                  </a>
+                  <a
+                    onClick={() => handleStatusFilter("Completed")}
+                    class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                    href="#"
+                  >
+                    COMPLETED
+                  </a>
+                </ul>
+              </div>
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
               <div className="flex flex-row w-full md:mr-2">
                 <button className=" bg-[#295141] p-3 rounded-l-md">
