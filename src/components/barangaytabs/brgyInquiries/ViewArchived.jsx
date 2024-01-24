@@ -221,7 +221,7 @@ function ViewArchivedModal({ inquiry, setInquiry }) {
                                   {DateFormat(responseItem.date) || ""}
                                 </p>
                               </div>
-                              <p className="text-[10px] md:text-xs">
+                              <p className="text-[10px] md:text-xs line-clamp-2">
                                 {responseItem.message}
                               </p>
                             </div>

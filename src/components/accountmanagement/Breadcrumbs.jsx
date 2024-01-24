@@ -8,7 +8,7 @@ const Breadcrumb = ({ id }) => {
         <TfiAnnouncement size={22} />
         <li>
           <a
-            href={`/announcements/?id=${id}`}
+            href={`/accountmanagement/?id=${id}`}
             className="text-gray-600 font-bold hover:underline text-xs md:text-lg"
           >
             ACCOUNT MANAGEMENT

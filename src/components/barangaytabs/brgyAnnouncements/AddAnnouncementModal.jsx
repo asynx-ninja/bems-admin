@@ -13,7 +13,7 @@ function CreateAnnouncementModal() {
     details: "",
     date: "",
     brgy: brgy,
-    isOpen: false,
+    isOpen: true,
   });
 
   const [logo, setLogo] = useState();
