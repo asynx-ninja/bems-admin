@@ -1,20 +1,20 @@
 import React from "react";
 import ReactPaginate from "react-paginate";
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { BsPrinter } from "react-icons/bs";
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
-import { FiEdit } from "react-icons/fi";
-import { FaArchive, FaPlus, FaUserCircle } from "react-icons/fa";
-import CreateOfficialModal from "../components/municipalityofficials/CreateOfficialModal";
-import GenerateReportsModal from "../components/municipalityofficials/GenerateReportsModal";
-import ArchiveOfficialModal from "../components/municipalityofficials/ArchiveOfficialModal";
-import EditOfficialModal from "../components/municipalityofficials/ManageOfficialModal";
-import { useSearchParams } from "react-router-dom";
+import { MdRestartAlt } from "react-icons/md";
+import officialimage from "../../assets/sample/official.jpg";
+import GenerateReportsModal from "../../components/municipalityofficials/GenerateReportsModal";
+import Breadcrumbs from "../../components/municipalityofficials/Breadcrumbs";
+import RestoreOfficialModal from "../../components/municipalityofficials/RestoreOfficialModal";
+import ViewOfficialModal from "../../components/municipalityofficials/ViewOfficialModal";
 import axios from "axios";
-import API_LINK from "../config/API";
+import API_LINK from "../../config/API";
+import { useSearchParams } from "react-router-dom";
+import {FaUserCircle} from "react-icons/fa"
 
-const MunicipalityOfficials = () => {
+const ArchivedOfficials = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [officials, setOfficials] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,7 +25,6 @@ const MunicipalityOfficials = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
-
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
@@ -76,44 +75,45 @@ const MunicipalityOfficials = () => {
     }
   };
 
-  useEffect(() => {
-    document.title = "Barangay Officials | Barangay E-Services Management";
-
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${API_LINK}/mofficials/?brgy=${brgy}&archived=false&page=${currentPage}`
-        );
-  
-        if (response.status === 200) {
-          const officialsData = response.data.result || [];
-          setPageCount(response.data.pageCount);
-          if (officialsData.length > 0) {
-            setOfficials(officialsData);
-          } else {
-            setOfficials([]);
-            console.log(`No officials found for Barangay ${brgy}`);
-          }
-        } else {
-          setOfficials([]);
-          console.error("Failed to fetch officials:", response.status);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setOfficials([]);
-      }
-    };
-  
-    fetchData();
-  }, [brgy, currentPage]);
-  
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
-  };
-  const handleEditClick = async (official) => {
+  const handleView = async (official) => {
     setSelectedOfficial(official);
   };
 
+  useEffect(() => {
+    document.title =
+      "Archived Barangay Officials | Barangay E-Services Management";
+
+      const fetchData = async () => {
+        try {
+          const response = await axios.get(
+            `${API_LINK}/mofficials/?brgy=${brgy}&archived=true&page=${currentPage}`
+          );
+    
+          if (response.status === 200) {
+            const officialsData = response.data.result || [];
+            setPageCount(response.data.pageCount);
+            if (officialsData.length > 0) {
+              setOfficials(officialsData);
+            } else {
+              setOfficials([]);
+              console.log(`No officials found for Barangay ${brgy}`);
+            }
+          } else {
+            setOfficials([]);
+            console.error("Failed to fetch officials:", response.status);
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setOfficials([]);
+        }
+      };
+    
+      fetchData();
+    }, [brgy, currentPage]);
+  
+    const handlePageChange = ({ selected }) => {
+      setCurrentPage(selected);
+    };
   const tableHeader = [
     "IMAGE",
     "NAME",
@@ -141,65 +141,19 @@ const MunicipalityOfficials = () => {
   };
 
   return (
-    <div className="mx-4 mt-[10rem] lg:mt-4 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
-      <div className="flex flex-col">
+    <div className="mx-4 mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+      <Breadcrumbs />
+      {/* Body */}
+      <div>
         {/* Header */}
-        <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
-          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
+        <div className="flex flex-row lg:mt-5 sm:flex-col-reverse lg:flex-row w-full">
+          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
               className="text-center mx-auto font-bold text-xs md:text-xl lg:text-[16px] xl:text-[20px] xxl:text-[1.5rem] xxxl:text-3xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
-              MUNICIPALITY OFFICIALS
+              ARCHIVED OFFICIALS
             </h1>
-          </div>
-          <div className="lg:w-3/5 flex flex-row justify-end items-center ">
-            <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
-              <div className="w-full rounded-lg flex justify-center">
-                <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-create-official-modal"
-                    className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm  text-center inline-flex items-center "
-                  >
-                    <FaPlus size={24} style={{ color: "#ffffff" }} />
-                    <span className="sm:block md:hidden sm:pl-5">
-                      Add Official
-                    </span>
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-50 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Add Official
-                    </span>
-                  </button>
-                </div>
-              </div>
-              <div className="w-full rounded-lg ">
-                <Link
-                  to={`/archivedmunicipalityofficials/?id=${id}&brgy=${brgy}&archived=true`}
-                >
-                  <div className="hs-tooltip inline-block w-full">
-                    <button
-                      type="button"
-                      data-hs-overlay="#hs-modal-add"
-                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm text-center inline-flex items-center"
-                    >
-                      <FaArchive size={24} style={{ color: "#ffffff" }} />
-                      <span className="sm:block md:hidden sm:pl-5">
-                        Archived Officials
-                      </span>
-                      <span
-                        className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-50 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                        role="tooltip"
-                      >
-                        Archived Officials
-                      </span>
-                    </button>
-                  </div>
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -315,15 +269,15 @@ const MunicipalityOfficials = () => {
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
-                    data-hs-overlay="#hs-archive-official-modal"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md  bg-pink-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
+                    data-hs-overlay="#hs-restore-official-modal"
+                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md   bg-[#295141] font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
                   >
-                    <AiOutlineStop size={24} style={{ color: "#ffffff" }} />
+                    <MdRestartAlt size={24} style={{ color: "#ffffff" }} />
                     <span
                       className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                       role="tooltip"
                     >
-                      Archive Selected Officials
+                      Restore Selected Officials
                     </span>
                   </button>
                 </div>
@@ -333,7 +287,7 @@ const MunicipalityOfficials = () => {
         </div>
 
         {/* Table */}
-        <div className="overflow-auto sm:overflow-x-auto h-[calc(100vh_-_300px)] xxxl:h-[calc(100vh_-_326px)]">
+        <div className="overflow-auto sm:overflow-x-auto h-[calc(100vh_-_340px)] xxxl:h-[calc(100vh_-_326px)]">
           <table className="w-full ">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
@@ -359,7 +313,14 @@ const MunicipalityOfficials = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {officials.map((item, index) => (
+            {officials.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+              officials.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
@@ -391,7 +352,7 @@ const MunicipalityOfficials = () => {
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm text-black line-clamp-2 capitalize">
-                      {item.lastName}, {item.firstName}
+                        {item.lastName}, {item.firstName}
                       </span>
                     </div>
                   </td>
@@ -413,17 +374,18 @@ const MunicipalityOfficials = () => {
                   <td className="px-6 py-3">
                     <div className="flex justify-center space-x-1 sm:space-x-none">
                       <button
+                        onClick={() => handleView(item)}
                         type="button"
-                        data-hs-overlay="#hs-edit-official-modal"
+                        data-hs-overlay="#hs-view-archived-official-modal"
                         className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                        onClick={() => handleEditClick(item)}
                       >
-                        <FiEdit size={24} style={{ color: "#ffffff" }} />
+                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
                       </button>
                     </div>
                   </td>
                 </tr>
-              ))}
+            ))
+            )}
             </tbody>
           </table>
         </div>
@@ -434,21 +396,36 @@ const MunicipalityOfficials = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
             renderOnZeroPageCount={null}
           />
         </div>
-      <CreateOfficialModal brgy={brgy} />
       <GenerateReportsModal />
-      <ArchiveOfficialModal selectedItems={selectedItems} />
-      <EditOfficialModal
+      <RestoreOfficialModal selectedItems={selectedItems} />
+      <ViewOfficialModal
         selectedOfficial={selectedOfficial}
         setSelectedOfficial={setSelectedOfficial}
         brgy={brgy}
@@ -457,4 +434,4 @@ const MunicipalityOfficials = () => {
   );
 };
 
-export default MunicipalityOfficials;
+export default ArchivedOfficials;

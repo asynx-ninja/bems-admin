@@ -310,11 +310,12 @@ function CreateAnnouncementModal() {
             </div>
           </div>
         </div>
-        {submitClicked && <AddLoader creationStatus="creating" />}
+      
+      </div>
+      {submitClicked && <AddLoader creationStatus="creating" />}
         {creationStatus && (
           <AddLoader creationStatus={creationStatus} error={error} />
         )}
-      </div>
     </div>
   );
 }

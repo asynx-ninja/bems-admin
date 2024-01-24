@@ -112,7 +112,6 @@ const Inquiries = () => {
   };
 
   const tableHeader = [
-    "Inquiry id",
     "name",
     "e-mail",
     "date",
@@ -167,7 +166,7 @@ const Inquiries = () => {
               MUNICIPALITY INQUIRIES
             </h1>
           </div>
-          {/* <div className="lg:w-3/5 flex flex-row justify-end items-center ">
+          <div className="lg:w-3/5 flex flex-row justify-end items-center ">
             <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
               <div className="w-full rounded-lg ">
                 <Link to={`/archivedinquiries/?id=${id}&brgy=${brgy}`}>
@@ -191,7 +190,7 @@ const Inquiries = () => {
                 </Link>
               </div>
             </div>
-          </div> */}
+          </div>
         </div>
 
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
@@ -364,7 +363,15 @@ const Inquiries = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {inquiries
+            {inquiries.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+              
+              inquiries
                 .slice()
                 .sort(
                   (a, b) => new Date(b.compose.date) - new Date(a.compose.date)
@@ -382,13 +389,7 @@ const Inquiries = () => {
                         />
                       </div>
                     </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {item.inq_id}
-                        </span>
-                      </div>
-                    </td>
+                  
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
@@ -479,7 +480,8 @@ const Inquiries = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+          ))
+          )}
             </tbody>
           </table>
         </div>
@@ -489,11 +491,27 @@ const Inquiries = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"

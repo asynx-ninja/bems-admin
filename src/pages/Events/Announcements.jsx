@@ -7,14 +7,18 @@ import { useSearchParams } from "react-router-dom";
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { FaArchive, FaPlus } from "react-icons/fa";
 import { BsPrinter } from "react-icons/bs";
+import { MdFormatListBulletedAdd } from "react-icons/md";
+import { MdOutlineEditNote } from "react-icons/md";
 
 import ReactPaginate from "react-paginate";
 import axios from "axios";
-import API_LINK from "../config/API";
+import API_LINK from "../../config/API";
 
-import ArchiveModal from "../components/announcement/ArchiveAnnouncementModal";
-import AddModal from "../components/announcement/AddAnnouncementModal";
-import ManageAnnouncementModal from "../components/announcement/ManageAnnouncementModal";
+import ArchiveModal from "../../components/announcement/ArchiveAnnouncementModal";
+import AddModal from "../../components/announcement/AddAnnouncementModal";
+import ManageAnnouncementModal from "../../components/announcement/ManageAnnouncementModal";
+import AddEventsForm from "../../components/announcement/form/add_event/AddEventsForm";
+import EditEventsForm from "../../components/announcement/form/edit_event/EditEventsForm";
 
 const Announcement = () => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -74,7 +78,6 @@ const Announcement = () => {
   };
 
   const tableHeader = [
-    "event id",
     "title",
     "details",
     "date",
@@ -104,7 +107,7 @@ const Announcement = () => {
               className="mx-auto font-bold text-xs md:text-xl lg:text-[17px] xl:text-[20px] xxl:text-[1.5rem] xxxl:text-4xl text-white text-center"
               style={{ letterSpacing: "0.2em" }}
             >
-              MUNICIPALITY EVENTS
+              EVENTS MANAGEMENT
             </h1>
           </div>
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">
@@ -285,7 +288,14 @@ const Announcement = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {announcements
+            {announcements.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+              announcements
                 .slice() // Create a shallow copy to avoid mutating the original array
                 .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by date descending
                 .map((item, index) => (
@@ -301,11 +311,7 @@ const Announcement = () => {
                         />
                       </div>
                     </td>
-                    <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                        {item.event_id}
-                      </span>
-                    </td>
+                   
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
@@ -336,21 +342,68 @@ const Announcement = () => {
                     </td>
                     <td className="px-6 py-3">
                       <div className="flex justify-center space-x-1 sm:space-x-none">
-                        <button
-                          type="button"
-                          data-hs-overlay="#hs-modal-editAnnouncement"
-                          onClick={() => handleView({ ...item })}
-                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                        >
-                          <AiOutlineEye
-                            size={24}
-                            style={{ color: "#ffffff" }}
-                          />
-                        </button>
+                        <div className="hs-tooltip inline-block">
+                          <button
+                            type="button"
+                            data-hs-overlay="#hs-modal-editAnnouncement"
+                            onClick={() => handleView({ ...item })}
+                            className="hs-tooltip-toggle text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                          >
+                            <AiOutlineEye
+                              size={24}
+                              style={{ color: "#ffffff" }}
+                            />
+                            <span
+                              className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                              role="tooltip"
+                            >
+                              View Announcement
+                            </span>
+                          </button>
+                        </div>
+                        <div className="hs-tooltip inline-block">
+                          <button
+                            type="button"
+                            data-hs-overlay="#hs-create-eventsForm-modal"
+                            onClick={() => handleView({ ...item })}
+                            className="hs-tooltip-toggle text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                          >
+                            <MdFormatListBulletedAdd
+                              size={24}
+                              style={{ color: "#ffffff" }}
+                            />
+                          </button>
+                          <span
+                            className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                            role="tooltip"
+                          >
+                            Create Event Forms
+                          </span>
+                        </div>
+                        <div className="hs-tooltip inline-block">
+                          <button
+                            type="button"
+                            data-hs-overlay="#hs-edit-eventsForm-modal"
+                            onClick={() => handleView({ ...item })}
+                            className="hs-tooltip-toggle text-white bg-purple-700 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                          >
+                            <MdOutlineEditNote
+                              size={24}
+                              style={{ color: "#ffffff" }}
+                            />
+                          </button>
+                          <span
+                            className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                            role="tooltip"
+                          >
+                            Edit Event Forms
+                          </span>
+                        </div>
                       </div>
                     </td>
                   </tr>
-                ))}
+             ))
+             )}
             </tbody>
           </table>
         </div>
@@ -360,11 +413,27 @@ const Announcement = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
@@ -377,6 +446,8 @@ const Announcement = () => {
           announcement={announcement}
           setAnnouncement={setAnnouncement}
         />
+         <AddEventsForm announcement_id={announcement.event_id} brgy={brgy}/>
+        <EditEventsForm announcement_id={announcement.event_id} brgy={brgy}/>
       </div>
     </div>
   );

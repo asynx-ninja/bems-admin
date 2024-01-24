@@ -30,6 +30,9 @@ function AddAboutus({ brgy }) {
   };
 
   const handleChange = (e) => {
+    // if (e.target.classList.contains("border-red-500")) {
+    //   e.target.classList.remove("border-red-500");
+    // }
     setAboutus((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -38,42 +41,64 @@ function AddAboutus({ brgy }) {
 
   const handleSubmit = async (e) => {
     try {
-      e.preventDefault();
+    e.preventDefault();
+
+    // Check for empty fields
+    if (!aboutus.title.trim() || !aboutus.details.trim() || !banner) {
+        setError("Please fill out all required fields.");
+        return; // Prevent further execution of handleSubmit
+    }
+
+
+      // Reset form state and perform submission logic
       setSubmitClicked(true);
-      var formData = new FormData();
+      setError(null);
 
+      // Create form data
+      const formData = new FormData();
       formData.append("file", banner);
+      formData.append(
+        "aboutusinfo",
+        JSON.stringify({
+          brgy: aboutus.brgy,
+          title: aboutus.title,
+          details: aboutus.details,
+        })
+      );
 
-      const obj = {
-        brgy: aboutus.brgy,
-        title: aboutus.title,
-        details: aboutus.details,
-      };
-
-      formData.append("aboutusinfo", JSON.stringify(obj));
-
+      // Submit form data
       const result = await axios.post(`${API_LINK}/aboutus`, formData);
 
       if (result.status === 200) {
+        // Reset form fields
         setAboutus({
           brgy: "",
           title: "",
           details: "",
         });
-        setBanner();
+        setBanner(null);
         setSubmitClicked(false);
         setCreationStatus("success");
         setTimeout(() => {
           window.location.reload();
         }, 3000);
-       
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setSubmitClicked(false);
       setCreationStatus(null);
       setError("An error occurred while creating the info.");
     }
+  };
+  const resetForm = () => {
+    setAboutus({
+      brgy: "", // Reset to the initial value or keep the initial brgy if needed
+      title: "",
+      details: "",
+    });
+    setBanner(null); // Assuming null is the initial state of banner
+    setError(null);
+   
   };
 
   return (
@@ -96,6 +121,32 @@ function AddAboutus({ brgy }) {
             </div>
 
             <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+            {error && (
+                  <div
+                    className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
+                    role="alert"
+                  >
+                    <div className="flex p-4">
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                        </svg>
+                      </div>
+                      <div className="ms-3">
+                        <p className="text-sm text-gray-700 font-medium ">
+                          {error}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
                 <div className="w-full">
                   <label
@@ -121,15 +172,24 @@ function AddAboutus({ brgy }) {
                     <label className="w-full bg-white border border-gray-300">
                       <span className="sr-only">Choose banner photo</span>
                       <input
+                        required
                         type="file"
                         onChange={handleBannerChange}
                         name="banner"
                         accept="image/*"
                         value={!banner ? "" : banner.originalname}
-                        className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4  file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+                        className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4  file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 ${
+                          error && !banner ? "border-red-500" : ""
+                        }`}
+                        id="bannerInput"
                       />
                     </label>
                   </div>
+                  {error && !banner && (
+                    <p className="text-red-500 text-xs italic">
+                      Please select banner image.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -142,13 +202,20 @@ function AddAboutus({ brgy }) {
                 </label>
                 <input
                   id="title"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    error && !aboutus.title ? "border-red-500" : ""
+                  }`}
                   name="title"
                   type="text"
                   value={aboutus.title}
                   onChange={handleChange}
                   placeholder="Article name"
                 />
+                {error && !aboutus.title && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter a title.
+                  </p> 
+                )}
               </div>
               <div className="mb-4">
                 <label
@@ -163,9 +230,16 @@ function AddAboutus({ brgy }) {
                   name="details"
                   value={aboutus.details}
                   onChange={handleChange}
-                  className="block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline "
+                  className={`block p-2.5 w-full text-sm text-gray-700  rounded-lg border focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    error && !aboutus.details ? "border-red-500" : ""
+                  }`}
                   placeholder="Enter article details..."
                 />
+                {error && !aboutus.details && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter article details.
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700">
@@ -181,6 +255,7 @@ function AddAboutus({ brgy }) {
                   type="button"
                   className="h-[2.5rem] w-full py-1 px-6  gap-2 rounded-md borde text-sm font-base bg-pink-800 text-white shadow-sm"
                   data-hs-overlay="#hs-modal-addaboutus"
+                  onClick={resetForm}
                 >
                   CLOSE
                 </button>
@@ -190,9 +265,9 @@ function AddAboutus({ brgy }) {
         </div>
       </div>
       {submitClicked && <AddLoader creationStatus="creating" />}
-        {creationStatus && (
-          <AddLoader creationStatus={creationStatus} error={error} />
-        )}
+      {creationStatus && (
+        <AddLoader creationStatus={creationStatus} error={error} />
+      )}
     </div>
   );
 }

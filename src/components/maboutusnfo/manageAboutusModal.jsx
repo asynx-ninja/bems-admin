@@ -31,19 +31,27 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if any field is empty
+    if (!aboutusInfo.title || !aboutusInfo.details || !banner) {
+      setError("Please fill out all required fields.");
+      return; // Prevent further execution of handleSubmit
+    }
+
+    // If all fields are filled, proceed with form submission
     setSubmitClicked(true);
     const formData = new FormData();
     formData.append("file", banner);
-    console.log([...formData]);
     formData.append("aboutusInfo", JSON.stringify(aboutusInfo));
+
     try {
       const result = await axios.patch(
         `${API_LINK}/aboutus/manage/?doc_id=${aboutusInfo._id}`,
         formData
       );
       if (result.status === 200) {
+        // Handle success
         setTimeout(() => {
-          // HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));
           setSubmitClicked(false);
           setUpdatingStatus("success");
           setTimeout(() => {
@@ -52,7 +60,8 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
         }, 1000);
       }
     } catch (err) {
-      console.log(err);
+      // Handle errors
+      console.error(err);
       setSubmitClicked(false);
       setUpdatingStatus(null);
       setError("An error occurred while updating the info.");
@@ -63,6 +72,11 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
     setEdit(!edit);
   };
 
+  const resetForm = () => {
+
+    setError(null);
+   
+  };
   return (
     <div>
       <div
@@ -83,7 +97,34 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
             </div>
 
             <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+            {error && (
+                  <div
+                    className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
+                    role="alert"
+                  >
+                    <div className="flex p-4">
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                        </svg>
+                      </div>
+                      <div className="ms-3">
+                        <p className="text-sm text-gray-700 font-medium ">
+                          {error}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
+               
                 <div className="w-full">
                   <label
                     className="block text-gray-700 text-sm font-bold mb-2"
@@ -112,7 +153,8 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
                         disabled={!edit}
                         name="banner"
                         accept="image/*"
-                        className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4  file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+                        className="first-line:block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4  file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+                        id="bannerInput"
                       />
                     </label>
                   </div>
@@ -128,7 +170,9 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
                 </label>
                 <input
                   id="title"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    error && !aboutusInfo.title ? "border-red-500" : ""
+                  }`}
                   name="title"
                   type="text"
                   value={aboutusInfo.title || ""}
@@ -136,6 +180,11 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
                   onChange={handleChange}
                   placeholder="Article name"
                 />
+                {error && !aboutusInfo.title && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter article title.
+                  </p>
+                )}
               </div>
               <div className="mb-4">
                 <label
@@ -151,9 +200,16 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
                   value={aboutusInfo.details || ""}
                   disabled={!edit}
                   onChange={handleChange}
-                  className="block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline "
+                  className={`block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    error && !aboutusInfo.details ? "border-red-500" : ""
+                  }`}
                   placeholder="Enter article details..."
                 />
+                {error && !aboutusInfo.details && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter article title.
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700">
@@ -186,7 +242,10 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
                   <button
                     type="button"
                     className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-pink-800 text-white shadow-sm"
-                    onClick={handleOnEdit}
+                    onClick={() => {
+                      handleOnEdit();
+                      resetForm();
+                    }}
                   >
                     CANCEL
                   </button>

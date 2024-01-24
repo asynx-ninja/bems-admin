@@ -186,8 +186,8 @@ const StatisticsDashboard = () => {
       title: "Barangay Services",
       active: services.length,
       archived: archivedServices.length,
-      activeLink: `/requests/?id=${id}&brgy=${brgy}`,
-      archivedLink: `/archivedrequests/?id=${id}&brgy=${brgy}`,
+      activeLink: `/barangaymenu/?id=${id}`,
+      archivedLink: `/barangaymenu/?id=${id}`,
       icon: <GoGitPullRequest size={15} className="sm:block md:hidden" />,
     },
     userData.type === "Head Admin"
@@ -195,8 +195,8 @@ const StatisticsDashboard = () => {
           title: "Admin Accounts",
           active: users.length,
           archived: archivedUsers.length,
-          activeLink: `/residents/?id=${id}&brgy=${brgy}`,
-          archivedLink: `/archivedresidents/?id=${id}&brgy=${brgy}`,
+          activeLink: `/accountmanagement/?id=${id}`,
+          archivedLink: `/archivedaccountmanagement/?id=${id}&brgy=${brgy}&archived=true`,
           icon: <BsPeopleFill size={15} className="sm:block md:hidden" />,
         }
       : null,
@@ -206,8 +206,8 @@ const StatisticsDashboard = () => {
           title: "Officials",
           active: officials.length,
           archived: archivedOfficials.length,
-          activeLink: `/officials/?id=${id}&brgy=${brgy}`,
-          archivedLink: `/archived_officials/?id=${id}&brgy=${brgy}`,
+          activeLink: `/municipalityofficials/?id=${id}`,
+          archivedLink: `/archivedmunicipalityofficials/?id=${id}&brgy=${brgy}&archived=true`,
           icon: <FaPeopleGroup size={15} className="sm:block md:hidden" />,
         }
       : null,
@@ -216,7 +216,7 @@ const StatisticsDashboard = () => {
       title: "Barangays",
       active: barangays.length, // Check if officials is defined before using it
       archived: "n/a",
-      activeLink: `/officials/?id=${id}&brgy=${brgy}`,
+      activeLink: `/barangaymenu/?id=${id}`,
       archivedLink: `/archived_officials/?id=${id}&brgy=${brgy}`,
       icon: <FaPeopleGroup size={15} className="sm:block md:hidden" />,
     },

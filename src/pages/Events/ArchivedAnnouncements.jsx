@@ -4,11 +4,11 @@ import { FaTrashRestore } from "react-icons/fa";
 import { BsPrinter } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
-import Breadcrumbs from "../components/announcement/Breadcrumbs";
-import ViewArchivedAnnouncementModal from "../components/announcement/ViewArchivedAnnouncement";
-import RestoreAnnouncementModal from "../components/announcement/RestoreAnnouncementModal";
+import Breadcrumbs from "../../components/announcement/Breadcrumbs";
+import ViewArchivedAnnouncementModal from "../../components/announcement/ViewArchivedAnnouncement";
+import RestoreAnnouncementModal from "../../components/announcement/RestoreAnnouncementModal";
 import axios from "axios";
-import API_LINK from "../config/API";
+import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
 
 const Announcement = () => {
@@ -71,7 +71,6 @@ const Announcement = () => {
   };
 
   const tableHeader = [
-    "event id",
     "title",
     "details",
     "date",
@@ -98,8 +97,8 @@ const Announcement = () => {
         <Breadcrumbs id={id} />
         <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
           <div className="flex justify-center items-center sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
-            <h1
-              className="sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-[1.3rem] xxxl:text-2xl xxxl:mt-1 text-white"
+          <h1
+              className="mx-auto font-bold text-xs md:text-xl lg:text-[17px] xl:text-[20px] xxl:text-[1.5rem] xxxl:text-4xl text-white text-center"
               style={{ letterSpacing: "0.2em" }}
             >
               ARCHIVED EVENTS
@@ -236,7 +235,14 @@ const Announcement = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {announcements
+            {announcements.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+              announcements
                 .slice() // Create a shallow copy to avoid mutating the original array
                 .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by date descending
                 .map((item, index) => (
@@ -252,11 +258,7 @@ const Announcement = () => {
                         />
                       </div>
                     </td>
-                    <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
-                        {item.event_id}
-                      </span>
-                    </td>
+                   
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
@@ -301,7 +303,8 @@ const Announcement = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                 ))
+                 )}
             </tbody>
           </table>
         </div>
@@ -311,11 +314,27 @@ const Announcement = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"

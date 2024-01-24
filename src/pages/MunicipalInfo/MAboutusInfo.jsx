@@ -30,17 +30,15 @@ const MHomepageInfo = () => {
       const response = await axios.get(
         `${API_LINK}/aboutus/?brgy=${brgy}&archived=false&page=${currentPage}`
       );
-      if (response.status === 200) 
-      {
+      if (response.status === 200) {
         setAboutus(response.data.result);
         setPageCount(response.data.pageCount);
-      }
-      else setAboutus([]);
+      } else setAboutus([]);
     };
 
     fetch();
   }, [currentPage]);
-  
+
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -85,7 +83,10 @@ const MHomepageInfo = () => {
     const eventdate = date === undefined ? "" : date.substr(0, 10);
     return eventdate;
   };
-
+  const nextLabelStyle = {
+    color: currentPage === pageCount - 1 ? "gray" : "white",
+    cursor: currentPage === pageCount - 1 ? "not-allowed" : "pointer",
+  };
   return (
     <div className="mx-4 mt-[10rem] lg:mt-4 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div className="flex flex-col">
@@ -276,72 +277,83 @@ const MHomepageInfo = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {aboutus.map((item, index) => (
-                <tr key={index} className="odd:bg-slate-100 text-center">
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        value={item._id}
-                        onChange={checkboxHandler}
-                        id=""
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2">
-                      <div className="px-2 sm:px-6 py-2">
-                        {item.banner.link ? (
-                          <div className="lg:w-32 lg:h-20 w-16 h-24 aspect-w-4 aspect-h-3 overflow-hidden mx-auto border border-4 border-[#013D74]">
-                            <img
-                              src={item.banner.link}
-                              alt="picture"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <FaUserCircle className="lg:w-20 lg:h-32 w-16 h-24 object-cover border border-4 border-[#013D74] rounded-full text-gray-500 mx-auto" />
-                        )}
-                      </div>
-                    </span>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {item.title}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {item.details}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {dateFormat(item.createdAt) || ""}
-                      </span>
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center space-x-1 sm:space-x-none">
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-modal-manageaboutus"
-                        onClick={() => handleView({ ...item })}
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                    </div>
+              {aboutus.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-10 text-gray-400">
+                    No data found
                   </td>
                 </tr>
-              ))}
+              ) : (
+                aboutus.map((item, index) => (
+                  <tr key={index} className="odd:bg-slate-100 text-center">
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(item._id)}
+                          value={item._id}
+                          onChange={checkboxHandler}
+                          id=""
+                        />
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <div className="px-2 sm:px-6 py-2">
+                          {item.banner.link ? (
+                            <div className="lg:w-32 lg:h-20 w-16 h-24 aspect-w-4 aspect-h-3 overflow-hidden mx-auto border border-4 border-[#013D74]">
+                              <img
+                                src={item.banner.link}
+                                alt="picture"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <FaUserCircle className="lg:w-20 lg:h-32 w-16 h-24 object-cover border border-4 border-[#013D74] rounded-full text-gray-500 mx-auto" />
+                          )}
+                        </div>
+                      </span>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.title}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.details}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {dateFormat(item.createdAt) || ""}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center space-x-1 sm:space-x-none">
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-modal-manageaboutus"
+                          onClick={() => handleView({ ...item })}
+                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                        >
+                          <AiOutlineEye
+                            size={24}
+                            style={{ color: "#ffffff" }}
+                          />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -351,11 +363,27 @@ const MHomepageInfo = () => {
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel=">>"
+            nextLabel={
+              pageCount > currentPage + 1 ? (
+                <span className="text-white">&gt;&gt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &gt;&gt;
+                </span>
+              )
+            }
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel="<<"
+            previousLabel={
+              currentPage > 0 ? (
+                <span className="text-white"> &lt;&lt;</span>
+              ) : (
+                <span className="text-gray-300 cursor-not-allowed">
+                  &lt;&lt;
+                </span>
+              )
+            }
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
             disabledLinkClassName="text-gray-300"
@@ -365,7 +393,7 @@ const MHomepageInfo = () => {
         <AddAboutusModal brgy={brgy} />
         <ArchiveAboutusModal selectedItems={selectedItems} />
         <ManageAboutusModal
-          brgy={brgy} 
+          brgy={brgy}
           aboutusInfo={aboutusInfo}
           setAboutusinfo={setAboutusinfo}
         />
