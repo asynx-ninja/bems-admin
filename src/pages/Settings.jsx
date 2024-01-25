@@ -208,7 +208,6 @@ const Settings = () => {
       return; // Prevent further execution of handleSubmit
     }
 
-   
     const obj = {
       firstName: userData.firstName,
       middleName: userData.middleName,
@@ -247,13 +246,23 @@ const Settings = () => {
         `${API_LINK}/users/?doc_id=${id}`,
         formData
       );
-    
+
       // CHANGE USERNAME
       if (activeButton.credential === true) {
-   
-        if (userData.username && userCred.username && userData.username !== userCred.username) {
-
-           changeCredentials(
+        if (
+          userData.username &&
+          userCred.username &&
+          userData.username !== userCred.username
+          
+        ) {
+          if (!userCred.username || !userCred.oldPass) {
+            setMessage({
+              display: false,
+            });
+            setError("Please provide both the new username and password.");
+            return; // Prevent further execution
+          }
+          changeCredentials(
             userData.username,
             userCred.username,
             userCred.oldPass,
@@ -261,9 +270,14 @@ const Settings = () => {
           );
         }
       } else if (activeButton.pass === true) {
-        
         if (userCred.newPass !== "" || userCred.oldPass !== "") {
-
+          if (!userCred.newPass || !userCred.oldPass) {
+            setMessage({
+              display: false,
+            });
+            setError("Please provide both the new username and password.");
+            return; // Prevent further execution
+          }
           changeCredentials(
             userData.username,
             userCred.username,
@@ -273,7 +287,7 @@ const Settings = () => {
         }
       } else if (response.status === 200) {
         setSubmitClicked(true);
-        setError(null)
+        setError(null);
         console.log("Update successful:", response);
         setUserData(response.data);
         setUserAddress({
@@ -301,9 +315,13 @@ const Settings = () => {
       console.error("Error saving changes:", error);
       setSubmitClicked(false);
       setUpdatingStatus(null);
-      setError(error.response ? error.response.data.message : "An unknown error occurred");
-    }    
-  }
+      setError(
+        error.response
+          ? error.response.data.message
+          : "An unknown error occurred"
+      );
+    }
+  };
   const changeCredentials = async (
     oldUsername,
     newUsername,
@@ -315,25 +333,17 @@ const Settings = () => {
         username: newUsername !== oldUsername ? newUsername : oldUsername,
         password: newPassword !== "" ? newPassword : oldPassword,
       };
-      if (!userCred.oldPass.trim() || !userCred.newPass.trim() || !userCred.username.trim() || !newPassword.trim()) {
-        setError("Please provide both old and new usernames, as well as the old password.");
-        return; // Prevent further execution
-      }
-  
-      // Check if the old username and password are valid
-      const response = await axios.get(`${API_LINK}/auth/${oldUsername}/${oldPassword}`);
-      if (response.status !== 200) {
-        setError("The old username or password is incorrect.");
-        return; // Prevent further execution
-      }
+
+      const response = await axios.get(
+        `${API_LINK}/auth/${oldUsername}/${oldPassword}`
+      );
 
       console.log("mm", user);
       console.log(response);
-     
       if (response.status === 200) {
         setSubmitClicked(true);
-        setError(null)
-        await axios.patch(`${API_LINK}/auth/${id}`, { username: newUsername });
+        setError(null);
+        await axios.patch(`${API_LINK}/auth/${id}`, user);
         setMessage({
           display: true,
           success: true,
@@ -349,6 +359,7 @@ const Settings = () => {
         }, 1000);
       }
     } catch (err) {
+      setError(null);
       setMessage({
         display: true,
         success: false,
@@ -357,7 +368,7 @@ const Settings = () => {
       });
       setSubmitClicked(false);
       setUpdatingStatus(null);
-      setError("The password you entered is incorrect");
+      // setError("The password you entered is incorrect");
     }
   };
 
@@ -1214,7 +1225,11 @@ const Settings = () => {
                       type="text"
                       disabled={editButton}
                       id="username"
-                      className="py-3 px-4 block w-full border-2 text-black rounded-md text-sm  bg-white"
+                      className={`py-3 px-4 block w-full border-2 text-black rounded-md text-sm  bg-white ${
+                        error && !userCred.username.trim()
+                          ? "border-red-500"
+                          : "border-gray-200"
+                      }`}
                       placeholder="username"
                       aria-describedby="hs-input-helper-text"
                       value={userCred.username || ""}
@@ -1298,9 +1313,8 @@ const Settings = () => {
                 </div>
               </div>
               <div className={activeButton.pass ? "flex flex-col" : "hidden"}>
-              
                 <div className=" shadow-lg px-[100px] pb-[30px] ">
-                   {error && (
+                  {error && (
                     <div
                       className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
                       role="alert"
@@ -1348,7 +1362,7 @@ const Settings = () => {
                         handleUserChangeCred("oldPass", e.target.value)
                       }
                     />
-                      {error && !userCred.oldPass.trim() && (
+                    {error && !userCred.oldPass.trim() && (
                       <p className="text-red-500 text-xs italic">
                         Please enter a old password.
                       </p>
@@ -1381,7 +1395,7 @@ const Settings = () => {
                       disabled={editButton}
                       readOnly={userCred.oldPass === ""}
                       id="newpass"
-                       className={`py-3 px-4 block w-full  text-black rounded-md text-sm border-2 bg-white ${
+                      className={`py-3 px-4 block w-full  text-black rounded-md text-sm border-2 bg-white ${
                         error && !userCred.newPass.trim()
                           ? "border-red-500"
                           : "border-gray-200"
@@ -1392,7 +1406,7 @@ const Settings = () => {
                         handleUserChangeCred("newPass", e.target.value)
                       }
                     />
-                      {error && !userCred.newPass.trim() && (
+                    {error && !userCred.newPass.trim() && (
                       <p className="text-red-500 text-xs italic">
                         Please enter a new password.
                       </p>
