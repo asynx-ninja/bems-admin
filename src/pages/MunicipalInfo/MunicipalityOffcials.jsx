@@ -80,7 +80,7 @@ const MunicipalityOfficials = () => {
   };
 
   useEffect(() => {
-    document.title = "Barangay Officials | Barangay E-Services Management";
+    document.title = "Municipal Officials | Barangay E-Services Management";
 
     const fetchData = async () => {
       try {

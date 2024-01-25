@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from "react";
 
-function ReplyLoader({ replyStatus, error }) {
+function StatusLoader({ updatingStatus, error }) {
   const textPrompts = {
-    replying: "Replying to the inquiry...",
+    updating: "Archiving the application...",
     waiting: "Please wait...",
-    success: "Inquiry Reply Sent!",
-    error: "Error replying to the inquiry. Please try again.",
+    success: "Application Archived Successful!",
+    error: "Error archiving application. Please try again.",
   };
 
   const [loadingText, setLoadingText] = useState(
-    textPrompts[replyStatus] || "Replying to the inquiry..."
+    textPrompts[updatingStatus] || "Archiving the application..."
   );
-  const [loading, setLoading] = useState(replyStatus === "replying");
+  const [loading, setLoading] = useState(updatingStatus === "Archiving");
 
   useEffect(() => {
-    if (["success", "error"].includes(replyStatus)) {
+    if (["success", "error"].includes(updatingStatus)) {
       const timeout = setTimeout(() => {
         setLoading(false);
       }, 3000);
 
       return () => clearTimeout(timeout);
     }
-  }, [replyStatus]);
+  }, [updatingStatus]);
 
   return (
     <div className="absolute top-0 lg:top-0 lg:end-0 mb-20 lg:mr-5 z-[80]">
@@ -64,4 +64,4 @@ function ReplyLoader({ replyStatus, error }) {
   );
 }
 
-export default ReplyLoader;
+export default StatusLoader;

@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import API_LINK from "../../config/API";
-import StatusLoader from "./loaders/StatusLoader";
+import StatusLoader from "./loaders/ArchiveLoader";
 import { useState } from "react";
 
 function InquiryStatus({ status, setStatus }) {

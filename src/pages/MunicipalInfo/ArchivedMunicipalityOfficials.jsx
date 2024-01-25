@@ -5,6 +5,7 @@ import { BsPrinter } from "react-icons/bs";
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { MdRestartAlt } from "react-icons/md";
 import officialimage from "../../assets/sample/official.jpg";
+import moment from "moment";
 import GenerateReportsModal from "../../components/municipalityofficials/GenerateReportsModal";
 import Breadcrumbs from "../../components/municipalityofficials/Breadcrumbs";
 import RestoreOfficialModal from "../../components/municipalityofficials/RestoreOfficialModal";
@@ -84,7 +85,7 @@ const ArchivedOfficials = () => {
   };
 
   useEffect(() => {
-    document.title = "Barangay Officials | Barangay E-Services Management";
+    document.title = "Archived Municipal Officials | Barangay E-Services Management";
 
     const fetchData = async () => {
       try {
