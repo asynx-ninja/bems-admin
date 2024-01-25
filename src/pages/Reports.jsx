@@ -421,69 +421,70 @@ const Reports = () => {
                     Annual
                   </button>
                 </div>
-                {timeRange === "specific" && (
-                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-2 mt-4">
-                    <label className="mr-4 text-lg font-medium text-gray-700">
-                      Select Specific Date:
-                    </label>
+
+                <div className="w-full mt-2">
+              {timeRange === "specific" && (
+                <div className="flex flex-col md:flex-row md:justify-center md:items-center bg-gray-200 shadow-sm rounded-lg p-2 ">
+                  <label className="mr-4 text-sm font-medium text-gray-700">
+                    Select Specific Date:
+                  </label>
+                  <input
+                    type="date"
+                    value={specificDate}
+                    onChange={(e) => setSpecificDate(e.target.value)}
+                    className="px-2 py-1 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm text-gray-700"
+                  />
+                </div>
+              )}
+
+              {timeRange === "weekly" && (
+                <div className="flex flex-col md:flex-row md:justify-center md:items-center bg-gray-200 shadow-sm rounded-lg p-2 ">
+                  <label className="mr-4 text-sm font-medium text-gray-700">
+                    Select Specific Week:
+                  </label>
+                  <div className="relative">
                     <input
-                      type="date"
-                      value={specificDate}
-                      onChange={(e) => setSpecificDate(e.target.value)}
-                      className="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg text-gray-700"
+                      type="week"
+                      value={specificWeek}
+                      onChange={(e) => setSpecificWeek(e.target.value)}
+                      className="px-2 py-1 border-2 border-gray-300 w-full rounded-md focus:outline-none focus:border-blue-500 text-sm text-gray-700"
                     />
                   </div>
-                )}
+                </div>
+              )}
 
-                {timeRange === "weekly" && (
-                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-4 mt-4">
-                    <label className="mr-4 text-lg font-medium text-gray-700">
-                      Select Specific Week:
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="week"
-                        value={specificWeek}
-                        onChange={(e) => setSpecificWeek(e.target.value)}
-                        className="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg text-gray-700"
-                      />
-                    </div>
-                  </div>
-                )}
+              {timeRange === "monthly" && (
+                <div className="flex flex-col md:flex-row md:justify-center md:items-center bg-gray-200 shadow-sm rounded-lg p-2 ">
+                  <label className="mr-4 text-sm font-medium text-gray-700">
+                    Select Month:
+                  </label>
+                  <input
+                    className="text-gray-400 px-2 py-1 rounded-md font-medium shadow-sm text-sm border border-black"
+                    type="month"
+                    id="month"
+                    name="month"
+                    value={specificMonth} // Directly use specificMonth as value
+                    onChange={(e) => setSpecificMonth(e.target.value)} // Update specificMonth with the input's value directly
+                  />
+                </div>
+              )}
 
-                {timeRange === "monthly" && (
-                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-4 mt-4">
-                    <label className="mr-4 text-lg font-medium text-gray-700">
-                      Select Month:
-                    </label>
-                    <input
-                      className="text-gray-400 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
-                      type="month"
-                      id="month"
-                      name="month"
-                      value={specificMonth} // Directly use specificMonth as value
-                      onChange={(e) => setSpecificMonth(e.target.value)} // Update specificMonth with the input's value directly
-                    />
-                  </div>
-                )}
-
-                {timeRange === "annual" && (
-                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-4 mt-4">
-                    <label className="mr-4 text-lg font-medium text-gray-700">
-                      Select Year:
-                    </label>
-                    <input
-                      type="number"
-                      value={specificYear}
-                      min="1950"
-                      max={new Date().getFullYear() + 10}
-                      onChange={(e) =>
-                        setSpecificYear(parseInt(e.target.value))
-                      }
-                      className="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg text-gray-700"
-                    />
-                  </div>
-                )}
+              {timeRange === "annual" && (
+                <div className="flex flex-col md:flex-row md:justify-center md:items-center bg-gray-200 shadow-sm rounded-lg p-2">
+                  <label className="mr-4 text-sm font-medium text-gray-700">
+                    Select Year:
+                  </label>
+                  <input
+                    type="number"
+                    value={specificYear}
+                    min="1950"
+                    max={new Date().getFullYear() + 10}
+                    onChange={(e) => setSpecificYear(parseInt(e.target.value))}
+                    className="px-2 py-1 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm text-gray-700"
+                  />
+                </div>
+              )}
+            </div>
 
                 {/* END OF DATE INPUTS */}
               </div>

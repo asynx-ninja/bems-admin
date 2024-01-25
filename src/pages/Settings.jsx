@@ -208,7 +208,7 @@ const Settings = () => {
       return; // Prevent further execution of handleSubmit
     }
 
-    setSubmitClicked(true);
+   
     const obj = {
       firstName: userData.firstName,
       middleName: userData.middleName,
@@ -247,18 +247,23 @@ const Settings = () => {
         `${API_LINK}/users/?doc_id=${id}`,
         formData
       );
-
-        // CHANGE USERNAME
+    
+      // CHANGE USERNAME
+      if (activeButton.credential === true) {
+   
         if (userData.username && userCred.username && userData.username !== userCred.username) {
-          await changeCredentials(
+
+           changeCredentials(
             userData.username,
             userCred.username,
             userCred.oldPass,
             userCred.newPass
           );
         }
+      } else if (activeButton.pass === true) {
+        
+        if (userCred.newPass !== "" || userCred.oldPass !== "") {
 
-        if (userCred.newPass !== "") {
           changeCredentials(
             userData.username,
             userCred.username,
@@ -266,32 +271,30 @@ const Settings = () => {
             userCred.newPass
           );
         }
-
-
-        if (response.status === 200) {
-          console.log("Update successful:", response);
-          setUserData(response.data);
-          setUserAddress({
-            street: response.data.address.street,
-            brgy: response.data.address.brgy,
-            city: response.data.address.city,
-          });
-          setUserSocials({
-            facebook: response.data.socials.facebook,
-            instagram: response.data.socials.instagram,
-            twitter: response.data.socials.twitter,
-          });
-          setEditButton(true);
+      } else if (response.status === 200) {
+        setSubmitClicked(true);
+        setError(null)
+        console.log("Update successful:", response);
+        setUserData(response.data);
+        setUserAddress({
+          street: response.data.address.street,
+          brgy: response.data.address.brgy,
+          city: response.data.address.city,
+        });
+        setUserSocials({
+          facebook: response.data.socials.facebook,
+          instagram: response.data.socials.instagram,
+          twitter: response.data.socials.twitter,
+        });
+        setEditButton(true);
+        setTimeout(() => {
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
           setTimeout(() => {
-            setSubmitClicked(false);
-            setUpdatingStatus("success");
-            setTimeout(() => {
-              window.location.reload();
-            }, 3000);
-          }, 1000);
-        }
-        
-        else {
+            window.location.reload();
+          }, 3000);
+        }, 1000);
+      } else {
         console.error("Update failed. Status:", response.status);
       }
     } catch (error) {
@@ -300,8 +303,7 @@ const Settings = () => {
       setUpdatingStatus(null);
       setError(error.response ? error.response.data.message : "An unknown error occurred");
     }    
-  };
-
+  }
   const changeCredentials = async (
     oldUsername,
     newUsername,
@@ -313,7 +315,7 @@ const Settings = () => {
         username: newUsername !== oldUsername ? newUsername : oldUsername,
         password: newPassword !== "" ? newPassword : oldPassword,
       };
-      if (!oldUsername.trim() || !oldPassword.trim() || !newUsername.trim()) {
+      if (!userCred.oldPass.trim() || !userCred.newPass.trim() || !userCred.username.trim() || !newPassword.trim()) {
         setError("Please provide both old and new usernames, as well as the old password.");
         return; // Prevent further execution
       }
@@ -327,8 +329,10 @@ const Settings = () => {
 
       console.log("mm", user);
       console.log(response);
-      setSubmitClicked(true);
+     
       if (response.status === 200) {
+        setSubmitClicked(true);
+        setError(null)
         await axios.patch(`${API_LINK}/auth/${id}`, { username: newUsername });
         setMessage({
           display: true,
@@ -353,7 +357,7 @@ const Settings = () => {
       });
       setSubmitClicked(false);
       setUpdatingStatus(null);
-      setError("An error occurred while updating the info.");
+      setError("The password you entered is incorrect");
     }
   };
 
@@ -1149,7 +1153,7 @@ const Settings = () => {
                 }
               >
                 <div className="flex flex-col w-[80%] justify-center mx-auto gap-4">
-                  {/* {error && (
+                  {error && (
                     <div
                       className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
                       role="alert"
@@ -1174,7 +1178,7 @@ const Settings = () => {
                         </div>
                       </div>
                     </div>
-                  )} */}
+                  )}
                   <div className={message.display ? "block" : "hidden"}>
                     <div
                       className={
@@ -1322,7 +1326,7 @@ const Settings = () => {
                       </div>
                     </div>
                   )}
-                  {/* <div className="relative z-0">
+                  <div className="relative z-0">
                     <label
                       htmlFor="oldpass"
                       className="block sm:text-xs lg:text-sm font-medium mb-2"
@@ -1364,7 +1368,7 @@ const Settings = () => {
                         />
                       )}
                     </button>
-                  </div> */}
+                  </div>
                   <div className="relative z-0">
                     <label
                       htmlFor="newpass"
@@ -1390,7 +1394,7 @@ const Settings = () => {
                     />
                       {error && !userCred.newPass.trim() && (
                       <p className="text-red-500 text-xs italic">
-                        Please enter a old password.
+                        Please enter a new password.
                       </p>
                     )}
                     <button
