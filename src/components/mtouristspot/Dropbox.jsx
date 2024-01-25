@@ -8,6 +8,8 @@ const Dropbox = ({
   setImages,
   handleFileChange,
   handleSubmit,
+  error,
+  isEmpty,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef();
@@ -89,7 +91,11 @@ const Dropbox = ({
             )}
             {/* scroll area */}
             <section className="h-full overflow-auto p-1 w-full flex flex-col">
-              <header className="border-dashed border-2 border-gray-400 py-12 flex flex-col justify-center items-center">
+              <header
+                className={`border-dashed border-2 ${
+                  error && isEmpty ? "border-red-500" : "border-gray-400"
+                }  py-12 flex flex-col justify-center items-center`}
+              >
                 <p className="mb-3 font-semibold text-gray-900 flex flex-wrap justify-center">
                   <span>Drag and drop your</span>&nbsp;
                   <span>files anywhere or</span>
@@ -111,6 +117,11 @@ const Dropbox = ({
                   Upload a file
                 </button>
               </header>
+              {error && isEmpty && (
+                <p className="text-red-500 text-xs italic">
+                  Please upload at least one image
+                </p>
+              )}
               <h1 className="pt-3 font-semibold sm:text-lg text-gray-900">
                 To Upload
               </h1>
@@ -118,7 +129,7 @@ const Dropbox = ({
                 {images.length > 0 ? (
                   images.map((file, idx) => (
                     <li
-                    className="block p-1 w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/2 xl:w-1/2 h-24"
+                      className="block p-1 w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/2 xl:w-1/2 h-24"
                       key={idx}
                     >
                       <article
