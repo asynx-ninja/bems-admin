@@ -684,11 +684,12 @@ function ReplyRegistrationModal({ application, setApplication }) {
             </div>
           </div>
         </div>
-        {submitClicked && <ReplyLoader replyingStatus="replying" />}
+     
+      </div>
+      {submitClicked && <ReplyLoader replyingStatus="replying" />}
         {replyingStatus && (
           <ReplyLoader replyingStatus={replyingStatus} error={error} />
         )}
-      </div>
     </div>
   );
 }

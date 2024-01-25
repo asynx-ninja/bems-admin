@@ -11,7 +11,8 @@ import ViewOfficialModal from "../../components/barangaytabs/brgyarchivedOfficia
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
-import {  FaUserCircle } from "react-icons/fa";
+import { FaUserCircle } from "react-icons/fa";
+import noData from "../../assets/image/no-data.png";
 const ArchivedOfficials = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [officials, setOfficials] = useState([]);
@@ -23,7 +24,9 @@ const ArchivedOfficials = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
-
+  const [positionFilter, setPositionFilter] = useState("all");
+  const [filteredOfficials, setFilteredOfficials] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("")
   const handleSort = (sortBy) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
@@ -79,21 +82,21 @@ const ArchivedOfficials = () => {
   };
 
   useEffect(() => {
-    document.title =
-      "Archived Barangay Officials | Barangay E-Services Management";
+    document.title = "Barangay Officials | Barangay E-Services Management";
 
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/brgyofficial/?brgy=${brgy}&archived=true&page=${currentPage}`
+          `${API_LINK}/brgyofficial/?brgy=${brgy}&archived=true&page=${currentPage}&position=${positionFilter}`
         );
-console.log("ss",response)
+
         if (response.status === 200) {
           const officialsData = response.data.result || [];
 
           if (officialsData.length > 0) {
             setOfficials(officialsData);
             setPageCount(response.data.pageCount);
+            setFilteredOfficials(response.data.result)
           } else {
             setOfficials([]);
             console.log(`No officials found for Barangay ${brgy}`);
@@ -109,7 +112,8 @@ console.log("ss",response)
     };
 
     fetchData();
-  }, [currentPage, brgy]);
+  }, [currentPage, brgy, positionFilter]);
+
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -122,19 +126,27 @@ console.log("ss",response)
     "ACTIONS",
   ];
 
+  const handleResetFilter = () => {
+    setPositionFilter("all");
+  };
+
+  const handlePositionFilter = (selectedPosition) => {
+    setPositionFilter(selectedPosition);
+  };
+
   const dateFormat = (fromYear, toYear) => {
     const startDate = fromYear ? new Date(fromYear) : null;
     const endDate = toYear ? new Date(toYear) : null;
 
     const startYearMonth = startDate
       ? `${startDate.toLocaleString("default", {
-          month: "short",
-        })} ${startDate.getFullYear()}`
+        month: "short",
+      })} ${startDate.getFullYear()}`
       : "";
     const endYearMonth = endDate
       ? `${endDate.toLocaleString("default", {
-          month: "short",
-        })} ${endDate.getFullYear()}`
+        month: "short",
+      })} ${endDate.getFullYear()}`
       : "";
 
     return `${startYearMonth} ${endYearMonth}`;
@@ -165,66 +177,73 @@ console.log("ss",response)
 
           <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
             <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
-              <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
-                <button
-                  id="hs-dropdown"
-                  type="button"
-                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
-                >
-                  SORT BY
-                  <svg
-                    className={`hs-dropdown-open:rotate-${
-                      sortOrder === "asc" ? "180" : "0"
-                    } w-2.5 h-2.5 text-white`}
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+              <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
+                <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
+                  <button
+                    id="hs-dropdown"
+                    type="button"
+                    className="bg-[#295141]  sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
                   >
-                    <path
-                      d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-                <ul
-                  className="bg-[#295141] border-2 border-[#ffb13c] hs-dropdown-menu w-96 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10 shadow-md rounded-lg p-2"
-                  aria-labelledby="hs-dropdown"
-                >
-                  <li
-                    onClick={() => handleSort("name")}
-                    className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 "
+                    POSITION
+                    <svg
+                      className={`hs-dropdown-open:rotate-${sortOrder === "asc" ? "180" : "0"
+                        } w-2.5 h-2.5 text-white`}
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </button>
+                  <ul
+                    className="bg-[#f8f8f8] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-xl rounded-xl p-2 "
+                    aria-labelledby="hs-dropdown"
                   >
-                    NAME
-                    {sortColumn === "name" && (
-                      <span className="ml-auto">
-                        {sortOrder === "asc" ? (
-                          <span>DESC &darr;</span>
-                        ) : (
-                          <span>ASC &uarr;</span>
-                        )}
-                      </span>
-                    )}
-                  </li>
-                  <li
-                    onClick={() => handleSort("rendered_service")}
-                    className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 "
-                  >
-                    RENDERED SERVICE
-                    {sortColumn === "rendered_service" && (
-                      <span className="ml-auto">
-                        {sortOrder === "asc" ? (
-                          <span className="text-xs">OLD TO LATEST &darr;</span>
-                        ) : (
-                          <span className="text-xs">LATEST TO OLD &uarr;</span>
-                        )}
-                      </span>
-                    )}
-                  </li>
-                </ul>
+                    <a
+                      onClick={handleResetFilter}
+                      className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-2 text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 hover:rounded-[12px] focus:ring-2 focus:ring-blue-500"
+                      href="#"
+                    >
+                      RESET FILTERS
+                    </a>
+                    <hr className="border-[#4e4e4e] my-1" />
+                    <a
+                      onClick={() => handlePositionFilter("Barangay Chairman")}
+                      class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                      href="#"
+                    >
+                      BARANGAY CHAIRMAN
+                    </a>
+                    <a
+                      onClick={() => handlePositionFilter("Barangay Kagawad")}
+                      class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                      href="#"
+                    >
+                      BARANGAY KAGAWAD
+                    </a>
+                    <a
+                      onClick={() => handlePositionFilter("SK Chairman")}
+                      class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                      href="#"
+                    >
+                      SK CHAIRMAN
+                    </a>
+                    <a
+                      onClick={() => handlePositionFilter("SK Kagawad")}
+                      class="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                      href="#"
+                    >
+                      SK KAGAWAD
+                    </a>
+                  </ul>
+                </div>
               </div>
               <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
                 <div className="flex flex-row w-full md:mr-2">
@@ -254,6 +273,25 @@ console.log("ss",response)
                     id="hs-table-with-pagination-search"
                     className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500 "
                     placeholder="Search for items"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+
+                      if (e.target.value.trim() === '') {
+                        // If the search input is empty, fetch all data
+                        setOfficials(officials);
+                      } else {
+                        // If the search input is not empty, filter the data
+                        const Official = officials.filter(
+                          (item) =>
+                            item.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                            item.lastName.toLowerCase().includes(e.target.value.toLowerCase())
+                        );
+                        setFilteredOfficials(Official);
+                      }
+
+                      console.log("Officials Fetched", officials);
+                    }}
                   />
                 </div>
                 <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
@@ -319,81 +357,89 @@ console.log("ss",response)
                 </tr>
               </thead>
               <tbody className="odd:bg-slate-100">
-              {officials.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="text-center py-10 text-gray-400">
-                    No data found
+                {filteredOfficials.length === 0 ? (
+                  <tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
                   </td>
                 </tr>
-              ) : (
-                officials.map((item, index) => (
-                  <tr key={index} className="odd:bg-slate-100 text-center">
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center items-center">
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.includes(item._id)}
-                          value={item._id}
-                          onChange={checkboxHandler}
-                        />
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        <div className="px-2 sm:px-6 py-2">
-                          {item.picture.link ? (
-                            <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
-                              <img
-                                src={item.picture.link}
-                                alt="picture"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          ) : (
-                            <FaUserCircle className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4 border-[#013D74] rounded-full text-gray-500 mx-auto" />
-                          )}
-                        </div>
-                      </span>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {item.name}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {item.position}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {dateFormat(item.fromYear) || ""} -{" "}
-                          {dateFormat(item.toYear) || ""}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center space-x-1 sm:space-x-none">
-                        <button
-                          onClick={() => handleView(item)}
-                          type="button"
-                          data-hs-overlay="#hs-view-archived-official-modal"
-                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                        >
-                          <AiOutlineEye
-                            size={24}
-                            style={{ color: "#ffffff" }}
+                ) : (
+                  filteredOfficials.map((item, index) => (
+                    <tr key={index} className="odd:bg-slate-100 text-center">
+                      <td className="px-6 py-3">
+                        <div className="flex justify-center items-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.includes(item._id)}
+                            value={item._id}
+                            onChange={checkboxHandler}
                           />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          <div className="px-2 sm:px-6 py-2">
+                            {item.picture.link ? (
+                              <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
+                                <img
+                                  src={item.picture.link}
+                                  alt="picture"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <FaUserCircle className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4 border-[#013D74] rounded-full text-gray-500 mx-auto" />
+                            )}
+                          </div>
+                        </span>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex justify-center items-center">
+                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.lastName}, {item.firstName}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex justify-center items-center">
+                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                            {item.position}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex justify-center items-center">
+                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                            {dateFormat(item.fromYear) || ""} -{" "}
+                            {dateFormat(item.toYear) || ""}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex justify-center space-x-1 sm:space-x-none">
+                          <button
+                            onClick={() => handleView(item)}
+                            type="button"
+                            data-hs-overlay="#hs-view-archived-official-modal"
+                            className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                          >
+                            <AiOutlineEye
+                              size={24}
+                              style={{ color: "#ffffff" }}
+                            />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 
-function EditLoader({ updatingStatus, error }) {
+function RestoreLoader({ updatingStatus, error }) {
   const textPrompts = {
-    updating: "Updating the announcement...",
+    updating: "Restoring the inquiry ...",
     waiting: "Please wait...",
-    success: "Announcement Update Successful!",
-    error: "Error updating announcement. Please try again.",
+    success: "Inquiry Restored Successful!",
+    error: "Error restoring inquiry. Please try again.",
   };
 
   const [loadingText, setLoadingText] = useState(
-    textPrompts[updatingStatus] || "Updating the announcement.."
+    textPrompts[updatingStatus] || "Restoring the inquiry.."
   );
-  const [loading, setLoading] = useState(updatingStatus === "updating");
+  const [loading, setLoading] = useState(updatingStatus === "Restoring");
 
   useEffect(() => {
     if (["success", "error"].includes(updatingStatus)) {
@@ -64,4 +64,4 @@ function EditLoader({ updatingStatus, error }) {
   );
 }
 
-export default EditLoader;
+export default RestoreLoader;

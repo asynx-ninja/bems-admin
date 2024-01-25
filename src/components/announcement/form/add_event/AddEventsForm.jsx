@@ -252,11 +252,12 @@ const AddEventsForm = ({ announcement_id, brgy }) => {
             </div>
           </div>
         </div>
-        {submitClicked && <AddFormLoader creationStatus="creating" />}
+       
+      </div>
+      {submitClicked && <AddFormLoader creationStatus="creating" />}
         {creationStatus && (
           <AddFormLoader creationStatus={creationStatus} error={error} />
         )}
-      </div>
     </div>
   );
 };

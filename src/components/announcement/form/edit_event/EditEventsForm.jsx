@@ -240,11 +240,12 @@ const EditEventsForm = ({ announcement_id, brgy }) => {
             </div>
           </div>
         </div>
-        {submitClicked && <EditFormLoader updatingStatus="updating" />}
+       
+      </div>
+      {submitClicked && <EditFormLoader updatingStatus="updating" />}
         {updatingStatus && (
           <EditFormLoader updatingStatus={updatingStatus} error={error} />
         )}
-      </div>
     </div>
   );
 };

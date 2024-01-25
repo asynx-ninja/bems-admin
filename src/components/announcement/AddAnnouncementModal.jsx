@@ -319,6 +319,7 @@ function CreateAnnouncementModal({ brgy }) {
                 </button>
                 <button
                   type="button"
+                  onClick={clearForm}
                   className="h-[2.5rem] w-full py-1 px-6  gap-2 rounded-md borde text-sm font-base bg-pink-800 text-white shadow-sm"
                   data-hs-overlay="#hs-modal-add"
                 >

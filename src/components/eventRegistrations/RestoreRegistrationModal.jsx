@@ -2,25 +2,37 @@ import React from "react";
 import Error from "../../assets/modals/Error.png";
 import axios from "axios";
 import API_LINK from "../../config/API";
-
+import { useState } from "react";
+import StatusLoader from "./loaders/RestoreLoader";
 function RestoreRegistrationModal({ selectedItems }) {
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
   const handleSave = async (e) => {
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       for (let i = 0; i < selectedItems.length; i++) {
         const response = await axios.patch(
           `${API_LINK}/application/archived/${selectedItems[i]}/false`
         );
+        if (response.status === 200) {
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }
       }
 
-      window.location.reload();
+     
     } catch (err) {
       console.log(err);
     }
   };
   return (
-    <div
+   <div>
+     <div
       id="hs-restore-requests-modal"
       className="z-[100] hs-overlay hidden w-full h-full fixed top-0 left-0 z-60 overflow-x-hidden overflow-y-auto"
     >
@@ -39,7 +51,6 @@ function RestoreRegistrationModal({ selectedItems }) {
           <div className="flex mt-8 space-x-4 relative bottom-[3rem]">
             <button
               type="button"
-              data-hs-overlay="#hs-restore-requests-modal"
               onClick={handleSave} // Call the handleArchive function
               className=" w-[6rem] lg:w-[12rem] px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600"
             >
@@ -56,6 +67,11 @@ function RestoreRegistrationModal({ selectedItems }) {
         </div>
       </div>
     </div>
+    {submitClicked && <StatusLoader updatingStatus="updating" />}
+      {updatingStatus && (
+        <StatusLoader updatingStatus={updatingStatus} error={error} />
+      )}
+   </div>
   );
 }
 

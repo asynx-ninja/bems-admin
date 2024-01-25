@@ -5,6 +5,7 @@ import ReactPaginate from "react-paginate";
 import { BsPrinter } from "react-icons/bs";
 import { AiOutlineEye } from "react-icons/ai";
 import axios from "axios";
+import moment from "moment";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
 import Breadcrumbs from "../../components/mservicesinfo/Breadcrumbs";
@@ -26,6 +27,11 @@ const ArchivedServicesInfo = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [specifiedDate, setSpecifiedDate] = useState(new Date());
+  const [filteredServices, setFilteredServices] = useState([]);
+  const [selected, setSelected] = useState("date");
+
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
@@ -33,6 +39,7 @@ const ArchivedServicesInfo = () => {
       );
       if (response.status === 200) {
         setPageCount(response.data.pageCount);
+        setFilteredServices(response.data.result);
         setServicesInfo(response.data.result);
       }
         
@@ -40,6 +47,11 @@ const ArchivedServicesInfo = () => {
     };
     fetch();
   }, [currentPage]);
+
+  const Services = servicesinfo.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -60,16 +72,20 @@ const ArchivedServicesInfo = () => {
   };
 
   const checkAllHandler = () => {
-    if (servicesinfo.length === selectedItems.length) {
+    const servicesToCheck = Services.length > 0 ? Services : servicesinfo;
+
+    if (servicesToCheck.length === selectedItems.length) {
       setSelectedItems([]);
     } else {
-      const postIds = servicesinfo.map((item) => {
+      const postIds = servicesToCheck.map((item) => {
         return item._id;
       });
 
       setSelectedItems(postIds);
     }
   };
+
+
   const dateFormat = (date) => {
     const eventdate = date === undefined ? "" : date.substr(0, 10);
     return eventdate;
@@ -78,7 +94,98 @@ const ArchivedServicesInfo = () => {
   const handleView = (item) => {
     setServicesInfos(item);
   };
-  const tableHeader = ["banner", "title", "details", "date", "actions"];
+
+  const handleResetFilter = () => {
+    setSearchQuery("");
+    setServicesInfo();
+  };
+
+  const filters = (choice, selectedDate) => {
+    switch (choice) {
+      case "date":
+        const newArr = servicesinfo.filter((item) => {
+          const createdAt = new Date(item.createdAt.slice(0, 10));
+
+          return (
+            createdAt.getFullYear() === selectedDate.getFullYear() &&
+            createdAt.getMonth() === selectedDate.getMonth() &&
+            createdAt.getDate() === selectedDate.getDate()
+          );
+        });
+
+        return newArr;
+      case "week":
+        const startDate = selectedDate;
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+
+        return servicesinfo.filter((item) => {
+          const createdAt = new Date(item.createdAt.slice(0, 10));
+
+          return (
+            createdAt.getFullYear() === startDate.getFullYear() &&
+            createdAt.getMonth() === startDate.getMonth() &&
+            createdAt.getDate() >= startDate.getDate() &&
+            createdAt.getDate() <= endDate.getDate()
+          );
+        });
+      case "month":
+        return servicesinfo.filter((item) => {
+          const createdAt = new Date(item.createdAt.slice(0, 10));
+
+          return (
+            createdAt.getFullYear() === selectedDate.getFullYear() &&
+            createdAt.getMonth() === selectedDate.getMonth()
+          );
+        });
+      case "year":
+        return servicesinfo.filter((item) => {
+          const createdAt = new Date(item.createdAt.slice(0, 10));
+          return createdAt.getFullYear() === selectedDate.getFullYear();
+        });
+    }
+  };
+
+  const onSelect = (e) => {
+    console.log("select", e.target.value);
+
+    setSelected(e.target.value);
+
+    console.log("specified select", filters(e.target.value, specifiedDate));
+  };
+
+  const onChangeDate = (e) => {
+    const date = new Date(e.target.value);
+    date.setHours(0, 0, 0, 0);
+    setSpecifiedDate(date);
+    setFilteredServices(filters(selected, date));
+  };
+
+  const onChangeWeek = (e) => {
+    const date = moment(e.target.value).toDate();
+    setSpecifiedDate(date);
+    setFilteredServices(filters(selected, date));
+  };
+
+  const onChangeMonth = (e) => {
+    const date = moment(e.target.value).toDate();
+    setSpecifiedDate(date);
+    setFilteredServices(filters(selected, date));
+  };
+
+  const onChangeYear = (e) => {
+    if (e.target.value === "") {
+      setFilteredServices(aboutus);
+    } else {
+      const date = new Date(e.target.value, 0, 1);
+      setSpecifiedDate(date);
+      console.log("selected year converted date", date);
+      console.log("specified year", filters(selected, date));
+      setFilteredServices(filters(selected, date));
+    }
+  };
+
+  const tableHeader = ["banner", "title", "details", "creation date", "actions"];
   return (
     <div className="mx-4 mt-[10rem] lg:mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div>
@@ -96,15 +203,15 @@ const ArchivedServicesInfo = () => {
 
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
-            <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
+             <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left] shadow-sm">
               <button
                 id="hs-dropdown"
                 type="button"
                 className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
               >
-                SORT BY
+                DATE
                 <svg
-                  className="hs-dropdown-open:rotate-180 w-2.5 h-2.5 text-white"
+                  className={`hs-dropdown w-2.5 h-2.5 text-white`}
                   width="16"
                   height="16"
                   viewBox="0 0 16 16"
@@ -120,19 +227,77 @@ const ArchivedServicesInfo = () => {
                 </svg>
               </button>
               <ul
-                className="bg-[#013D74] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-md rounded-lg p-2 "
+                className="bg-[#f8f8f8] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-xl rounded-xl p-2 "
                 aria-labelledby="hs-dropdown"
               >
-                <li className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ">
-                  TITLE
-                </li>
-                <li className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ">
-                  DATE
-                </li>
+                <a
+                  onClick={handleResetFilter}
+                  className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-2 text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 hover:rounded-[12px] focus:ring-2 focus:ring-blue-500"
+                  href="#"
+                >
+                  RESET FILTERS
+                </a>
+                <hr className="border-[#4e4e4e] mt-1" />
+                <div class="hs-dropdown relative inline-flex flex-col w-full space-y-1 my-2 px-2">
+                  <label className="text-black font-medium mb-1">
+                    DATE RANGE
+                  </label>
+                  <div className="flex flex-col gap-2">
+                    <select
+                      className="bg-[#f8f8f8] text-gray-600 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+                      onChange={onSelect}
+                      defaultValue={selected}
+                    >
+                      <option value="date">Specific Date</option>
+                      <option value="week">Week</option>
+                      <option value="month">Month</option>
+                      <option value="year">Year</option>
+                    </select>
+                    {selected === "date" && (
+                      <input
+                        className="bg-[#f8f8f8] text-gray-400 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+                        type="date"
+                        id="date"
+                        name="date"
+                        onChange={onChangeDate}
+                      />
+                    )}
+                    {selected === "week" && (
+                      <input
+                        className="bg-[#f8f8f8] text-gray-400 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+                        type="week"
+                        id="week"
+                        name="week"
+                        onChange={onChangeWeek}
+                      />
+                    )}
+                    {selected === "month" && (
+                      <input
+                        className=" text-gray-400 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+                        type="month"
+                        id="month"
+                        name="month"
+                        onChange={onChangeMonth}
+                      />
+                    )}
+                    {selected === "year" && (
+                      <input
+                        className=" text-black py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-grey-800 w-full"
+                        type="number"
+                        id="year"
+                        name="year"
+                        placeholder="YEAR"
+                        onChange={onChangeYear}
+                        min={1990}
+                        max={new Date().getFullYear() + 10}
+                      />
+                    )}
+                  </div>
+                </div>
               </ul>
             </div>
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
-              <div className="flex flex-row w-full md:mr-2">
+            <div className="flex flex-row w-full md:mr-2">
                 <button className=" bg-[#295141] p-3 rounded-l-md">
                   <div className="w-full overflow-hidden">
                     <svg
@@ -157,8 +322,18 @@ const ArchivedServicesInfo = () => {
                   type="text"
                   name="hs-table-with-pagination-search"
                   id="hs-table-with-pagination-search"
-                  className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500 "
+                  className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Search for items"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    const Services = servicesinfo.filter((item) =>
+                      item.name
+                        .toLowerCase()
+                        .includes(e.target.value.toLowerCase())
+                    );
+                    setFilteredServices(Services);
+                  }}
                 />
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
@@ -222,7 +397,7 @@ const ArchivedServicesInfo = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-            {servicesinfo.length === 0 ? (
+            {filteredServices.length === 0 ? (
                    <tr>
                    <td
                      colSpan={tableHeader.length + 1}
@@ -237,7 +412,7 @@ const ArchivedServicesInfo = () => {
                    </td>
                  </tr>
               ) : (
-              servicesinfo.map((item, index) => (
+                filteredServices.map((item, index) => (
                 <tr key={index} className="odd:bg-slate-100 text-center">
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">

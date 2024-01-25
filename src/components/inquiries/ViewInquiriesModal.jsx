@@ -742,12 +742,13 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
               </div>
             </div>
           </div>
-          {/* <ReplyLoader /> */}
-          {submitClicked && <ReplyLoader replyStatus="replying" />}
+        
+        </div>
+         {/* <ReplyLoader /> */}
+         {submitClicked && <ReplyLoader replyStatus="replying" />}
           {replyStatus && (
             <ReplyLoader replyStatus={replyStatus} error={error} />
           )}
-        </div>
       </div>
     </div>
   );

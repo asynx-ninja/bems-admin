@@ -1,5 +1,5 @@
 import React from "react";
-
+import moment from "moment";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -14,6 +14,7 @@ import GenerateReportsModal from "../../components/barangaytabs/brgyAnnouncement
 import ViewArchivedAnnouncementModal from "../../components/barangaytabs/brgyAnnouncements/ViewArchivedAnnouncement";
 import PrintPDF from "../../components/barangaytabs/brgyAnnouncements/form/PrintPDF";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import noData from "../../assets/image/no-data.png";
 const BrgyAnnouncement = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,15 +23,20 @@ const BrgyAnnouncement = () => {
   const [announcement, setAnnouncement] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  //date filtering
+  const [specifiedDate, setSpecifiedDate] = useState(new Date());
+  const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
+  const [selected, setSelected] = useState("date");
 
   useEffect(() => {
     const fetch = async () => {
       const response = await axios.get(
         `${API_LINK}/announcement/?brgy=${brgy}&archived=false&page=${currentPage}`
       );
-      if (response.status === 200) 
-      {
+      if (response.status === 200) {
         setAnnouncements(response.data.result);
+        setFilteredAnnouncements(response.data.result);
         setPageCount(response.data.pageCount);
       }
       else setAnnouncements([]);
@@ -50,6 +56,12 @@ const BrgyAnnouncement = () => {
     "actions",
   ];
 
+  const Announcements = announcements.filter(
+    (item) =>
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.event_id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   useEffect(() => {
     document.title = "Announcement | Barangay E-Services Management";
   }, []);
@@ -58,9 +70,91 @@ const BrgyAnnouncement = () => {
     setAnnouncement(item);
   };
 
-  const dateFormat = (date) => {
-    const eventdate = date === undefined ? "" : date.substr(0, 10);
-    return eventdate;
+  const DateFormat = (date) => {
+    const dateFormat = date === undefined ? "" : date.substr(0, 10);
+    return dateFormat;
+  };
+
+  const handleResetFilter = () => {
+    setSearchQuery("");
+    setAnnouncements([]);
+  };
+
+  const filters = (choice, selectedDate) => {
+    switch (choice) {
+      case "date":
+        return announcements.filter((item) => {
+          console.log(typeof new Date(item.createdAt), selectedDate);
+          console.log("Announcements: ", announcements)
+          return (
+            new Date(item.createdAt).getFullYear() === selectedDate.getFullYear() &&
+            new Date(item.createdAt).getMonth() === selectedDate.getMonth() &&
+            new Date(item.createdAt).getDate() === selectedDate.getDate()
+          );
+        });
+      case "week":
+        const startDate = selectedDate;
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+
+        console.log("start and end", startDate, endDate);
+
+        return announcements.filter(
+          (item) =>
+            new Date(item.createdAt).getFullYear() === startDate.getFullYear() &&
+            new Date(item.createdAt).getMonth() === startDate.getMonth() &&
+            new Date(item.createdAt).getDate() >= startDate.getDate() &&
+            new Date(item.createdAt).getDate() <= endDate.getDate()
+        );
+      case "month":
+        return announcements.filter(
+          (item) =>
+            new Date(item.createdAt).getFullYear() === selectedDate.getFullYear() &&
+            new Date(item.createdAt).getMonth() === selectedDate.getMonth()
+        );
+      case "year":
+        return announcements.filter(
+          (item) => new Date(item.createdAt).getFullYear() === selectedDate.getFullYear()
+        );
+    }
+  };
+
+  const onSelect = (e) => {
+    console.log("select", e.target.value);
+
+    setSelected(e.target.value);
+
+    console.log("specified select", filters(e.target.value, specifiedDate));
+  };
+
+  const onChangeDate = (e) => {
+    const date = new Date(e.target.value);
+    setSpecifiedDate(date);
+    setFilteredAnnouncements(filters(selected, date))
+  };
+
+  const onChangeWeek = (e) => {
+    const date = moment(e.target.value).toDate();
+    setSpecifiedDate(date);
+    setFilteredAnnouncements(filters(selected, date))
+  };
+
+  const onChangeMonth = (e) => {
+    const date = moment(e.target.value).toDate();
+    setSpecifiedDate(date);
+    setFilteredAnnouncements(filters(selected, date))
+  };
+
+  const onChangeYear = (e) => {
+    if (e.target.value === "") {
+      setFilteredAnnouncements(announcements)
+    } else {
+      const date = new Date(e.target.value, 0, 1);
+      setSpecifiedDate(date);
+      console.log("selected year converted date", date);
+      console.log("specified year", filters(selected, date));
+      setFilteredAnnouncements(filters(selected, date))
+    }
   };
 
   return (
@@ -106,40 +200,104 @@ const BrgyAnnouncement = () => {
 
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
-            <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
-              <button
-                id="hs-dropdown"
-                type="button"
-                className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
-              >
-                SORT BY
-                <svg
-                  className="hs-dropdown-open:rotate-180 w-2.5 h-2.5 text-white"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+            <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
+              {/* <span className="font-medium text-[#292929]  justify-center flex text-center my-auto mx-2">
+                SORT BY:{" "}
+              </span> */}
+
+              {/* Date Sort */}
+              <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left] shadow-sm">
+                <button
+                  id="hs-dropdown"
+                  type="button"
+                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
                 >
-                  <path
-                    d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-              <ul
-                className="bg-[#295141] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-md rounded-lg p-2 "
-                aria-labelledby="hs-dropdown"
-              >
-                <li className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ">
-                  TITLE
-                </li>
-                <li className="font-medium uppercase flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-white hover:bg-gradient-to-r from-[#295141] to-[#408D51] hover:text-[#EFC586] focus:ring-2 focus:ring-blue-500 ">
                   DATE
-                </li>
-              </ul>
+                  <svg
+                    className={`hs-dropdown w-2.5 h-2.5 text-white`}
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+                <ul
+                  className="bg-[#f8f8f8] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-xl rounded-xl p-2 "
+                  aria-labelledby="hs-dropdown"
+                >
+                  <a
+                    onClick={handleResetFilter}
+                    className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-2 text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 hover:rounded-[12px] focus:ring-2 focus:ring-blue-500"
+                    href="#"
+                  >
+                    RESET FILTERS
+                  </a>
+                  <hr className="border-[#4e4e4e] mt-1" />
+                  <div class="hs-dropdown relative inline-flex flex-col w-full space-y-1 my-2 px-2">
+                    <label className="text-black font-medium mb-1">DATE RANGE</label>
+                    <div className="flex flex-col gap-2">
+                      <select
+                        className="bg-[#f8f8f8] text-gray-600 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+
+                        onChange={onSelect}
+                        defaultValue={selected}
+                      >
+                        <option value="date">Specific Date</option>
+                        <option value="week">Week</option>
+                        <option value="month">Month</option>
+                        <option value="year">Year</option>
+                      </select>
+                      {selected === "date" && (
+                        <input
+                          className="bg-[#f8f8f8] text-gray-400 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+                          type="date"
+                          id="date"
+                          name="date"
+                          onChange={onChangeDate}
+                        />
+                      )}
+                      {selected === "week" && (
+                        <input
+                          className="bg-[#f8f8f8] text-gray-400 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+                          type="week"
+                          id="week"
+                          name="week"
+                          onChange={onChangeWeek}
+                        />
+                      )}
+                      {selected === "month" && (
+                        <input
+                          className=" text-gray-400 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+                          type="month"
+                          id="month"
+                          name="month"
+                          onChange={onChangeMonth}
+                        />
+                      )}
+                      {selected === "year" && (
+                        <input
+                          className=" text-black py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-grey-800 w-full"
+                          type="number"
+                          id="year"
+                          name="year"
+                          placeholder="YEAR"
+                          onChange={onChangeYear}
+                          min={1990}
+                          max={new Date().getFullYear() + 10}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </ul>
+              </div>
             </div>
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">
@@ -169,6 +327,15 @@ const BrgyAnnouncement = () => {
                   id="hs-table-with-pagination-search"
                   className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500 "
                   placeholder="Search for items"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
+                    const Announcements = announcements.filter(
+                      (item) =>
+                        item.title.toLowerCase().includes(e.target.value.toLowerCase())
+                    );
+                    setFilteredAnnouncements(Announcements)
+                  }}
                 />
               </div>
               {/* <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
@@ -210,58 +377,66 @@ const BrgyAnnouncement = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-            {announcements.length === 0 ? (
+              {filteredAnnouncements.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="text-center py-10 text-gray-400">
-                    No data found
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
                   </td>
                 </tr>
               ) : (
-              announcements.map((item, index) => (
-                <tr key={index} className="odd:bg-slate-100 text-center">
-                
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {item.title}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                        {item.details}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {dateFormat(item.date) || ""}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
-                        {item.attendees.length}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex justify-center space-x-1 sm:space-x-none">
-                      <button
-                        type="button"
-                        data-hs-overlay="#hs-modal-viewArchivedAnnouncement"
-                        onClick={() => handleView({ ...item })}
-                        className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                      >
-                        <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                filteredAnnouncements.map((item, index) => (
+                  <tr key={index} className="odd:bg-slate-100 text-center">
+
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.title}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.details}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {DateFormat(item.createdAt) || ""}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          {item.attendees.length}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center space-x-1 sm:space-x-none">
+                        <button
+                          type="button"
+                          data-hs-overlay="#hs-modal-viewArchivedAnnouncement"
+                          onClick={() => handleView({ ...item })}
+                          className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                        >
+                          <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
@@ -303,7 +478,7 @@ const BrgyAnnouncement = () => {
           announcement={announcement}
           setAnnouncement={setAnnouncement}
         />
-        <GenerateReportsModal/>
+        <GenerateReportsModal />
       </div>
     </div>
   );

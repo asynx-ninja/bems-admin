@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from "react";
 
-function AddLoader({ creationStatus, error }) {
+function RestoreLoader({ updatingStatus, error }) {
   const textPrompts = {
-    creating: "Creating the announcement...",
+    updating: "Restoring the application...",
     waiting: "Please wait...",
-    success: "Announcement Created Successful!",
-    error: "Error creating announcement. Please try again.",
+    success: "Application Restored Successful!",
+    error: "Error restoring application. Please try again.",
   };
 
   const [loadingText, setLoadingText] = useState(
-    textPrompts[creationStatus] || "Creating the announcement.."
+    textPrompts[updatingStatus] || "Restoring the application.."
   );
-  const [loading, setLoading] = useState(creationStatus === "creating");
+  const [loading, setLoading] = useState(updatingStatus === "Restoring");
 
   useEffect(() => {
-    if (["success", "error"].includes(creationStatus)) {
+    if (["success", "error"].includes(updatingStatus)) {
       const timeout = setTimeout(() => {
         setLoading(false);
       }, 3000);
 
       return () => clearTimeout(timeout);
     }
-  }, [creationStatus]);
+  }, [updatingStatus]);
 
   return (
     <div className="absolute top-0 lg:top-0 lg:end-0 mb-20 lg:mr-5 z-[80]">
@@ -64,4 +64,4 @@ function AddLoader({ creationStatus, error }) {
   );
 }
 
-export default AddLoader;
+export default RestoreLoader;

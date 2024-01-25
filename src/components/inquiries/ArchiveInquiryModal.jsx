@@ -2,29 +2,41 @@ import React from "react";
 import Error from "../../assets/modals/Error.png";
 import axios from "axios";
 import API_LINK from "../../config/API";
-
+import { useState } from "react";
+import StatusLoader from "./loaders/ArchiveLoader";
 function ArchiveInquiryModal({ selectedItems }) {
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
   const handleSave = async (e) => {
     try {
       e.preventDefault();
-
+      setSubmitClicked(true);
       for (let i = 0; i < selectedItems.length; i++) {
         const response = await axios.patch(
           `${API_LINK}/inquiries/archived/${selectedItems[i]}/true`
         );
+        if (response.status === 200) {
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }
       }
 
-      window.location.reload();
+    
     } catch (err) {
       console.log(err);
     }
   };
   return (
+    <div>
     <div
       id="hs-modal-archiveInquiry"
-      className="z-[100] hs-overlay hidden w-full h-full fixed top-0 left-0 overflow-x-hidden overflow-y-auto"
+      className="z-[80] hs-overlay hidden w-full h-full fixed top-0 left-0 overflow-x-hidden overflow-y-auto"
     >
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-300 bg-opacity-0">
+      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-gray-300 bg-opacity-0">
         <div className="bg-white sm:w-5/6 sm:h-[18rem] md:w-2/4 md:h-[18rem]  lg:w-[40rem] lg:h-[22rem] rounded-3xl shadow-lg relative flex flex-col items-center justify-center">
           <img
             src={Error}
@@ -39,7 +51,6 @@ function ArchiveInquiryModal({ selectedItems }) {
           <div className="flex mt-8 space-x-4 relative bottom-[3rem]">
             <button
               type="button"
-              data-hs-overlay="#hs-modal-archiveInquiry"
               onClick={handleSave} 
               className=" w-[6rem] lg:w-[12rem] px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600"
             >
@@ -54,7 +65,14 @@ function ArchiveInquiryModal({ selectedItems }) {
             </button>
           </div>
         </div>
+      
       </div>
+    
+    </div>
+      {submitClicked && <StatusLoader updatingStatus="updating" />}
+      {updatingStatus && (
+        <StatusLoader updatingStatus={updatingStatus} error={error} />
+      )}
     </div>
   );
 }

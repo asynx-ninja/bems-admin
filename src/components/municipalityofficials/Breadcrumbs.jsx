@@ -12,7 +12,7 @@ const Breadcrumbs = () => {
       <ol className="flex items-center space-x-2 text-gray-500">
         <BsPeopleFill size={22} />
         <li>
-          <a href={`/officials/?id=${id}&brgy=${brgy}&archived=false`} className="text-gray-600 font-bold hover:underline text-sm md:text-lg">
+          <a href={`/municipalityofficials/?id=${id}`} className="text-gray-600 font-bold hover:underline text-sm md:text-lg">
             BARANGAY OFFICIALS
           </a>
         </li>

@@ -346,11 +346,12 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
               </div>
             </div>
           </div>
-          {submitClicked && <EditLoader updatingStatus="updating" />}
+         
+        </div> 
+        {submitClicked && <EditLoader updatingStatus="updating" />}
           {updatingStatus && (
             <EditLoader updatingStatus={updatingStatus} error={error} />
           )}
-        </div>
       </div>
     </div>
   );
