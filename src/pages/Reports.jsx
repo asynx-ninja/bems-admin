@@ -128,8 +128,15 @@ const Reports = () => {
     xaxis: { categories: [] },
     yaxis: {
       title: {
-        text: "Total Revenue",
+        text: "Total Revenue (₱)",  // Add Peso sign to y-axis label
       },
+    },
+    tooltip: {
+      y: {
+        formatter: function (value) {  // Add Peso sign to tooltip
+          return `₱${value}.00`;
+        }
+      }
     },
   });
   useEffect(() => {
@@ -225,11 +232,23 @@ const Reports = () => {
       xaxis: {
         categories: barangays,
       },
+      yaxis: {
+        title: {
+          text: "Est. Total Revenue (₱)",  // Add Peso sign to y-axis label
+        },
+      },
+      tooltip: {
+        y: {
+          formatter: function (value) {  // Add Peso sign to tooltip
+            return `₱${value}.00`;
+          }
+        }
+      },
     },
     series: [
       {
         name: "Total Fee",
-        data: new Array(barangays.length).fill(0), // Initialize with 0s
+        data: new Array(barangays.length).fill(0),
       },
     ],
   });
@@ -338,7 +357,7 @@ const Reports = () => {
   };
 
   return (
-    <div className="mx-4 mt-[10rem] md:mt-[2rem] p-2 lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+    <div className="mx-4 mt-[10rem] md:mt-[6rem] p-2 lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div className="flex flex-col scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb  h-[calc(100vh_-_95px)]">
         <div className="flex flex-col lg:flex-col justify-start items-start w-full mb-3">
           {/* <h2 className="text-lg lg:text-4xl font-bold mb-3 lg:mb-0 uppercase">

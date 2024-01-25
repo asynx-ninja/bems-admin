@@ -72,7 +72,7 @@ function ViewRegistrationModal({ application }) {
                 className="font-bold text-white mx-auto md:text-xl text-center"
                 style={{ letterSpacing: "0.3em" }}
               >
-                RESIDENT EVENT REGISTRATION
+                RESIDENT EVENT APPLICATION
               </h3>
             </div>
 

@@ -164,7 +164,11 @@ function AddServicesInfo({ brgy }) {
                         className={`${!icon ? "" : "hidden"} mx-auto`}
                       />
                     </div>
-                    <label className="w-full bg-white border border-gray-300">
+                    <label
+                      className={`w-full bg-white border   ${
+                        error && !icon ? " border-red-500" : "border-gray-300"
+                      }`}
+                    >
                       <span className="sr-only">Choose icon photo</span>
                       <input
                         type="file"

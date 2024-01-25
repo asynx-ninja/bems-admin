@@ -199,11 +199,12 @@ const EventsRegistrations = () => {
   };
 
   return (
-    <div className="mx-4 mt-[10rem] lg:mt-4 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+    <div className="mx-4 mt-[10rem] md:mt-[5rem] lg:mt-4 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
     <div className="flex flex-col">
-      <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full shrink-0">
-        <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]  py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
-          <h1
+        {/* Header */}
+        <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
+          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
+            <h1
               className="text-center mx-auto font-bold text-xs md:text-xl lg:text-[16px] xl:text-[20px] xxl:text-2xl xxxl:text-3xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
@@ -635,18 +636,18 @@ const EventsRegistrations = () => {
                 ))
               ) : (
                 <tr>
-                <td
-                  colSpan={tableHeader.length + 1}
-                  className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
-                >
-                  <img
-                    src={noData}
-                    alt=""
-                    className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
-                  />
-                  <strong className="text-[#535353]">NO DATA FOUND</strong>
-                </td>
-              </tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center py-48 lg:py-48 xxl:py-32"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -657,28 +658,12 @@ const EventsRegistrations = () => {
           Showing {currentPage + 1} out of {pageCount} pages
         </span>
         <ReactPaginate
-            breakLabel="..."
-            nextLabel={
-              pageCount > currentPage + 1 ? (
-                <span className="text-white">&gt;&gt;</span>
-              ) : (
-                <span className="text-gray-300 cursor-not-allowed">
-                  &gt;&gt;
-                </span>
-              )
-            }
-            onPageChange={handlePageChange}
-            pageRangeDisplayed={3}
-            pageCount={pageCount}
-            previousLabel={
-              currentPage > 0 ? (
-                <span className="text-white"> &lt;&lt;</span>
-              ) : (
-                <span className="text-gray-300 cursor-not-allowed">
-                  &lt;&lt;
-                </span>
-              )
-            }
+          breakLabel="..."
+          nextLabel=">>"
+          onPageChange={handlePageChange}
+          pageRangeDisplayed={3}
+          pageCount={pageCount}
+          previousLabel="<<"
           className="flex space-x-3 text-white font-bold"
           activeClassName="text-yellow-500"
           disabledLinkClassName="text-gray-400"

@@ -147,10 +147,9 @@ const ArchivedOfficials = () => {
   };
 
   return (
-    <div className="mx-4 mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
-      <Breadcrumbs />
-      {/* Body */}
-      <div>
+    <div className="mx-4 mt-[10rem] md:mt-[5rem] lg:mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+    <div>
+      <Breadcrumbs id={id} />
         {/* Header */}
         <div className="flex flex-row lg:mt-5 sm:flex-col-reverse lg:flex-row w-full">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
@@ -352,9 +351,17 @@ const ArchivedOfficials = () => {
             <tbody className="odd:bg-slate-100">
             {filteredOfficials.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center py-10 text-gray-400">
-                    No data found
-                  </td>
+                <td
+                  colSpan={tableHeader.length + 1}
+                  className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                >
+                  <img
+                    src={noData}
+                    alt=""
+                    className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                  />
+                  <strong className="text-[#535353]">NO DATA FOUND</strong>
+                </td>
                 </tr>
               ) : (
                 filteredOfficials.map((item, index) => (

@@ -237,7 +237,7 @@ const ArchivedRegistrations = () => {
   };
 
   return (
-    <div className="mx-4 mt-[10rem] lg:mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+    <div className="mx-4 mt-[10rem] md:mt-[5rem] lg:mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div>
         <Breadcrumbs id={id} />
         {/* Header */}

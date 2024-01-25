@@ -86,6 +86,11 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+      if (!announcement.title.trim() || !announcement.details.trim() || !announcement.date.trim() || !files || !banner || !logo) {
+
+        setError("Please fill out all required fields.");
+        return; // Prevent further execution of handleSubmit
+      }
       setSubmitClicked(true);
 
       var formData = new FormData();
@@ -168,6 +173,32 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
               </div>
 
               <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+              {error && (
+                <div
+                  className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
+                  role="alert"
+                >
+                  <div className="flex p-4">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={16}
+                        height={16}
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                      </svg>
+                    </div>
+                    <div className="ms-3">
+                      <p className="text-sm text-gray-700 font-medium ">
+                        {error}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
                 <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
                   <div className="w-full">
                     <label
@@ -237,7 +268,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                       type="checkbox"
                       name="isOpen"
                       onChange={handleChange}
-                      disabled={!edit}
+                      disabled
                       checked={announcement.isOpen}
                       className="sr-only peer"
                     />
@@ -253,13 +284,20 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                   </label>
                   <input
                     id="title"
-                    className="shadow appearance-none text-sm border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                      error && !announcement.title ? "border-red-500" : "border-gray-300"
+                    }`}
                     type="text"
                     name="title"
                     value={announcement && announcement.title}
                     disabled={!edit}
                     onChange={handleChange}
                   />
+                   {error && !announcement.title && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter a title.
+                  </p>
+                )}
                 </div>
                 <div className="mb-4">
                   <label
@@ -272,12 +310,19 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                     id="details"
                     rows={4}
                     name="details"
-                    className="block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                      error && !announcement.details ? "border-red-500" : "border-gray-300"
+                    }`}
                     placeholder="Enter announcement details..."
                     value={announcement && announcement.details}
                     disabled={!edit}
                     onChange={handleChange}
                   />
+                   {error && !announcement.details && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter a details.
+                  </p>
+                )}
                 </div>
                 <div className="mb-4">
                   <label
@@ -287,7 +332,9 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                     Date
                   </label>
                   <input
-                    className="shadow text-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                     className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                      error && !announcement.date ? "border-red-500" : "border-gray-300"
+                    }`}
                     id="date"
                     type="date"
                     name="date"
@@ -295,6 +342,11 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                     disabled={!edit}
                     onChange={handleChange}
                   />
+                   {error && !announcement.date && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter a date.
+                  </p>
+                )}
                 </div>
 
                 <EditDropbox

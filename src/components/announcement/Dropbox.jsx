@@ -2,7 +2,8 @@ import React from "react";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Dropbox = ({files, setFiles, handleFileChange, handleSubmit}) => {
+const Dropbox = ({files, setFiles, error,
+  isEmpty, handleFileChange, handleSubmit}) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef();
   const navigate = useNavigate();
@@ -83,7 +84,11 @@ const Dropbox = ({files, setFiles, handleFileChange, handleSubmit}) => {
             )}
             {/* scroll area */}
             <section className="h-full overflow-auto p-1 w-full flex flex-col">
-              <header className="border-dashed border-2 border-gray-400 py-12 flex flex-col justify-center items-center">
+            <header
+                className={`border-dashed border-2 ${
+                  error && isEmpty ? "border-red-500" : "border-gray-400"
+                }  py-12 flex flex-col justify-center items-center`}
+              >
                 <p className="mb-3 font-semibold text-gray-900 flex flex-wrap justify-center">
                   <span>Drag and drop your</span>&nbsp;
                   <span>files anywhere or</span>
@@ -105,6 +110,11 @@ const Dropbox = ({files, setFiles, handleFileChange, handleSubmit}) => {
                   Upload a file
                 </button>
               </header>
+              {error && isEmpty && (
+                <p className="text-red-500 text-xs italic">
+                  Please upload at least one file
+                </p>
+              )}
               <h1 className="pt-8 pb-3 font-semibold sm:text-lg text-gray-900">
                 To Upload
               </h1>

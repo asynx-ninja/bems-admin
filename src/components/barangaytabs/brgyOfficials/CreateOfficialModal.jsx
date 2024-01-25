@@ -3,8 +3,11 @@ import { useState, useEffect } from "react";
 import { CiImageOn } from "react-icons/ci";
 import API_LINK from "../../../config/API";
 import axios from "axios";
-
+import AddLoader from "./loaders/AddLoader";
 function CreateOfficialModal({ brgy }) {
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [creationStatus, setCreationStatus] = useState(null);
+  const [error, setError] = useState(null);
   const [official, setOfficial] = useState({
     firstName: "",
     middleName: "",
@@ -18,10 +21,36 @@ function CreateOfficialModal({ brgy }) {
 
   const [pfp, setPfp] = useState();
 
+  const handlePfpChange = (e) => {
+    setPfp(e.target.files[0]);
+
+    var output = document.getElementById("add_pfp");
+    output.src = URL.createObjectURL(e.target.files[0]);
+    output.onload = function () {
+      URL.revokeObjectURL(output.src); // free memory
+    };
+  };
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
 
+      if (
+        !official.firstName.trim() ||
+        !official.middleName.trim() ||
+        !official.lastName.trim() ||
+        !official.fromYear.trim() ||
+        !official.toYear.trim() ||
+        !official.position.trim() ||
+        !pfp
+      ) {
+        // Highlight empty fields with red border
+
+        setError("Please fill out all required fields.");
+        return; // Prevent further execution of handleSubmit
+      }
+
+      setSubmitClicked(true);
+      setError(null)
       const formData = new FormData();
       formData.append("file", pfp);
 
@@ -52,23 +81,33 @@ function CreateOfficialModal({ brgy }) {
           brgy: "",
         });
         setPfp(null);
-        window.location.reload();
+        setSubmitClicked(false);
+        setCreationStatus("success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       }
     } catch (err) {
-      console.error("Error adding official:", err);
+      console.log(err);
+      setSubmitClicked(false);
+      setCreationStatus(null);
+      setError("An error occurred while creating the info.");
     }
   };
-
-  const handlePfpChange = (e) => {
-    setPfp(e.target.files[0]);
-
-    var output = document.getElementById("add_pfp");
-    output.src = URL.createObjectURL(e.target.files[0]);
-    output.onload = function () {
-      URL.revokeObjectURL(output.src); // free memory
-    };
+  const resetForm = () => {
+    setOfficial({
+      firstName: "",
+      lastName: "",
+      middleName: "",
+      fromYear: "",
+      toYear: "",
+      position: "",
+    });
+    setPfp(null); // Assuming null is the initial state of banner
+    setError(null);
+    setSubmitClicked(false);
+    setCreationStatus(null);
   };
-
   return (
     <div>
       <div
@@ -89,6 +128,32 @@ function CreateOfficialModal({ brgy }) {
             </div>
 
             <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+              {error && (
+                <div
+                  className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
+                  role="alert"
+                >
+                  <div className="flex p-4">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={16}
+                        height={16}
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                      </svg>
+                    </div>
+                    <div className="ms-3">
+                      <p className="text-sm text-gray-700 font-medium ">
+                        {error}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="flex flex-col">
                 <div className="flex flex-col lg:flex-row mb-1">
                   {/* Service Description */}
@@ -109,15 +174,26 @@ function CreateOfficialModal({ brgy }) {
                         />
                       </div>
                     </div>
-
-                    <input
-                      className="block p-2 mb-2 w-full  mx-auto lg:w-full text-sm text-black rounded-b-xl cursor-pointer bg-gray-100 "
-                      type="file"
-                      onChange={handlePfpChange}
-                      name="pfp"
-                      accept="image/*"
-                      value={!pfp ? "" : pfp.originalname}
-                    />
+                    <label
+                      className={`w-full bg-white border   ${
+                        error && !pfp ? " border-red-500" : "border-gray-300"
+                      }`}
+                    >
+                      <input
+                        className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4  file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100`}
+                        id="officialImage"
+                        type="file"
+                        onChange={handlePfpChange}
+                        name="pfp"
+                        accept="image/*"
+                        value={!pfp ? "" : pfp.originalname}
+                      />
+                    </label>
+                    {error && !pfp && (
+                      <p className="text-red-500 text-xs italic">
+                        Please select banner image.
+                      </p>
+                    )}
                   </div>
 
                   {/* Request Information */}
@@ -134,13 +210,20 @@ function CreateOfficialModal({ brgy }) {
                     <input
                       type="text"
                       id="firstName"
-                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                        error && !official.firstName ? "border-red-500" : ""
+                      }`}
                       placeholder=""
                       value={official.firstName}
-                      onChange={(e) =>
-                        setOfficial({ ...official, firstName: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setOfficial({ ...official, firstName: e.target.value });
+                      }}
                     />
+                    {error && !official.firstName && (
+                      <p className="text-red-500 text-xs italic">
+                        Please enter a First name.
+                      </p>
+                    )}
 
                     <h1
                       className="font-medium mb-1 text-black text-sm"
@@ -151,14 +234,23 @@ function CreateOfficialModal({ brgy }) {
                     <input
                       type="text"
                       id="middleName"
-                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                        error && !official.middleName ? "border-red-500" : ""
+                      }`}
                       placeholder=""
                       value={official.middleName}
-                      onChange={(e) =>
-                        setOfficial({ ...official, middleName: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setOfficial({
+                          ...official,
+                          middleName: e.target.value,
+                        });
+                      }}
                     />
-
+                    {error && !official.middleName && (
+                      <p className="text-red-500 text-xs italic">
+                        Please enter a middle name.
+                      </p>
+                    )}
                     <h1
                       className="font-medium mb-1 text-black text-sm"
                       style={{ letterSpacing: "0.1em" }}
@@ -185,13 +277,20 @@ function CreateOfficialModal({ brgy }) {
                     <input
                       type="text"
                       id="lastName"
-                      className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                      className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                        error && !official.lastName ? "border-red-500" : ""
+                      }`}
                       placeholder=""
                       value={official.lastName}
-                      onChange={(e) =>
-                        setOfficial({ ...official, lastName: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setOfficial({ ...official, lastName: e.target.value });
+                      }}
                     />
+                    {error && !official.lastName && (
+                      <p className="text-red-500 text-xs italic">
+                        Please enter a last name.
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -201,6 +300,7 @@ function CreateOfficialModal({ brgy }) {
                 </b>
                 <div className="relative mt-5  overflow-y-auto flex flex-col space-y-4">
                   {/* Position and Service Rendered */}
+                
                   <div className="w-full">
                     <h1
                       className="font-bold text-black mx-auto text-sm"
@@ -210,14 +310,16 @@ function CreateOfficialModal({ brgy }) {
                     </h1>
                     <select
                       id="position"
-                      className="shadow border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                      onChange={(e) =>
-                        setOfficial({ ...official, position: e.target.value })
-                      }
+                      className={`shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                        error && !official.position ? "border-red-500" : ""
+                      }`}
+                      onChange={(e) => {
+                        setOfficial({ ...official, position: e.target.value });
+                      }}
                       value={official.position}
                       required
                     >
-                      <option value="" disabled>
+                    <option value="" >
                         -- Select Position --
                       </option>
                       <option value="Barangay Chairman">
@@ -227,6 +329,11 @@ function CreateOfficialModal({ brgy }) {
                       <option value="SK Chairman">SK Chairman</option>
                       <option value="SK Kagawad">SK Kagawad</option>
                     </select>
+                    {error && !official.position && (
+                      <p className="text-red-500 text-xs italic">
+                        Please enter a position.
+                      </p>
+                    )}
                   </div>
                   <div className="w-full mt-2">
                     <h1
@@ -249,17 +356,24 @@ function CreateOfficialModal({ brgy }) {
                       <div className="w-full lg:w-5/6">
                         <input
                           type="month"
-                          className="shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                          id="from_year"
-                          onChange={(e) =>
+                          className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                            error && !official.fromYear ? "border-red-500" : ""
+                          }`}
+                          id="fromyear"
+                          onChange={(e) => {
                             setOfficial({
                               ...official,
                               fromYear: e.target.value,
-                            })
-                          }
+                            });
+                          }}
                           value={official.fromYear}
                           required
                         />
+                        {error && !official.fromYear && (
+                          <p className="text-red-500 text-xs italic">
+                            Please enter a fromyear.
+                          </p>
+                        )}
                       </div>
                     </div>
                     {/* Date 2 */}
@@ -275,14 +389,24 @@ function CreateOfficialModal({ brgy }) {
                       <div className="w-full lg:w-5/6">
                         <input
                           type="month"
-                          className="shadow border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                          id="To_year"
-                          onChange={(e) =>
-                            setOfficial({ ...official, toYear: e.target.value })
-                          }
+                          className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                            error && !official.fromYear ? "border-red-500" : ""
+                          }`}
+                          id="toyear"
+                          onChange={(e) => {
+                            setOfficial({
+                              ...official,
+                              toYear: e.target.value,
+                            });
+                          }}
                           value={official.toYear}
                           required
                         />
+                        {error && !official.toYear && (
+                          <p className="text-red-500 text-xs italic">
+                            Please enter a toyear.
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -292,25 +416,31 @@ function CreateOfficialModal({ brgy }) {
 
             {/* Buttons */}
             <div className="flex justify-end items-center gap-x-2 py-3 px-6 dark:border-gray-700">
-              <button
-                type="button"
-                className="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md borde text-sm font-base bg-custom-green-button3 text-white shadow-sm align-middle"
-                data-hs-overlay="#hs-create-official-modal"
-                onClick={handleSubmit}
-              >
-                SAVE CHANGES
-              </button>
-              <button
-                type="button"
-                className="py-1 px-6 inline-flex justify-center items-center gap-2 rounded-md border text-sm font-base bg-custom-red-button text-white shadow-sm align-middle"
-                data-hs-overlay="#hs-create-official-modal"
-              >
-                CLOSE
-              </button>
+              <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
+                <button
+                  type="button"
+                  className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-teal-900 text-white shadow-sm"
+                  onClick={handleSubmit}
+                >
+                  CREATE
+                </button>
+                <button
+                  type="button"
+                  className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-pink-800 text-white shadow-sm"
+                  onClick={resetForm}
+                  data-hs-overlay="#hs-create-official-modal"
+                >
+                  CLOSE
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      {submitClicked && <AddLoader creationStatus="creating" />}
+      {creationStatus && (
+        <AddLoader creationStatus={creationStatus} error={error} />
+      )}
       <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
     </div>
   );

@@ -207,7 +207,7 @@ function ReplyRegistrationModal({ application, setApplication }) {
                 className="font-bold text-white mx-auto md:text-xl text-center"
                 style={{ letterSpacing: "0.3em" }}
               >
-                REPLY TO EVENT REGISTRATION
+                REPLY TO EVENT APPLICATION
               </h3>
             </div>
 

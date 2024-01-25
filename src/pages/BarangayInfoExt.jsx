@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import Information from "./BarangayTabs/Brgyinformation";
-import Profit from "../pages/BarangayTabs/Profit";
+import Profit from "../pages/BarangayTabs/Reports";
 import Services from "./BarangayTabs/BrgyServices";
 import ServiceRequest from "./BarangayTabs/BrgyServiceRequests";
 import Officials from "./BarangayTabs/BrgyOfficials";

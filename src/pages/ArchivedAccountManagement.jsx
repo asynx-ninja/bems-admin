@@ -106,7 +106,7 @@ const ArchivedAccountManagement = () => {
 
 
   return (
-    <div className="mx-4 mt-[10rem] lg:mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+    <div className="mx-4 mt-[10rem]  md:mt-[5rem] lg:mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div>
         <Breadcrumbs id={id} />
         <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">

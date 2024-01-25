@@ -82,7 +82,9 @@ const StatisticsDashboard = () => {
           `${API_LINK}/users/showArchived/?brgy=${brgy}&type=Admin`
         );
         setArchivedUsers(
-          archivedUsersResponse.status === 200 ? archivedUsersResponse.data.result : []
+          archivedUsersResponse.status === 200
+            ? archivedUsersResponse.data.result
+            : []
         );
 
         try {
@@ -90,7 +92,9 @@ const StatisticsDashboard = () => {
             `${API_LINK}/mofficials/?brgy=${brgy}&archived=false`
           );
           setOfficials(
-            officialsResponse.status === 200 ? officialsResponse.data.result : []
+            officialsResponse.status === 200
+              ? officialsResponse.data.result
+              : []
           );
         } catch (err) {
           console.log("err", err.message);
@@ -130,8 +134,6 @@ const StatisticsDashboard = () => {
             ? archivedServicesResponse.data
             : []
         );
-
-      
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -215,7 +217,6 @@ const StatisticsDashboard = () => {
     {
       title: "Barangays",
       active: barangays.length, // Check if officials is defined before using it
-      archived: "n/a",
       activeLink: `/barangaymenu/?id=${id}`,
       archivedLink: `/archived_officials/?id=${id}&brgy=${brgy}`,
       icon: <FaPeopleGroup size={15} className="sm:block md:hidden" />,
@@ -283,16 +284,18 @@ const StatisticsDashboard = () => {
                       </strong>
                     </a>
                   </Link>
-                  <Link to={titleItem ? titleItem.archivedLink : ""}>
-                    <a
-                      className={`flex items-center p-1 gap-x-3.5 rounded-lg font-heavy text-[12px] xl:text-[14px] text-white hover:bg-gradient-to-r ${item.gradient1} hover:border hover:border-gray-300`}
-                    >
-                      Archived:
-                      <strong className="ml-auto">
-                        {titleItem ? titleItem.archived : ""}
-                      </strong>
-                    </a>
-                  </Link>
+                  {titleItem.title !== "Barangays" && (
+                    <Link to={titleItem ? titleItem.archivedLink : ""}>
+                      <a
+                        className={`flex items-center p-1 gap-x-3.5 rounded-lg font-heavy text-[12px] xl:text-[14px] text-white hover:bg-gradient-to-r ${item.gradient1} hover:border hover:border-gray-300`}
+                      >
+                        Archived:
+                        <strong className="ml-auto">
+                          {titleItem ? titleItem.archived : ""}
+                        </strong>
+                      </a>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

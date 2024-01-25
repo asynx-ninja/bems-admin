@@ -57,7 +57,7 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
       return; // Prevent further execution of handleSubmit
     }
     setSubmitClicked(true);
-    
+    setError(null)
       let formData = new FormData();
 
       images.forEach((image) => {

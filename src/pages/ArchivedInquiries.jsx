@@ -212,9 +212,9 @@ const Inquiries = () => {
   };
 
   return (
-    <div className="mx-4 mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_300px)] xxxl:w-[calc(100vw_-_305px)]">
-    <div>
-        <Breadcrumbs />
+    <div className="mx-4 mt-[10rem] md:mt-[5rem] lg:mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+      <div>
+        <Breadcrumbs id={id} />
         <div className="flex flex-row lg:mt-5 sm:flex-col-reverse lg:flex-row w-full">
           <div className="flex justify-center items-center sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1

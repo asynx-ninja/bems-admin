@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import Information from "./BarangayTabs/Brgyinformation";
-import Profit from "../pages/BarangayTabs/Profit";
+import Profit from "./BarangayTabs/Reports";
 import Services from "./BarangayTabs/BrgyServices";
 import ServiceRequest from "./BarangayTabs/BrgyServiceRequests";
 import Officials from "./BarangayTabs/BrgyOfficials";
@@ -27,7 +27,7 @@ function BarangayDetails() {
   }, []);
 
   return (
-    <div className="mx-4 mt-[10rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)] ">
+    <div className="mx-4 mt-[10rem]  md:mt-[6rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)] ">
       <div className="w-full flex items-center justify-center bg-[#295141] rounded-t-lg">
         <h1 className="text-white lg:text-3xl py-2 px-5 font-heavy ">
           BARANGAY {brgy ? brgy.toUpperCase() : ""} INFORMATION
@@ -48,7 +48,7 @@ function BarangayDetails() {
         {activeTab === 5 && 'Residents'}
         {activeTab === 6 && 'Events'}
         {activeTab === 7 && 'Inquiries'}
-        {activeTab === 8 && 'Profits'}
+        {activeTab === 8 && 'Reports'}
         <svg
           className={`hs-collapse-open ${
             collapseOpen ? 'rotate-180' : ''
@@ -165,7 +165,7 @@ function BarangayDetails() {
               role="tab"
               onClick={() => handleTabChange(8)}
             >
-              Profits
+              Reports
             </button>
           </nav>
         </div>

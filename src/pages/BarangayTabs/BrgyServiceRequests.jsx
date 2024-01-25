@@ -205,10 +205,10 @@ function ServiceRequests() {
 
   return (
     <div className="">
-      {/* Body */}
-      <div>
-        {/* Header */}
-        <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
+    {/* Body */}
+    <div>
+      {/* Header */}
+      <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
               className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-2xl xxxl:text-3xl xxxl:mt-1 text-white"
@@ -247,13 +247,13 @@ function ServiceRequests() {
 
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
-            <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
+            <div className="flex flex-col lg:flex-row md:flex-row items-center justify-center gap-4 lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
               {/* Status Sort */}
-              <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
+              <div className="hs-dropdown relative  inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
                 <button
                   id="hs-dropdown"
                   type="button"
-                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-2 lg:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
                 >
                   STATUS
                   <svg
@@ -567,7 +567,7 @@ function ServiceRequests() {
         </div>
 
         {/* Table */}
-        <div className="overflow-y-auto sm:overflow-x-auto h-[calc(100vh_-_270px)] xxxl:h-[calc(100vh_-_286px)]">
+        <div className="overflow-auto sm:overflow-x-auto xxxl:h-[calc(100vh_-_526px)]">
           <table className="w-full ">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
@@ -713,7 +713,7 @@ function ServiceRequests() {
             </tbody>
           </table>
         </div>
-        <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
+        <div className="md:py-4 md:px-4  bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
           <span className="font-medium text-white sm:text-xs text-sm">
             Showing 1 out of 15 pages
           </span>

@@ -52,7 +52,7 @@ function AddTouristSpot({ section }) {
         return; // Prevent further execution of handleSubmit
       }
       setSubmitClicked(true);
-
+      setError(null)
       let formData = new FormData();
 
       images.forEach((image) => {

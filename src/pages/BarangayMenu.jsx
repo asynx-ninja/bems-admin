@@ -31,7 +31,7 @@ function BarangayMenu() {
 
   console.log(barangays)
   return (
-    <div className="mx-4 mt-[10rem] md:mt-[4rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+    <div className="mx-4 mt-[10rem]  md:mt-[6rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
       <div className="flex flex-col justify-center items-center mx-auto mt-4">
         <div className="py-2 text-center font-bold text-3xl">
           <h1>SELECT A BARANGAY</h1>
@@ -66,7 +66,7 @@ function BarangayMenu() {
             className="h-[12rem] bg-[#295141] shadow-lg rounded-2xl flex justify-center items-center text-white font-bold text-lg flex-col hover:bg-[#2b6950] transition duration-300"
           >
             <img src={barangay.logo} alt={barangay.brgy} className="h-[8rem]" />
-            <h1 className="mt-1 px-4 text-md uppercase md:text-sm xl:text-lg">
+            <h1 className="mt-1 px-4 text-md uppercase text-center md:text-sm xl:text-lg">
               Barangay {barangay.brgy}
             </h1>
           </Link>

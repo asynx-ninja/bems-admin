@@ -40,6 +40,7 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
 
     // If all fields are filled, proceed with form submission
     setSubmitClicked(true);
+    setError(null)
     const formData = new FormData();
     formData.append("file", banner);
     formData.append("aboutusInfo", JSON.stringify(aboutusInfo));

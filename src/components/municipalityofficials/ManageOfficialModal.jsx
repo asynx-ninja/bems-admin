@@ -77,6 +77,7 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
       }
 
       setSubmitClicked(true);
+      setError(null)
       const formData = new FormData();
       if (pfp) formData.append("file", pfp);
       formData.append("official", JSON.stringify(selectedOfficial));
