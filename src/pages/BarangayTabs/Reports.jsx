@@ -64,20 +64,29 @@ const Reports = () => {
         }
 
         // Fetch archived users
-        const archivedUsersResponse = await axios.get(
-          `${API_LINK}/users/showArchived/?brgy=${brgy}&type=Resident`
-        );
-        if (archivedUsersResponse.status === 200) {
-          setArchivedUsers(archivedUsersResponse.data.result);
-        } else {
-          setArchivedUsers([]);
-        }
-
         const announcementsResponse = await axios.get(
           `${API_LINK}/announcement/?brgy=${brgy}&archived=false`
         );
+
         if (announcementsResponse.status === 200) {
           setAnnouncements(announcementsResponse.data.result);
+
+          // Fetch completed counts for each announcement
+          const announcementsData = await Promise.all(
+            announcementsResponse.data.result.map(async (announcement) => {
+              const completedResponse = await axios.get(
+                `${API_LINK}/application/completed?brgy=${brgy}&event_id=${announcement.event_id}`
+              );
+
+              if (completedResponse.status === 200) {
+                const completedCount = completedResponse.data.completedCount;
+                return { ...announcement, completedCount };
+              }
+            })
+          );
+
+          // Use the updated announcementsData with completed counts
+          setAnnouncements(announcementsData);
         } else {
           setAnnouncements([]);
         }
@@ -87,7 +96,7 @@ const Reports = () => {
     };
 
     fetchData();
-    
+
     const intervalId = setInterval(() => {
       fetchData();
     }, 10000);
@@ -113,13 +122,13 @@ const Reports = () => {
         if (data) {
           const { residents } = data;
           const registeredCount = residents.filter(
-            (resident) => resident.status === 'Registered'
+            (resident) => resident.status === "Registered"
           ).length;
           const pendingCount = residents.filter(
-            (resident) => resident.status === 'Pending'
+            (resident) => resident.status === "Pending"
           ).length;
           const deniedCount = residents.filter(
-            (resident) => resident.status === 'Denied'
+            (resident) => resident.status === "Denied"
           ).length;
 
           setRegisteredCount(registeredCount);
@@ -127,7 +136,7 @@ const Reports = () => {
           setDeniedCount(deniedCount);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -141,7 +150,7 @@ const Reports = () => {
 
     // Clear the interval when the component is unmounted or when brgy changes
     return () => clearInterval(intervalId);
-  }, [brgy]);// Dependency on brgy to update counts when barangay changes
+  }, [brgy]); // Dependency on brgy to update counts when barangay changes
 
   const chartDataResidentStatus = {
     series: [registeredCount, pendingCount, deniedCount],
@@ -154,71 +163,135 @@ const Reports = () => {
     },
   };
 
+  const [activeResidentCount, setActiveResidentCount] = useState(0);
+  const [archivedResidentCount, setArchivedResidentCount] = useState(0);
+
+  useEffect(() => {
+    // Fetch data for both isArchived: "true" and isArchived: "false"
+    const getResidentIsArchivedData = async () => {
+      try {
+        const responseTrue = await axios.get(
+          `${API_LINK}/users/brgy_resident_isArchived`,
+          {
+            params: {
+              brgy: brgy,
+              isArchived: "true",
+            },
+          }
+        );
+
+        const responseFalse = await axios.get(
+          `${API_LINK}/users/brgy_resident_isArchived`,
+          {
+            params: {
+              brgy: brgy,
+              isArchived: "false",
+            },
+          }
+        );
+
+        const dataTrue = responseTrue.data[0];
+        const dataFalse = responseFalse.data[0];
+
+        const activeResidentCount = dataFalse ? dataFalse.residents.length : 0;
+        const archivedResidentCount = dataTrue ? dataTrue.residents.length : 0;
+
+        // Update state variables
+        setActiveResidentCount(activeResidentCount);
+        setArchivedResidentCount(archivedResidentCount);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    // Initial fetch
+    getResidentIsArchivedData();
+
+    // Fetch data every 10 seconds
+    const intervalId = setInterval(() => {
+      getResidentIsArchivedData();
+    }, 10000);
+
+    // Clear the interval when the component is unmounted or when brgy changes
+    return () => clearInterval(intervalId);
+  }, [brgy]);
+
+  const chartDataResidentIsArchived = {
+    series: [activeResidentCount, archivedResidentCount],
+    options: {
+      colors: ["#4caf50", "#ac4646"], // Colors for Active, Archived
+      chart: {
+        background: "transparent",
+      },
+      labels: ["Active Residents", "Archived Residents"],
+    },
+  };
+
   const currentDate = new Date();
   const sixMonthsAgo = new Date();
   sixMonthsAgo.setMonth(currentDate.getMonth() - 6);
 
-  const monthlyRevenueData = Array.from({ length: 6 }, (_, index) => {
-    const startOfMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() - index,
-      1
-    );
-    const endOfMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() - index + 1,
-      0
-    );
+  // const monthlyRevenueData = Array.from({ length: 6 }, (_, index) => {
+  //   const startOfMonth = new Date(
+  //     currentDate.getFullYear(),
+  //     currentDate.getMonth() - index,
+  //     1
+  //   );
+  //   const endOfMonth = new Date(
+  //     currentDate.getFullYear(),
+  //     currentDate.getMonth() - index + 1,
+  //     0
+  //   );
 
-    const revenue = requests
-      .filter(
-        (request) =>
-          request.status === "Transaction Completed" &&
-          new Date(request.createdAt) >= startOfMonth &&
-          new Date(request.createdAt) <= endOfMonth
-      )
-      .reduce((total, request) => total + request.fee, 0);
+  //   const revenue = requests
+  //     .filter(
+  //       (request) =>
+  //         request.status === "Transaction Completed" &&
+  //         new Date(request.createdAt) >= startOfMonth &&
+  //         new Date(request.createdAt) <= endOfMonth
+  //     )
+  //     .reduce((total, request) => total + request.fee, 0);
 
-    return revenue;
-  }).reverse();
+  //   return revenue;
+  // }).reverse();
 
-  const chartDataRevenue = {
-    series: [
-      {
-        name: "Revenue",
-        data: monthlyRevenueData,
-      },
-    ],
-    options: {
-      colors: ["#4b7c80"],
-      chart: {
-        background: "transparent",
-      },
-      xaxis: {
-        categories: Array.from({ length: 6 }, (_, index) =>
-          new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth() - index,
-            1
-          ).toLocaleString("en-us", {
-            month: "short",
-          })
-        ).reverse(),
-        labels: {
-          style: {
-            fontSize: "9px",
-          },
-        },
-      },
-      yaxis: {
-        labels: {
-          formatter: function (value) {
-            return "PHP " + value;
-          },
-        },
-      },
-    },
-  };
+  // const chartDataRevenue = {
+  //   series: [
+  //     {
+  //       name: "Revenue",
+  //       data: monthlyRevenueData,
+  //     },
+  //   ],
+  //   options: {
+  //     colors: ["#4b7c80"],
+  //     chart: {
+  //       background: "transparent",
+  //     },
+  //     xaxis: {
+  //       categories: Array.from({ length: 6 }, (_, index) =>
+  //         new Date(
+  //           currentDate.getFullYear(),
+  //           currentDate.getMonth() - index,
+  //           1
+  //         ).toLocaleString("en-us", {
+  //           month: "short",
+  //         })
+  //       ).reverse(),
+  //       labels: {
+  //         style: {
+  //           fontSize: "9px",
+  //         },
+  //       },
+  //     },
+  //     yaxis: {
+  //       labels: {
+  //         formatter: function (value) {
+  //           return "PHP " + value;
+  //         },
+  //       },
+  //     },
+  //   },
+  // };
 
   const [statusPercentages, setStatusPercentages] = useState([]);
 
@@ -236,12 +309,12 @@ const Reports = () => {
 
         const data = response.data;
 
-        console.log('data for total status requests: ', data);
+        console.log("data for total status requests: ", data);
 
         // Assuming the API response has the structure similar to statusPercentages
         setStatusPercentages(data);
       } catch (error) {
-        console.error('Error fetching total status requests:', error);
+        console.error("Error fetching total status requests:", error);
       }
     };
 
@@ -257,33 +330,98 @@ const Reports = () => {
     return () => clearInterval(intervalId);
   }, [brgy]);
 
-const chartDataStatusPercentage = {
-  series: statusPercentages.map((percentage) => percentage.totalRequests),
-  options: {
-    colors: statusPercentages.map((percentage) => {
-      switch (percentage._id) {
-        case "Transaction Completed":
-          return "#007069";
-        case "Rejected":
-          return "#99364D";
-        case "Pending":
-          return "#d99c3f";
-        case "Paid":
-          return "#5B21B6";
-        case "Processing":
-          return "#1E40AF";
-        case "Cancelled":
-          return "#9e9e9e";
-        default:
-          return "#000000"; // Default color, modify as needed
-      }
-    }),
-    chart: {
-      background: "transparent",
+  const chartDataStatusPercentage = {
+    series: statusPercentages.map((percentage) => percentage.totalRequests),
+    options: {
+      colors: statusPercentages.map((percentage) => {
+        switch (percentage._id) {
+          case "Transaction Completed":
+            return "#007069";
+          case "Rejected":
+            return "#99364D";
+          case "Pending":
+            return "#d99c3f";
+          case "Paid":
+            return "#5B21B6";
+          case "Processing":
+            return "#1E40AF";
+          case "Cancelled":
+            return "#9e9e9e";
+          default:
+            return "#000000"; // Default color, modify as needed
+        }
+      }),
+      chart: {
+        background: "transparent",
+      },
+      labels: statusPercentages.map((percentage) => percentage._id),
     },
-    labels: statusPercentages.map((percentage) => percentage._id),
-  },
-};
+  };
+
+  //Inquiries Percentage:
+  const [statusPercentagesInquiries, setStatusPercentagesInquiries] = useState(
+    []
+  );
+
+  const chartDataInquiriesStatusPercentage = {
+    series: statusPercentagesInquiries.map(
+      (percentage) => percentage.totalRequests
+    ),
+    options: {
+      colors: statusPercentagesInquiries.map((percentage) => {
+        switch (percentage._id) {
+          case "Completed":
+            return "#007069";
+          case "Pending":
+            return "#99364D";
+          case "In Progress":
+            return "#d99c3f";
+          default:
+            return "#000000"; // Default color, modify as needed
+        }
+      }),
+      chart: {
+        background: "transparent",
+      },
+      labels: statusPercentagesInquiries.map((percentage) => percentage._id),
+    },
+  };
+
+  useEffect(() => {
+    const fetchTotalStatusInquiries = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/inquiries/all_status_inquiries`,
+          {
+            params: {
+              brgy: brgy,
+            },
+          }
+        );
+
+        const data = response.data;
+
+        console.log("data for total status inquiries: ", data);
+
+        // Assuming the API response has the structure similar to serviceSummary
+        setStatusPercentagesInquiries(data);
+      } catch (error) {
+        console.error("Error fetching total status inquiries:", error);
+      }
+    };
+
+    // Initial fetch
+    fetchTotalStatusInquiries();
+
+    // // Fetch data every 10 seconds
+    const intervalId = setInterval(() => {
+      fetchTotalStatusInquiries();
+    }, 10000);
+
+    // Clear the interval when the component is unmounted or when brgy changes
+    return () => clearInterval(intervalId);
+  }, [brgy]);
+
   const getPopulationGrowthData = () => {
     const currentDate = new Date();
     const sixMonthsAgo = new Date();
@@ -453,10 +591,10 @@ const chartDataStatusPercentage = {
     },
   };
 
-  // Function to get the total attendees for each announcement
+  // Use completedCount instead of attendees.length
   const totalAttendees = announcements.map((announcement) => ({
     announcement_title: announcement.title,
-    attendees: announcement.attendees.length,
+    attendees: announcement.completedCount || 0, // Use completedCount, default to 0 if undefined
   }));
 
   // Sort the total attendees array in descending order
@@ -553,6 +691,145 @@ const chartDataStatusPercentage = {
     )}`
   );
 
+  const [totalMonthlyRevenue, setTotalMonthlyRevenue] = useState(0);
+
+  useEffect(() => {
+    const fetchFeeSummary = async () => {
+      try {
+        const params = { timeRange: timeRange };
+
+        if (timeRange === "specific") {
+          params.specificDate = specificDate;
+        }
+
+        if (timeRange === "weekly" && specificWeek) {
+          const [year, weekNumber] = specificWeek.split("-W");
+          const weekStart = moment()
+            .isoWeekYear(year)
+            .isoWeek(weekNumber)
+            .startOf("isoWeek")
+            .toISOString();
+          params.week = weekStart;
+        }
+
+        if (timeRange === "monthly" && specificMonth) {
+          const [year, month] = specificMonth.split("-");
+          params.year = parseInt(year);
+          params.month = parseInt(month);
+        }
+
+        if (timeRange === "annual") {
+          params.year = specificYear;
+        }
+
+        // Make the API request using the GetMonthlyRevenueBrgy function
+        const response = await axios.get(
+          `${API_LINK}/requests/get_monthly_revenue_brgy`,
+          {
+            params: {
+              ...params,
+              brgy: brgy,
+            },
+          }
+        );
+
+        const data = response.data;
+
+        // Assuming your data structure is an array of objects
+        if (data.length > 0) {
+          // Assuming the totalFee property is present in each object
+          const totalMonthlyRevenue = data.reduce(
+            (total, item) => total + item.totalFee,
+            0
+          );
+          setTotalMonthlyRevenue(totalMonthlyRevenue);
+        } else {
+          setTotalMonthlyRevenue(0);
+        }
+      } catch (error) {
+        console.error("Error fetching monthly fee summary:", error);
+      }
+    };
+
+    fetchFeeSummary();
+  }, [
+    timeRange,
+    specificDate,
+    specificWeek,
+    specificMonth,
+    specificYear,
+    brgy,
+  ]);
+
+  // Monthly Revenue Data Calculation
+  // const currentDate = new Date();
+
+  const monthlyRevenueData = Array.from({ length: 6 }, (_, index) => {
+    const startOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - index,
+      1
+    );
+    const endOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - index + 1,
+      0
+    );
+
+    const revenue =
+      index === 0
+        ? totalMonthlyRevenue // Use totalMonthlyRevenue for the current month
+        : requests
+            .filter(
+              (request) =>
+                request.status === "Transaction Completed" &&
+                new Date(request.updatedAt) >= startOfMonth &&
+                new Date(request.updatedAt) <= endOfMonth
+            )
+            .reduce((total, request) => total + request.fee, 0);
+
+    return revenue;
+  }).reverse();
+
+  // Chart Data
+  const chartDataRevenue = {
+    series: [
+      {
+        name: "Revenue",
+        data: monthlyRevenueData,
+      },
+    ],
+    options: {
+      colors: ["#4b7c80"],
+      chart: {
+        background: "transparent",
+      },
+      xaxis: {
+        categories: Array.from({ length: 6 }, (_, index) =>
+          new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth() - index,
+            1
+          ).toLocaleString("en-us", {
+            month: "short",
+          })
+        ).reverse(),
+        labels: {
+          style: {
+            fontSize: "9px",
+          },
+        },
+      },
+      yaxis: {
+        labels: {
+          formatter: function (value) {
+            return "PHP " + value;
+          },
+        },
+      },
+    },
+  };
+
   const [estimatedRevenuess, setEstimatedRevenuess] = useState(0);
 
   useEffect(() => {
@@ -612,7 +889,7 @@ const chartDataStatusPercentage = {
     fetchFeeSummary();
   }, [timeRange, specificDate, specificWeek, specificMonth, specificYear]);
 
-  const [totalFeess, setTotalFeess] = useState(0);
+  const [totalFees, setTotalFees] = useState(0);
 
   useEffect(() => {
     const fetchFeeSummary = async () => {
@@ -661,10 +938,10 @@ const chartDataStatusPercentage = {
         // Assuming your data structure is an array with a single object
         if (data.length > 0) {
           const { totalFee } = data[0]; // Assuming the totalFee property is present
-          setTotalFeess(totalFee);
+          setTotalFees(totalFee);
         } else {
-          // If there is no data, set totalFeess to 0
-          setTotalFeess(0);
+          // If there is no data, set totalFees to 0
+          setTotalFees(0);
         }
       } catch (error) {
         console.error("Error fetching fee summary:", error);
@@ -1079,7 +1356,7 @@ const chartDataStatusPercentage = {
                 data-hs-toggle-count='{"target": "#toggle-count", "min": 129, "max": 149}'
                 className="text-gray-800 font-semibold text-xl lg:text-3xl dark:text-gray-200"
               >
-                {totalFeess}
+                {totalFees}
               </p>
             </div>
           </div>
@@ -1125,7 +1402,7 @@ const chartDataStatusPercentage = {
             <div className="flex rounded-xl justify-center items-center">
               <Chart
                 type="pie"
-                className="flex rounded-xl justify-center w-[400px] lg:w-[400px] xl:w-[400px] xxl:w-[500px] my-10"
+                className="flex rounded-xl justify-center w-[400px] lg:w-[300px] xl:w-[400px] xxl:w-[500px] my-10"
                 series={chartDataResidentStatus.series}
                 options={chartDataResidentStatus.options}
               />
@@ -1134,14 +1411,14 @@ const chartDataStatusPercentage = {
 
           <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5">
             <h1 className="mt-5 ml-5 font-medium text-black">
-              REGISTERED USERS (FOR THE PAST 6 MONTHS)
+              ACTIVE AND ARCHIVED RESIDENTS
             </h1>
-            <div className="flex rounded-xl">
+            <div className="flex rounded-xl justify-center items-center">
               <Chart
-                type="line"
-                className="flex w-full rounded-xl"
-                series={chartDataPopulationGrowth.series}
-                options={chartDataPopulationGrowth.options}
+                type="pie"
+                className="flex rounded-xl items-center justify-center w-[400px] lg:w-[300px] xl:w-[400px] xxl:w-[540px] my-10"
+                series={chartDataResidentIsArchived.series}
+                options={chartDataResidentIsArchived.options}
               />
             </div>
           </div>
@@ -1156,7 +1433,7 @@ const chartDataStatusPercentage = {
             <div className="flex justify-center items-center rounded-xl">
               <Chart
                 type="pie"
-                className="flex rounded-xl justify-center w-[500px] lg:w-[600px] xl:w-[400px] xxl:w-[600px] my-10"
+                className="flex rounded-xl justify-center w-[500px] lg:w-[600px] xl:w-[400px] xxl:w-[620px] my-10"
                 series={chartDataStatusPercentage.series}
                 options={chartDataStatusPercentage.options}
               />
@@ -1164,6 +1441,20 @@ const chartDataStatusPercentage = {
           </div>
 
           <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5">
+            <h1 className="mt-5 ml-5 font-medium text-black">
+              INQUIRIES PERCENTAGE
+            </h1>
+            <div className="flex justify-center items-center rounded-xl">
+              <Chart
+                type="pie"
+                className="flex rounded-xl justify-center w-[500px] lg:w-[300px] xl:w-[400px] xxl:w-[550px] my-10"
+                series={chartDataInquiriesStatusPercentage.series}
+                options={chartDataInquiriesStatusPercentage.options}
+              />
+            </div>
+          </div>
+
+          {/* <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5">
             <h1 className="mt-5 ml-5 font-medium text-black">
               SERVICE REQUEST COMPLETION RATE (FOR THE PAST 6 MONTHS)
             </h1>
@@ -1175,7 +1466,7 @@ const chartDataStatusPercentage = {
                 options={chartDataCompletionRate.options}
               />
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* CHARTS 4 */}
@@ -1194,7 +1485,7 @@ const chartDataStatusPercentage = {
             </div>
           </div>
 
-          <div className="flex flex-col bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5">
+          {/* <div className="flex flex-col bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5">
             <h1 className="mt-5 ml-5 font-medium text-black">
               OVERALL NUMBER OF CREATED EVENTS (FOR THE PAST 6 MONTHS)
             </h1>
@@ -1206,7 +1497,7 @@ const chartDataStatusPercentage = {
                 options={chartDataEventsOrganized.options}
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

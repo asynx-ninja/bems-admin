@@ -416,13 +416,13 @@ const BrgyAnnouncement = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-3">
+                    {/* <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black line-clamp-2">
                           {item.attendees.length}
                         </span>
                       </div>
-                    </td>
+                    </td> */}
                     <td className="px-6 py-3">
                       <div className="flex justify-center space-x-1 sm:space-x-none">
                         <button
