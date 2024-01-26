@@ -206,11 +206,29 @@ const Inquiries = () => {
       setFilteredInquiries(filters(selected, date));
     }
   };
+  const [showTooltip, setShowTooltip] = useState(false);
+  const isLatestResponseResident = (inquiry) => {
+    const { response, isApproved } = inquiry;
+    if (response && response.length > 0) {
+      const latestResponse = response[response.length - 1];
+      return (
+        latestResponse.type === "Resident" &&
+        !["Completed", "Pending"].includes(isApproved)
+      );
+    }
+    return false;
+  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowTooltip((prev) => !prev);
+    }, 5000);
 
+    return () => clearInterval(interval);
+  }, []);
   return (
-    <div className="mx-4 mt-[10rem] md:mt-[5rem] lg:mt-4 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
-    <div className="flex flex-col">
-        <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
+    <div className="mx-4 mt-4">
+      <div className="flex flex-col ">
+        <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
               className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[26px] xxxl:text-4xl xxxl:mt-1 text-white"
@@ -471,8 +489,8 @@ const Inquiries = () => {
           </div>
         </div>
 
-        <div className="overflow-auto sm:overflow-x-auto h-[calc(100vh_-_300px)] xxxl:h-[calc(100vh_-_326px)]">
-          <table className="w-full ">
+        <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll lg:overflow-x-hidden h-[calc(100vh_-_275px)] xxl:h-[calc(100vh_-_275px)] xxxl:h-[calc(100vh_-_300px)]">
+          <table className="relative table-auto w-full">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
                 <th scope="col" className="px-6 py-4">
@@ -566,12 +584,28 @@ const Inquiries = () => {
 
                     <td className="px-6 py-3">
                       <div className="flex justify-center space-x-1 sm:space-x-none">
-                        <div className="hs-tooltip inline-block">
+                      <div className="hs-tooltip inline-block relative">
+                          {isLatestResponseResident(item) && (
+                            <span className="tooltip absolute -top-2 left-8 z-10">
+                              <span className="animate-ping absolute inline-flex h-3 w-3 mt-1 rounded-full bg-red-400 opacity-75 dark:bg-red-600"></span>
+                              <span className="relative inline-flex rounded-full bg-red-500 text-white h-3 w-3"></span>
+                              {showTooltip && (
+                                <span className="tooltiptext bg-red-500 text-white text-xs py-1 px-2 rounded absolute -left-full top-1/2 transform -translate-y-1/2 -translate-x-full whitespace-nowrap">
+                                  You have a new reply
+                                </span>
+                              )}
+                            </span>
+                          )}
                           <button
                             type="button"
                             data-hs-overlay="#hs-modal-viewInquiries"
                             onClick={() => handleView({ ...item })}
-                            className="hs-tooltip-toggle text-white bg-teal-800  font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                            className={`hs-tooltip-toggle text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg ${
+                              item.isApproved === "Completed"
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            disabled={item.isApproved === "Completed"}
                           >
                             <AiOutlineEye
                               size={24}
@@ -583,6 +617,9 @@ const Inquiries = () => {
                             role="tooltip"
                           >
                             View Inquiry
+                            {item.isApproved === "Completed"
+                              ? "Inquiries already completed"
+                              : "View Inquiry"}
                           </span>
                         </div>
                       </div>

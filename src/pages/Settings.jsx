@@ -430,7 +430,7 @@ const Settings = () => {
   };
   return (
     <div>
-      <div className="mx-4 mt-[10rem]  md:mt-[5rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+      <div className="mx-4 overflow-y-auto lg:mt-[1rem] mt-0 scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb h-[calc(100vh_-_80px)] lg:h-[calc(100vh_-_80px)]">
         <div className="flex flex-col">
           <div className="relative w-full">
             <div className="relative">

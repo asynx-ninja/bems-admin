@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
 const Breadcrumbs = ({ id }) => {
   return (
     <nav className="flex ">
-    <ol className="flex items-center space-x-2 text-gray-500">
+    <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
       <BiMessageSquareDetail size={22} />
       <li>
         <a

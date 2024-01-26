@@ -75,7 +75,7 @@ const Residents = () => {
 
 
   return (
-    <div className="mx-4 mt-[10rem] lg:mt-8 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+    <div className="mx-4 mt-8 overflow-y-auto lg:h-[calc(100vh_-_110px)]">
       <div className="w-full flex items-center justify-center bg-[#295141] rounded-t-lg">
         <h1 className="text-white text-3xl py-2 px-5 font-heavy ">
           BARANGAY {brgy ? brgy.toUpperCase() : ""} INFORMATION
@@ -228,8 +228,8 @@ const Residents = () => {
           </div>
 
           {/* Table */}
-          <div className="overflow-y-auto sm:overflow-x-auto h-[calc(100vh_-_270px)] xxxl:h-[calc(100vh_-_286px)]">
-            <table className="w-full ">
+          <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll lg:overflow-x-hidden h-[calc(100vh_-_320px)] xxxl:h-[calc(100vh_-_340px)]">
+          <table className="relative table-auto w-full">
               <thead className="bg-[#295141] sticky top-0">
                 <tr className="">
                   {tableHeader.map((item, idx) => (

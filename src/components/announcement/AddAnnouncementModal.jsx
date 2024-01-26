@@ -393,7 +393,9 @@ function CreateAnnouncementModal({ brgy }) {
             </div>
           </div>
         </div>
-        {empty && (
+       
+      </div>
+      {empty && (
         <ErrorPopup />
         )}
         {/* <AddLoader /> */}
@@ -401,7 +403,6 @@ function CreateAnnouncementModal({ brgy }) {
         {creationStatus && (
           <AddLoader creationStatus={creationStatus} error={error} />
         )}
-      </div>
     </div>
   );
 }

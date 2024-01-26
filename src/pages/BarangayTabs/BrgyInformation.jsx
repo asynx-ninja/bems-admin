@@ -134,8 +134,8 @@ const Information = () => {
     <>
       {/* Table */}
 
-      <div className="">
-        <div>
+      <div className="mx-4 overflow-y-auto lg:h-[calc(100vh_-_80px)]">
+      <div>
           <div className="bg-cover bg-center h-96 rounded-lg">
             <div className="relative flex justify-end">
               {isEditingMode && (

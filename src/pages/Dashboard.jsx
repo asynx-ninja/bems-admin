@@ -10,7 +10,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="mx-4 my-4 mt-[10rem]  md:mt-[6rem] lg:mt-4">
+    <div className="mx-4 my-4 overflow-y-auto lg:h-[calc(100vh_-_105px)]">
       <StatisticsDashboard />
       <div className="w-full flex flex-col lg:flex-col ">
         <SubPendingRequest />

@@ -9,7 +9,7 @@ const Breadcrumbs = () => {
   const brgy = searchParams.get("brgy");
   return (
     <nav className="flex ">
-      <ol className="flex items-center space-x-2 text-gray-500 ">
+       <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
         <IoTicketSharp size={22} />
         <li>
           <a href={`/inquiries/?id=${id}&brgy=${brgy}`} className="text-gray-600 font-bold hover:underline text-sm md:text-lg">

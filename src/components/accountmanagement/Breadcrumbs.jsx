@@ -4,7 +4,7 @@ import { GrFormNext } from "react-icons/gr";
 const Breadcrumb = ({ id }) => {
   return (
     <nav className="flex ">
-      <ol className="flex items-center space-x-2 text-gray-500">
+    <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
         <TfiAnnouncement size={22} />
         <li>
           <a

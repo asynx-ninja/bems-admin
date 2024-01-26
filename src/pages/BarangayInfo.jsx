@@ -27,7 +27,7 @@ function BarangayDetails() {
   }, []);
 
   return (
-    <div className="mx-4 mt-[10rem]  md:mt-[6rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)] ">
+    <div className="mx-4 lg:mt-[1rem] overflow-y-auto lg:h-[calc(100vh_-_90px)] ">
       <div className="w-full flex items-center justify-center bg-[#295141] rounded-t-lg">
         <h1 className="text-white lg:text-3xl py-2 px-5 font-heavy ">
           BARANGAY {brgy ? brgy.toUpperCase() : ""} INFORMATION

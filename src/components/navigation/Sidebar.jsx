@@ -115,7 +115,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <div
+    <div
         id="hs-overlay-basic"
         className="sm:fixed lg:relative overflow-y-auto lg:block lg:end-auto lg:bottom-0 sm:block flex items-center justify-center hs-overlay-basic h-full overflow-hidden hs-overlay hs-overlay-open:translate-x-0 -translate-x-full transition-all duration-300 transform hidden top-0 z-[60] lg:z-0 lg:translate-x-0 w-[17rem]"
       >
