@@ -32,7 +32,7 @@ function BarangayMenu() {
   console.log(barangays)
   return (
     <div className="mx-4 mt-4">
-      <div className="flex flex-col justify-center items-center mx-auto mt-4">
+      <div className="flex flex-col justify-center items-center mx-auto mt-4 mb-2">
         <div className="py-2 text-center font-bold text-3xl">
           <h1>SELECT A BARANGAY</h1>
         </div>

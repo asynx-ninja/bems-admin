@@ -10,7 +10,6 @@ import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
 import Breadcrumbs from "../../components/mservicesinfo/Breadcrumbs";
 import RestoreServicesInfoModal from "../../components/mservicesinfo/restoreServiceInfoModal";
-import GenerateReportsModal from "../../components/accountmanagement/GenerateReportsModal";
 import ViewArchivedServicesInfo from "../../components/mservicesinfo/viewArchivedServicesInfoModal"
 import noData from "../../assets/image/no-data.png";
 const ArchivedServicesInfo = () => {
@@ -517,7 +516,6 @@ const ArchivedServicesInfo = () => {
         </div>
         {/* <ViewArchivedAdmin user={user} setUser={setUser}/> */}
         <RestoreServicesInfoModal selectedItems={selectedItems} />
-        <GenerateReportsModal />
         <ViewArchivedServicesInfo servicesinfos={servicesinfos}/>
       </div>
     </div>

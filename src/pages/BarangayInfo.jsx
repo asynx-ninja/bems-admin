@@ -8,6 +8,7 @@ import Officials from "./BarangayTabs/BrgyOfficials";
 import ArchivedOfficials from "./BarangayTabs/BrgyArchivedOfficials";
 import Residents from "./BarangayTabs/BrgyResidents";
 import Inquiries from "./BarangayTabs/BrgyInquiries";
+import Application from "./BarangayTabs/BrgyEventsApplication"
 import { useParams, useSearchParams } from "react-router-dom";
 import Announcement from "./BarangayTabs/BrgyAnnouncements";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
@@ -47,8 +48,9 @@ function BarangayDetails() {
         {activeTab === 4 && 'Service Requests'}
         {activeTab === 5 && 'Residents'}
         {activeTab === 6 && 'Events'}
-        {activeTab === 7 && 'Inquiries'}
-        {activeTab === 8 && 'Reports'}
+        {activeTab === 7 && 'Events Application'}
+        {activeTab === 8 && 'Inquiries'}
+        {activeTab === 9 && 'Reports'}
         <svg
           className={`hs-collapse-open ${
             collapseOpen ? 'rotate-180' : ''
@@ -144,17 +146,17 @@ function BarangayDetails() {
               onClick={() => handleTabChange(6)}
             >
               Events
-            </button>{" "}
+            </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className="hs-tab-active:font-semibold uppercase mx-1  my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-7"
               aria-controls="basic-tabs-7"
               role="tab"
               onClick={() => handleTabChange(7)}
             >
-              Inquiries
+              Events Application
             </button>
             <button
               type="button"
@@ -164,6 +166,17 @@ function BarangayDetails() {
               aria-controls="basic-tabs-8"
               role="tab"
               onClick={() => handleTabChange(8)}
+            >
+              Inquiries
+            </button>
+            <button
+              type="button"
+              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              id="basic-tabs-item-1"
+              data-hs-tab="#basic-tabs-9"
+              aria-controls="basic-tabs-9"
+              role="tab"
+              onClick={() => handleTabChange(9)}
             >
               Reports
             </button>
@@ -225,13 +238,21 @@ function BarangayDetails() {
           role="tabpanel"
           aria-labelledby="basic-tabs-item-7"
         >
-          <Inquiries brgy={brgy} id={id} />
+          <Application brgy={brgy} id={id} />
         </div>
         <div
           id="basic-tabs-8"
           className="hidden"
           role="tabpanel"
           aria-labelledby="basic-tabs-item-8"
+        >
+          <Inquiries brgy={brgy} id={id} />
+        </div>
+        <div
+          id="basic-tabs-9"
+          className="hidden"
+          role="tabpanel"
+          aria-labelledby="basic-tabs-item-9"
         >
           <Profit brgy={brgy} id={id} />
         </div>

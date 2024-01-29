@@ -22,8 +22,8 @@ import BarangayMenu from "../pages/BarangayMenu";
 import BarangayInfo from "../pages/BarangayInfo";
 import BrgyArchivedAnnouncement from "../pages/BarangayTabs/BrgyArchivedAnnouncement";
 import BrgyArchivedInquiries from "../pages/BarangayTabs/BrgyArchivedInquiries";
-import AccountManagement from "../pages/AccountManagement";
-import ArchivedAccountManagement from "../pages/ArchivedAccountManagement";
+import AccountManagement from "../pages/AccountManagement/MunicipalAccount";
+import ArchivedAccountManagement from "../pages/AccountManagement/ArchiveMunicipalAccount";
 import MunicipalityOffcials from "../pages/MunicipalInfo/MunicipalityOffcials";
 import ArchivedMunicipalityOfficials from "../pages/MunicipalInfo/ArchivedMunicipalityOfficials";
 import MAboutusInfo from "../pages/MunicipalInfo/MAboutusInfo";
@@ -34,6 +34,9 @@ import MTouristSpot from "../pages/MunicipalInfo/MTouristSpot";
 import ArchivedTouristSpot from "../pages/MunicipalInfo/ArchivedTouristSpot";
 import EventsRegistrations from "../pages/Events/EventsApplication";
 import ArchivedRegistrations from "../pages/Events/ArchivedApplication";
+import BarangayAccount from "../pages/AccountManagement/BarangayAccount";
+import ArchiveBarangayAccount from "../pages/AccountManagement/ArchiveBarangayAccount";
+import ArchiveApplication from "../pages/BarangayTabs/BrgyArchiveApplication"
 import Reports from "../pages/Reports";
 const pages = [
   {
@@ -118,12 +121,20 @@ const pages = [
     element: <Navbar comp={<ArchivedMunicipalityOfficials />} />,
   },
   {
-    path: "/accountmanagement",
+    path: "/municipal_account",
     element: <Navbar comp={<AccountManagement />} />,
   },
   {
-    path: "/archivedaccountmanagement",
+    path: "/archive_municipal_account",
     element: <Navbar comp={<ArchivedAccountManagement />} />,
+  },
+  {
+    path: "/brgy_account",
+    element: <Navbar comp={<BarangayAccount />} />,
+  },
+  {
+    path: "/archive_brgy_account",
+    element: <Navbar comp={<ArchiveBarangayAccount />} />,
   },
   {
     path: "/brgyarchivedservices",
@@ -152,6 +163,10 @@ const pages = [
   {
     path: "/brgyarchivedannoucements",
     element: <Navbar comp={<BrgyArchivedAnnouncement />} />,
+  },
+  {
+    path: "/brgyarchivedapplication",
+    element: <Navbar comp={<ArchiveApplication />} />,
   },
   {
     path: "/brgyarchivedresidents",

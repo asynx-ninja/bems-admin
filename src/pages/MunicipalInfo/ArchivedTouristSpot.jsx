@@ -10,7 +10,6 @@ import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
 import Breadcrumbs from "../../components/mtouristspot/Breadcrumbs";
 import RestoreTouristSpotModal from "../../components/mtouristspot/restoreTouristSpot";
-import GenerateReportsModal from "../../components/accountmanagement/GenerateReportsModal";
 import ViewArchivedTouristSpot from "../../components/mtouristspot/viewArchivedTouristSpotModal"
 import noData from "../../assets/image/no-data.png";
 const ArchivedTouristSpot = () => {
@@ -518,7 +517,6 @@ const ArchivedTouristSpot = () => {
         </div>
         {/* <ViewArchivedAdmin user={user} setUser={setUser}/> */}
         <RestoreTouristSpotModal selectedItems={selectedItems} />
-        <GenerateReportsModal />
         <ViewArchivedTouristSpot touristspotInfo={touristspotInfo}/>
       </div>
     </div>

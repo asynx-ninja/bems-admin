@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from "react";
 
-function RestoreLoader({ updatingStatus, error }) {
+function AddLoader({ creationStatus, error }) {
   const textPrompts = {
-    updating: "Restoring the account...",
+    creating: "Creating the new municipal admin account...",
     waiting: "Please wait...",
-    success: "Account Restored Successful!",
-    error: "Error restoring account. Please try again.",
+    success: "Municipal Admin Account Created Successful!",
+    error: "Error creating account. Please try again.",
   };
 
   const [loadingText, setLoadingText] = useState(
-    textPrompts[updatingStatus] || "Restoring the account.."
+    textPrompts[creationStatus] || "Creating new municipal admin account..."
   );
-  const [loading, setLoading] = useState(updatingStatus === "Restoring");
+  const [loading, setLoading] = useState(creationStatus === "creating");
 
   useEffect(() => {
-    if (["success", "error"].includes(updatingStatus)) {
+    if (["success", "error"].includes(creationStatus)) {
       const timeout = setTimeout(() => {
         setLoading(false);
       }, 3000);
 
       return () => clearTimeout(timeout);
     }
-  }, [updatingStatus]);
+  }, [creationStatus]);
 
   return (
-    <div className="absolute top-0 lg:top-0 lg:end-0 mb-20 lg:mr-5 z-[80]">
+    <div className="absolute top-0 lg:top-10 lg:end-0 mb-20 lg:mr-5 z-[80]">
       <div
         className="w-screen md:w-auto bg-[#295141] border border-gray-200 rounded-xl shadow-lg"
         role="alert"
@@ -64,4 +64,4 @@ function RestoreLoader({ updatingStatus, error }) {
   );
 }
 
-export default RestoreLoader;
+export default AddLoader;

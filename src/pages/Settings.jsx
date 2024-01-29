@@ -430,7 +430,7 @@ const Settings = () => {
   };
   return (
     <div>
-      <div className="mx-4 overflow-y-auto lg:mt-[1rem] mt-0 scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb h-[calc(100vh_-_80px)] lg:h-[calc(100vh_-_80px)]">
+      <div className="mx-4 overflow-y-auto lg:mt-[1rem] mt-0 scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb h-[calc(100vh_-_80px)] lg:h-[calc(100vh_-_90px)]">
         <div className="flex flex-col">
           <div className="relative w-full">
             <div className="relative">
@@ -1249,7 +1249,7 @@ const Settings = () => {
                       htmlFor="oldpass"
                       className="block sm:text-xs lg:text-sm font-medium mb-2"
                     >
-                      Enter your old password
+                      Enter your password
                     </label>
                     <input
                       type={oldpasswordShown ? "text" : "password"}
@@ -1345,7 +1345,7 @@ const Settings = () => {
                       htmlFor="oldpass"
                       className="block sm:text-xs lg:text-sm font-medium mb-2"
                     >
-                      Enter your old password
+                      Enter your current password
                     </label>
                     <input
                       type={oldpasswordShown ? "text" : "password"}

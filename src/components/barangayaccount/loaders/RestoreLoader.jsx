@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 
-function ArchiveLoader({ updatingStatus, error }) {
+function RestoreLoader({ updatingStatus, error }) {
   const textPrompts = {
-    updating: "Archiving the account...",
+    updating: "Restoring the account...",
     waiting: "Please wait...",
-    success: "Account Archived Successful!",
-    error: "Error archiving account. Please try again.",
+    success: "Account Restored Successful!",
+    error: "Error restoring account. Please try again.",
   };
 
   const [loadingText, setLoadingText] = useState(
-    textPrompts[updatingStatus] || "Archiving account.."
+    textPrompts[updatingStatus] || "Restoring the account.."
   );
-  const [loading, setLoading] = useState(updatingStatus === "archiving");
+  const [loading, setLoading] = useState(updatingStatus === "Restoring");
 
   useEffect(() => {
     if (["success", "error"].includes(updatingStatus)) {
@@ -24,7 +24,7 @@ function ArchiveLoader({ updatingStatus, error }) {
   }, [updatingStatus]);
 
   return (
-    <div className="absolute top-0 lg:top-0 lg:end-0 mb-20 lg:mr-5 z-[80]">
+    <div className="absolute top-0 lg:top-10 lg:end-0 mb-20 lg:mr-5 z-[80]">
       <div
         className="w-screen md:w-auto bg-[#295141] border border-gray-200 rounded-xl shadow-lg"
         role="alert"
@@ -64,4 +64,4 @@ function ArchiveLoader({ updatingStatus, error }) {
   );
 }
 
-export default ArchiveLoader;
+export default RestoreLoader;

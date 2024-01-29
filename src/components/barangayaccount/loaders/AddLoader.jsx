@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 
 function AddLoader({ creationStatus, error }) {
   const textPrompts = {
-    creating: "Creating the new admin account...",
+    creating: "Creating the new brgy admin account...",
     waiting: "Please wait...",
-    success: "Admin Account Created Successful!",
+    success: "Brgy Admin Account Created Successful!",
     error: "Error creating account. Please try again.",
   };
 
   const [loadingText, setLoadingText] = useState(
-    textPrompts[creationStatus] || "Creating new admin account..."
+    textPrompts[creationStatus] || "Creating new brgy admin account..."
   );
   const [loading, setLoading] = useState(creationStatus === "creating");
 

@@ -10,7 +10,6 @@ import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
 import Breadcrumbs from "../../components/maboutusnfo/Breadcrumbs";
 import RestoreAboutusModal from "../../components/maboutusnfo/restoreAboutusModal";
-import GenerateReportsModal from "../../components/accountmanagement/GenerateReportsModal";
 import ViewArchivedAboutusModal from "../../components/maboutusnfo/viewArchivedAboutusModal";
 import noData from "../../assets/image/no-data.png";
 const ArchivedAboutusInfo = () => {
@@ -517,7 +516,6 @@ const ArchivedAboutusInfo = () => {
         </div>
         {/* <ViewArchivedAdmin user={user} setUser={setUser}/> */}
         <RestoreAboutusModal selectedItems={selectedItems} />
-        <GenerateReportsModal />
         <ViewArchivedAboutusModal
           aboutusInfo={aboutusInfo}
           setAboutusinfo={setAboutusinfo}

@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 
 function EditLoader({ updatingStatus, error }) {
   const textPrompts = {
-    updating: "Updating the admin account...",
+    updating: "Updating the municipal admin account...",
     waiting: "Please wait...",
-    success: "Admin Account Updated Successful!",
+    success: "Municipal Admin Account Updated Successful!",
     error: "Error updating account. Please try again.",
   };
 
   const [loadingText, setLoadingText] = useState(
-    textPrompts[updatingStatus] || "Updating admin account..."
+    textPrompts[updatingStatus] || "Updating municipal admin account..."
   );
   const [loading, setLoading] = useState(updatingStatus === "updating");
 
@@ -24,7 +24,7 @@ function EditLoader({ updatingStatus, error }) {
   }, [updatingStatus]);
 
   return (
-    <div className="absolute top-0 lg:top-0 lg:right-0 mb-20 lg:mr-5 z-[80]">
+    <div className="absolute top-0 lg:top-10 lg:right-0 mb-20 lg:mr-5 z-[80]">
     <div
       className="w-full md:w-auto bg-[#295141] border border-gray-200 rounded-xl shadow-lg"
       role="alert"

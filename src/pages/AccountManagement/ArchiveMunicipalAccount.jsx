@@ -1,43 +1,70 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { FiMessageSquare } from "react-icons/fi";
-import { FiEdit } from "react-icons/fi";
-import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
-import { FaArchive, FaPlus, FaUserCircle } from "react-icons/fa";
-import { BsPrinter } from "react-icons/bs";
-import { useSearchParams } from "react-router-dom";
-import ArchiveAccAdmin from "../components/accountmanagement/ArchiveAdminModal";
-import StatusAccAdmin from "../components/accountmanagement/StatusAdmin";
-import GenerateReportsModal from "../components/accountmanagement/GenerateReportsModal";
-import AddAdminModal from "../components/accountmanagement/AddAdminModal";
-import ManageAdminModal from "../components/accountmanagement/ManageAdminModal";
-import { useEffect, useState } from "react";
+import { FaTrashRestore, FaUserCircle } from "react-icons/fa";
+import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
+import { BsPrinter } from "react-icons/bs";
+import { AiOutlineEye } from "react-icons/ai";
 import axios from "axios";
-import API_LINK from "../config/API";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import PrintPDF from "../components/accountmanagement/form/PrintPDF";
-import noData from "../assets/image/no-data.png";
-
-const AccountManagement = () => {
+import API_LINK from "../../config/API";
+import { useSearchParams } from "react-router-dom";
+import Breadcrumbs from "../../components/municipalaccount/Breadcrumbs";
+import ViewArchivedAdmin from "../../components/municipalaccount/ViewArchivedAdmin";
+import RestoreAdminModal from "../../components/municipalaccount/RestoreAdminModal";
+import GenerateReportsModal from "../../components/municipalaccount/GenerateReportsModal";
+import noData from "../../assets/image/no-data.png";
+const ArchivedAccountManagement = () => {
   useEffect(() => {
-    document.title = "Account Management | Barangay E-Services Management";
+    document.title = "Archived Account | Barangay E-Services Management";
   }, []);
+
   const [selectedItems, setSelectedItems] = useState([]);
   const [users, setUsers] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
   const brgy = "MUNISIPYO";
-  const occupation = "Municipality Admin";
-  const type = "Admin";
   const [user, setUser] = useState({});
-  const [status, setStatus] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [adminFilter, setAdminFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("")
   const [filteredUser, setFilteredUser] = useState([]);
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/users/showArchivedAdmin/?brgy=${brgy}&page=${currentPage}&type=${adminFilter}`
+        );
+
+        if (response.status === 200) {
+           setPageCount(response.data.pageCount);
+          setUsers(response.data.result); // Update the state variable with the fetched users
+          setFilteredUser(response.data.result) // Update the state variable with the fetched users
+        } else {
+          // Handle error here
+          console.error("Error fetching users:", response.error);
+        }
+      } catch (err) {
+        // Handle uncaught error here
+        console.error("Uncaught error:", err.message);
+      }
+    };
+
+    fetchUsers();
+  }, [currentPage, adminFilter]);
+
+  const handleAdminFilter = (type) => {
+    console.log("Selected Admin Type:", type);
+    setAdminFilter(type);
+  };
+
+  const handleResetFilter = () => {
+    setAdminFilter("all");
+  }
+
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
   const checkboxHandler = (e) => {
     let isSelected = e.target.checked;
     let value = e.target.value;
@@ -64,118 +91,35 @@ const AccountManagement = () => {
       setSelectedItems(postIds);
     }
   };
-
+  const handleView = (item) => {
+    setUser(item);
+  };
   const tableHeader = [
     "PROFILE",
     "NAME",
     "TYPE",
+    // "GENDER",
     "CONTACT",
     "ACCOUNT STATUS",
     "ACTIONS",
   ];
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get(
-          `${API_LINK}/users/?brgy=${brgy}&page=${currentPage}&type=${adminFilter}`
-        );
-        if (response.status === 200) {
-          setPageCount(response.data.pageCount);
-          setUsers(response.data.result); // Update the state variable with the fetched users
-          setFilteredUser(response.data.result);
-        } else {
-          // Handle error here
-          console.error("Error fetching users:", response.error);
-        }
-      } catch (err) {
-        // Handle uncaught error here
-        console.error("Uncaught error:", err.message);
-      }
-    };
-
-    fetchUsers();
-  }, [currentPage, adminFilter]);
-
-  const handleAdminFilter = (type) => {
-    setAdminFilter(type);
-  };
-
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
-  };
-  const handleView = (item) => {
-    setUser(item);
-  };
-
-  const handleStatus = (status) => {
-    setStatus(status);
-  };
-
-  const handleResetFilter = () => {
-    setAdminFilter("all");
-  };
 
   return (
-    <div className="mx-4 mt-4">
-      <div className="flex flex-col ">
-        <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
-          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
+    <div className="mx-4 mt-8">
+      <div>
+        <Breadcrumbs id={id} />
+        <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
+          <div className="flex justify-center items-center sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
-              className="text-center sm:text-[15px] mx-auto font-bold text-xs md:text-xl lg:text-[16px] xl:text-[20px] xxl:text-[1.5rem] xxxl:text-3xl xxxl:mt-1 text-white"
+              className="sm:text-[15px] mx-auto font-bold md:text-xl text-center lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-[1.5rem] xxxl:text-4xl text-white"
               style={{ letterSpacing: "0.2em" }}
             >
-              ACCOUNT MANAGEMENT
+              ARCHIVED ADMIN ACCOUNT
             </h1>
           </div>
-          <div className="lg:w-3/5 flex flex-row justify-end items-center ">
-            <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
-              <div className="w-full rounded-lg flex justify-center">
-                <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-modal-addAdmin"
-                    className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm  text-center inline-flex items-center "
-                  >
-                    <FaPlus size={24} style={{ color: "#ffffff" }} />
-                    <span className="sm:block md:hidden sm:pl-5">
-                      Add Admin Account
-                    </span>
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Add Admin Account
-                    </span>
-                  </button>
-                </div>
-              </div>
-              <div className="w-full rounded-lg ">
-                <Link
-                  to={`/archivedaccountmanagement/?id=${id}&brgy=${brgy}&archived=true`}
-                >
-                  <div className="hs-tooltip inline-block w-full">
-                    <button
-                      type="button"
-                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm text-center inline-flex items-center"
-                    >
-                      <FaArchive size={24} style={{ color: "#ffffff" }} />
-                      <span className="sm:block md:hidden sm:pl-5">
-                        Archived Admin Account
-                      </span>
-                      <span
-                        className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                        role="tooltip"
-                      >
-                        Archived Admin Account
-                      </span>
-                    </button>
-                  </div>
-                </Link>
-              </div>
-            </div>
-          </div>
         </div>
+
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
             <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
@@ -217,6 +161,7 @@ const AccountManagement = () => {
                   <a
                     onClick={() => handleAdminFilter("Head Admin")}
                     class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-md text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+
                   >
                     HEAD ADMIN
                   </a>
@@ -226,6 +171,7 @@ const AccountManagement = () => {
                   >
                     ADMIN
                   </a>
+
                 </ul>
               </div>
             </div>
@@ -261,19 +207,15 @@ const AccountManagement = () => {
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
 
-                    if (e.target.value.trim() === "") {
+                    if (e.target.value.trim() === '') {
                       // If the search input is empty, fetch all data
                       setUsers(users);
                     } else {
                       // If the search input is not empty, filter the data
                       const Users = users.filter(
                         (item) =>
-                          item.firstName
-                            .toLowerCase()
-                            .includes(e.target.value.toLowerCase()) ||
-                          item.lastName
-                            .toLowerCase()
-                            .includes(e.target.value.toLowerCase())
+                          item.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                          item.lastName.toLowerCase().includes(e.target.value.toLowerCase())
                       );
                       setFilteredUser(Users);
                     }
@@ -284,32 +226,31 @@ const AccountManagement = () => {
               </div>
               <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
                 {/* <div className="hs-tooltip inline-block w-full">
-                <PDFDownloadLink
-                  document={<PrintPDF users={users} tableHeader={tableHeader} />}
-                  fileName="SAMPLE.pdf"
-                  className="hs-tooltip-toggle sm:w-full md:w-full cursor-pointer text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                >
-                  <BsPrinter size={24} style={{ color: "#ffffff" }} />
+                  <button
+                    type="button"
+                    data-hs-overlay="#hs-generate-reports-modal"
+                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
+                  >
+                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
                     <span
                       className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                       role="tooltip"
                     >
                       Generate Report
                     </span>
-                </PDFDownloadLink>
+                  </button>
                 </div> */}
                 <div className="hs-tooltip inline-block w-full">
                   <button
-                    type="button"
-                    data-hs-overlay="#hs-modal-archiveAdmin"
+                    data-hs-overlay="#hs-modal-restoreAdmin"
                     className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md  bg-pink-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
                   >
-                    <AiOutlineStop size={24} style={{ color: "#ffffff" }} />
+                    <FaTrashRestore size={24} style={{ color: "#ffffff" }} />
                     <span
                       className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                       role="tooltip"
                     >
-                      Archived Selected Inquiries
+                      Restore Selected Inquiries
                     </span>
                   </button>
                 </div>
@@ -317,7 +258,8 @@ const AccountManagement = () => {
             </div>
           </div>
         </div>
-        <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll lg:overflow-x-hidden h-[calc(100vh_-_275px)] xxl:h-[calc(100vh_-_275px)] xxxl:h-[calc(100vh_-_300px)]">
+
+        <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll lg:overflow-x-hidden h-[calc(100vh_-_320px)] xxxl:h-[calc(100vh_-_340px)]">
           <table className="relative table-auto w-full">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
@@ -345,18 +287,18 @@ const AccountManagement = () => {
             <tbody className="odd:bg-slate-100">
               {filteredUser.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={tableHeader.length + 1}
-                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
-                  >
-                    <img
-                      src={noData}
-                      alt=""
-                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
-                    />
-                    <strong className="text-[#535353]">NO DATA FOUND</strong>
-                  </td>
-                </tr>
+                <td
+                  colSpan={tableHeader.length + 1}
+                  className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                >
+                  <img
+                    src={noData}
+                    alt=""
+                    className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                  />
+                  <strong className="text-[#535353]">NO DATA FOUND</strong>
+                </td>
+              </tr>
               ) : (
                 filteredUser.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
@@ -377,7 +319,6 @@ const AccountManagement = () => {
                           {item.profile.link ? (
                             <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
                               <img
-                                referrerPolicy="no-referrer"
                                 src={item.profile.link}
                                 alt="picture"
                                 className="w-full h-full object-cover"
@@ -401,6 +342,20 @@ const AccountManagement = () => {
                         </span>
                       </div>
                     </td>
+                    {/* <td className="px-6 py-3">
+                    <div className="flex justify-center items-center">
+                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                        {item.age}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-3">
+                    <div className="flex justify-center items-center">
+                      <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        {item.sex}
+                      </span>
+                    </div>
+                  </td> */}
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black line-clamp-2">
@@ -442,27 +397,11 @@ const AccountManagement = () => {
                       <div className="flex justify-center space-x-1 sm:space-x-none">
                         <button
                           type="button"
-                          data-hs-overlay="#hs-modal-editAdmin"
+                          data-hs-overlay="#hs-modal-viewAdmin"
                           onClick={() => handleView({ ...item })}
                           className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
                         >
-                          <AiOutlineEye
-                            size={24}
-                            style={{ color: "#ffffff" }}
-                          />
-                        </button>
-                        <button
-                          type="button"
-                          data-hs-overlay="#hs-modal-statusAdmin"
-                          className="text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
-                          onClick={() =>
-                            handleStatus({
-                              id: item._id,
-                              status: item.isApproved,
-                            })
-                          }
-                        >
-                          <FiEdit size={24} style={{ color: "#ffffff" }} />
+                          <AiOutlineEye size={24} style={{ color: "#ffffff" }} />
                         </button>
                       </div>
                     </td>
@@ -505,15 +444,12 @@ const AccountManagement = () => {
             renderOnZeroPageCount={null}
           />
         </div>
+        <ViewArchivedAdmin user={user} setUser={setUser} />
+        <RestoreAdminModal selectedItems={selectedItems} />
+        <GenerateReportsModal />
       </div>
-      <ArchiveAccAdmin selectedItems={selectedItems} />
-      {/* <StatusAccAdmin /> */}
-      <GenerateReportsModal user={user} setUser={setUser} />
-      <AddAdminModal brgy={brgy} occupation={occupation} type={type} />
-      <ManageAdminModal user={user} setUser={setUser} />
-      <StatusAccAdmin status={status} setStatus={setStatus} />
     </div>
   );
 };
 
-export default AccountManagement;
+export default ArchivedAccountManagement;

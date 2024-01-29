@@ -115,7 +115,7 @@ const Sidebar = () => {
 
   return (
     <>
-    <div
+      <div
         id="hs-overlay-basic"
         className="sm:fixed lg:relative overflow-y-auto lg:block lg:end-auto lg:bottom-0 sm:block flex items-center justify-center hs-overlay-basic h-full overflow-hidden hs-overlay hs-overlay-open:translate-x-0 -translate-x-full transition-all duration-300 transform hidden top-0 z-[60] lg:z-0 lg:translate-x-0 w-[17rem]"
       >
@@ -250,7 +250,8 @@ const Sidebar = () => {
                           : null;
                       }}
                       className={`${
-                        currentPath === "/announcements/"
+                        currentPath === "/announcements/" ||
+                        currentPath === "/archivedannoucements/"
                           ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                           : null
                       } flex items-center gap-x-3 py-2 px-2.5 ml-3 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
@@ -270,7 +271,8 @@ const Sidebar = () => {
                           : null;
                       }}
                       className={`${
-                        currentPath === "/events_registration/"
+                        currentPath === "/events_registration/" ||
+                        currentPath === "/archived_registrations/"
                           ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                           : null
                       } flex items-center gap-x-3 py-2 px-2.5 ml-3 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
@@ -328,19 +330,14 @@ const Sidebar = () => {
                           : null;
                       }}
                       className={`${
-                        currentPath === "/aboutus_info/"
+                        currentPath === "/aboutus_info/" ||
+                        currentPath === "/archived_aboutus_info/"
                           ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                           : null
                       } flex items-center gap-x-3 py-2 px-2.5 ml-3 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                     >
                       <GoGitPullRequest size={15} />
                       Manage AboutUs
-                      {/* <span className="flex relative  end-0">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
-                        <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
-                          9+
-                        </span>
-                      </span> */}
                     </Link>
                     <Link
                       to={`/services_info/?id=${id}`}
@@ -354,19 +351,14 @@ const Sidebar = () => {
                           : null;
                       }}
                       className={`${
-                        currentPath === "/services_info/"
+                        currentPath === "/services_info/" ||
+                        currentPath === "/archived_services_info/"
                           ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                           : null
                       } flex items-center gap-x-3 py-2 px-2.5 ml-3 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                     >
                       <GoGitPullRequest size={15} />
                       Manage Services
-                      {/* <span className="flex relative  end-0">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
-                        <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
-                          9+
-                        </span>
-                      </span> */}
                     </Link>
                     <Link
                       to={`/tourist_spot/?id=${id}`}
@@ -380,19 +372,14 @@ const Sidebar = () => {
                           : null;
                       }}
                       className={`${
-                        currentPath === "/tourist_spot/"
+                        currentPath === "/tourist_spot/" ||
+                        currentPath === "/archived_tourist_spot/"
                           ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                           : null
                       } flex items-center gap-x-3 py-2 px-2.5 ml-3 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                     >
                       <GoGitPullRequest size={15} />
                       Manage tourist spot
-                      {/* <span className="flex relative  end-0">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
-                        <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
-                          9+
-                        </span>
-                      </span> */}
                     </Link>
                     <Link
                       to={`/municipalityofficials/?id=${id}`}
@@ -406,19 +393,14 @@ const Sidebar = () => {
                           : null;
                       }}
                       className={`${
-                        currentPath === "/municipalityofficials/"
+                        currentPath === "/municipalityofficials/" ||
+                        currentPath === "/archivedmunicipalityofficials/"
                           ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                           : null
                       } flex items-center gap-x-3 py-2 px-2.5 ml-3 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
                     >
                       <GoGitPullRequest size={15} />
                       Manage Officials
-                      {/* <span className="flex relative  end-0">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
-                        <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
-                          9+
-                        </span>
-                      </span> */}
                     </Link>
                   </div>
                 </li>
@@ -435,7 +417,8 @@ const Sidebar = () => {
                         : null;
                     }}
                     className={`${
-                      currentPath === "/inquiries/"
+                      currentPath === "/inquiries/" ||
+                      currentPath === "/archivedinquiries/"
                         ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                         : null
                     } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
@@ -455,29 +438,88 @@ const Sidebar = () => {
                 {userData.type === "Head Admin" && (
                   <>
                     <li>
-                      <Link
-                        to={`/accountmanagement/?id=${id}`}
-                        onClick={() => {
-                          if (
-                            window.innerWidth >= 320 &&
-                            window.innerWidth <= 1023
-                          ) {
-                            document
-                              .querySelector(
-                                "[data-hs-overlay-backdrop-template]"
-                              )
-                              .remove();
-                          }
-                        }}
-                        className={`${
-                          currentPath === "/accountmanagement/"
-                            ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
-                            : ""
-                        } flex items-center gap-x-3 py-2 px-2.5 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                      <button
+                        id="hs-accounts-collapse"
+                        data-hs-collapse="#hs-accounts-collapse-heading"
+                        className="hs-collapse-toggle justify-between flex items-center w-full  gap-x-3 py-2 px-2.5  text-sm rounded-md uppercase  hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]"
                       >
-                        <RiAdminFill size={15} />
-                        Admin Management
-                      </Link>
+                        <div className="flex items-center text-left gap-x-3">
+                          <ImBullhorn size={15} />
+                          ACCOUNT MANAGEMENT
+                        </div>
+                        <div className="flex">
+                          <svg
+                            className="hs-collapse-open:rotate-180  w-2.5 h-2.5"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </div>
+                      </button>
+                      <div
+                        id="hs-accounts-collapse-heading"
+                        className="hs-collapse hidden w-full overflow-hidden transition-[height] duration-300"
+                        aria-labelledby="hs-accounts-collapse"
+                        // style={{ paddingLeft: "20px" }}
+                      >
+                        <Link
+                          to={`/brgy_account/?id=${id}`}
+                          onClick={() => {
+                            if (
+                              window.innerWidth >= 320 &&
+                              window.innerWidth <= 1023
+                            ) {
+                              document
+                                .querySelector(
+                                  "[data-hs-overlay-backdrop-template]"
+                                )
+                                .remove();
+                            }
+                          }}
+                          className={`${
+                            currentPath === "/brgy_account/" ||
+                            currentPath === "/archive_brgy_account/"
+                              ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
+                              : ""
+                          } flex items-center gap-x-3 py-2 px-2.5 ml-3 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                        >
+                          <RiAdminFill size={15} />
+                          Barangay Admin
+                        </Link>
+                        <Link
+                          to={`/municipal_account/?id=${id}`}
+                          onClick={() => {
+                            if (
+                              window.innerWidth >= 320 &&
+                              window.innerWidth <= 1023
+                            ) {
+                              document
+                                .querySelector(
+                                  "[data-hs-overlay-backdrop-template]"
+                                )
+                                .remove();
+                            }
+                          }}
+                          className={`${
+                            currentPath === "/municipal_account/" ||
+                            currentPath === "/archive_municipal_account/"
+                              ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
+                              : ""
+                          } flex items-center gap-x-3 py-2 px-2.5 ml-3 text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
+                        >
+                          <RiAdminFill size={15} />
+                          Municipal Admin
+                        </Link>
+                      </div>
                     </li>
                   </>
                 )}
@@ -495,7 +537,14 @@ const Sidebar = () => {
                         : null;
                     }}
                     className={`${
-                      currentPath === "/barangaymenu/"
+                      currentPath === "/barangaymenu/" ||
+                      currentPath === "/barangayinformation/" ||
+                      currentPath === "/brgyarchivedofficials/" ||
+                      currentPath === "/brgyarchivedservices/"  ||
+                      currentPath === "/brgyarchivedservicesreq/" ||
+                      currentPath === "/brgyarchivedresidents/" ||
+                      currentPath === "/brgyarchivedannoucements/" ||
+                      currentPath === "/brgyarchivedinquiries/" 
                         ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                         : null
                     } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}
