@@ -373,7 +373,7 @@ const BarangayAccount = () => {
                       </div>
                     </td>
                     <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
+                      <span className="text-xs sm:text-sm lg:text-xs xl:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                         <div className="px-2 sm:px-6 py-2">
                           {item.profile.link ? (
                             <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
@@ -393,7 +393,7 @@ const BarangayAccount = () => {
 
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm lg:text-xs xl:text-sm text-black  line-clamp-2 ">
                           {item.firstName +
                             " " +
                             item.middleName +
@@ -404,14 +404,14 @@ const BarangayAccount = () => {
                     </td>
                     {/* <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {item.type}
                         </span>
                       </div>
                     </td> */}
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {item.address.brgy}
                         </span>
                       </div>
@@ -419,21 +419,21 @@ const BarangayAccount = () => {
                     <td className="px-6 py-3">
                       {item.isApproved === "Registered" && (
                         <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             REGISTERED
                           </span>
                         </div>
                       )}
                       {item.isApproved === "Denied" && (
                         <div className="flex w-full items-center justify-center bg-custom-red-button m-2">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             DENIED
                           </span>
                         </div>
                       )}
                       {item.isApproved === "Pending" && (
                         <div className="flex w-full items-center justify-center bg-custom-amber m-2">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             PENDING
                           </span>
                         </div>

@@ -14,12 +14,14 @@ const SubPendingRequest = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+
+        
         const servicesResponse = await axios.get(
           `${API_LINK}/services/pendingservices/?archived=false&status=Pending&page=${currentPage}`
         );
         setServicesreq(servicesResponse.data.result);
         setPageCount(servicesResponse.data.pageCount);
-        console.log(servicesResponse.data);
+        console.log("anotoooo",servicesResponse.data);
       } catch (error) {
         console.log(error);
       }

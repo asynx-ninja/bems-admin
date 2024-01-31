@@ -314,7 +314,7 @@ const Residents = () => {
                 sortedAndFilteredUsers.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
                     <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
+                      <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                         <div className="px-2 sm:px-6 py-2">
                           {item.profile && item.profile.link ? (
                             <img
@@ -330,7 +330,7 @@ const Residents = () => {
                     </td>
 
                     <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
+                      <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2 ">
                         {item.lastName +
                           " " +
                           item.firstName +
@@ -340,21 +340,21 @@ const Residents = () => {
                     </td>
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black  line-clamp-2 ">
                           {item.age}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {item.sex}
                         </span>
                       </div>
                     </td>
                     {/* <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {item.contact}
                         </span>
                       </div>
@@ -362,21 +362,21 @@ const Residents = () => {
                     <td className="px-6 py-3">
                       {item.isApproved === "Registered" && (
                         <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             REGISTERED
                           </span>
                         </div>
                       )}
                       {item.isApproved === "Denied" && (
                         <div className="flex w-full items-center justify-center bg-custom-red-button m-2">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             DENIED
                           </span>
                         </div>
                       )}
                       {item.isApproved === "Pending" && (
                         <div className="flex w-full items-center justify-center bg-custom-amber m-2">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             PENDING
                           </span>
                         </div>

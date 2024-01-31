@@ -38,6 +38,7 @@ import BarangayAccount from "../pages/AccountManagement/BarangayAccount";
 import ArchiveBarangayAccount from "../pages/AccountManagement/ArchiveBarangayAccount";
 import ArchiveApplication from "../pages/BarangayTabs/BrgyArchiveApplication"
 import Reports from "../pages/Reports";
+import ViewNotifications from "../pages/ViewNotifications"
 const pages = [
   {
     path: "/",
@@ -163,6 +164,10 @@ const pages = [
   {
     path: "/brgyarchivedannoucements",
     element: <Navbar comp={<BrgyArchivedAnnouncement />} />,
+  },
+  {
+    path: "/view_notifications",
+    element: <Navbar comp={<ViewNotifications/>} />,
   },
   {
     path: "/brgyarchivedapplication",

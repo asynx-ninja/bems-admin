@@ -381,27 +381,27 @@ function ArchiveServices() {
                   filteredServices.map((item, index) => (
                     <tr key={index} className="odd:bg-slate-100 text-center">
                       <td className="px-6 py-3">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {item.name}
                         </span>
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex justify-center items-center">
-                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                             {item.details}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex justify-center items-center">
-                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                             {item.type}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex justify-center items-center">
-                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                             {new Date(service.createdAt).toLocaleDateString()}
                           </span>
                         </div>
@@ -415,7 +415,7 @@ function ArchiveServices() {
                                 : "bg-custom-red-button"
                             } m-2`}
                         >
-                          <span className="text-xs sm:text-sm text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-white p-3 mx-5">
                             {item.isApproved}
                           </span>
                         </div>

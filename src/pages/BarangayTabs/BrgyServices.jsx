@@ -411,27 +411,27 @@ function Services() {
                     </div>
                   </td> */}
                     <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
+                      <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                         {service.name}
                       </span>
                     </td>
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {service.details}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {service.type}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {new Date(service.createdAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -439,21 +439,21 @@ function Services() {
                     <td className="px-6 py-3 w-4/12">
                       {service.isApproved === "Approved" && (
                         <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             APPROVED
                           </span>
                         </div>
                       )}
                       {service.isApproved === "Disapproved" && (
                         <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             DISAPPROVED
                           </span>
                         </div>
                       )}
                       {service.isApproved === "Pending" && (
                         <div className="flex w-full items-center justify-center bg-custom-amber m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             PENDING
                           </span>
                         </div>

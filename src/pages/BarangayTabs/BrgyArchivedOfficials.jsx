@@ -385,7 +385,7 @@ const ArchivedOfficials = () => {
                         </div>
                       </td>
                       <td className="px-6 py-3">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           <div className="px-2 sm:px-6 py-2">
                             {item.picture.link ? (
                               <div className="lg:w-20 lg:h-20 w-16 h-16 aspect-w-1 aspect-h-1 overflow-hidden rounded-full mx-auto border border-4 border-[#013D74]">
@@ -403,21 +403,21 @@ const ArchivedOfficials = () => {
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex justify-center items-center">
-                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {item.lastName}, {item.firstName}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex justify-center items-center">
-                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                             {item.position}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex justify-center items-center">
-                          <span className="text-xs sm:text-sm text-black line-clamp-2">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                             {dateFormat(item.fromYear) || ""} -{" "}
                             {dateFormat(item.toYear) || ""}
                           </span>

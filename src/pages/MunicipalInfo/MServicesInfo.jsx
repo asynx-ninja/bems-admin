@@ -476,7 +476,7 @@ const MServicesInfo = () => {
                     </div>
                   </td>
                   <td className="px-6 py-3">
-                    <span className="text-xs sm:text-sm text-black line-clamp-2">
+                    <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                       <div className="px-2 sm:px-6 py-2">
                         {item.icon.link ? (
                           <div className="lg:w-32 lg:h-20 w-16 h-24 aspect-w-4 aspect-h-3 overflow-hidden mx-auto ">
@@ -494,21 +494,21 @@ const MServicesInfo = () => {
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                      <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black  line-clamp-2 ">
                         {item.name}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                      <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black  line-clamp-2 ">
                         {item.details}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
+                      <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                         {dateFormat(item.createdAt) || ""}
                       </span>
                     </div>

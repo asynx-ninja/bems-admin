@@ -82,7 +82,14 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
 
     setFiles([...files, ...e.target.files]);
   };
-
+  const getType = (type) => {
+    switch (type) {
+      case "MUNISIPYO":
+        return "Municipality";
+      default:
+        return "Barangay";
+    }
+  };
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -121,12 +128,12 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
 
       formData.append("announcement", JSON.stringify(announcement));
 
-      const result = await axios.patch(
+      const response = await axios.patch(
         `${API_LINK}/announcement/${announcement._id}`,
         formData
       );
 
-      if (result.status === 200) {
+      if (response.status === 200) {
         var logoSrc = document.getElementById("logo");
         logoSrc.src =
           "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
@@ -134,6 +141,41 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
         var bannerSrc = document.getElementById("banner");
         bannerSrc.src =
           "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
+          let notify;
+
+          if (announcement.isOpen) {
+            notify = {
+              category: "All",
+              compose: {
+                subject: `EVENT - ${announcement.title}`,
+                message: `Barangay ${brgy} has updated an event named: ${announcement.title}.\n\n
+                
+                Event Details:\n 
+                ${announcement.details}\n\n
+    
+                Event Date:
+                ${announcement.date}\n\n
+                `,
+                go_to: "Events",
+              },
+              target: {
+                user_id: null,
+                area: null,
+              },
+              type: getType(brgy),
+              banner: announcement.data.collections.banner,
+              logo: announcement.data.collections.logo,
+            };
+          } 
+  
+          console.log("Notify: ", notify);
+          console.log("Result: ", response);
+  
+          const result = await axios.post(`${API_LINK}/notification/`, notify, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
         setTimeout(() => {
           // HSOverlay.close(document.getElementById("hs-modal-editAnnouncement"));

@@ -22,7 +22,7 @@ function AddAboutus({ brgy }) {
   const handleBannerChange = (e) => {
     setBanner(e.target.files[0]);
 
-    var output = document.getElementById("banner");
+    var output = document.getElementById("add_banner");
     output.src = URL.createObjectURL(e.target.files[0]);
     output.onload = function () {
       URL.revokeObjectURL(output.src); // free memory
@@ -159,7 +159,7 @@ function AddAboutus({ brgy }) {
                         className={`${
                           banner ? "" : "hidden"
                         } w-[200px] md:w-[250px]  lg:w-full md:h-[140px] lg:h-[250px] object-cover`}
-                        id="banner"
+                        id="add_banner"
                         alt="Current profile photo"
                       />{" "}
                       <CiImageOn
@@ -181,7 +181,7 @@ function AddAboutus({ brgy }) {
                         accept="image/*"
                         value={!banner ? "" : banner.originalname}
                         className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4  file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100`}
-                        id="bannerInput"
+
                       />
                     </label>
                   </div>
