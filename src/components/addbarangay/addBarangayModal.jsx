@@ -57,9 +57,9 @@ function CreateAnnouncementModal() {
       const response2 = await axios.get(
         `${API_LINK}/folder/specific/?brgy=${barangay.brgy}`
       );
-      setFolder(response2.data);
+      setFolder(response2.data[0]);
 
-      console.log(response2.data.root);
+      console.log(response2.data[0].root);
       var formData = new FormData();
 
       formData.append("files", logo);
@@ -75,7 +75,7 @@ function CreateAnnouncementModal() {
       formData.append("brgyinfo", JSON.stringify(obj));
 
       if (response.status === 200) {
-        const result = await axios.post(`${API_LINK}/brgyinfo/?folder_id=${setFolder.root}`, formData);
+        const result = await axios.post(`${API_LINK}/brgyinfo/?folder_id=${response2.data[0].info}`, formData);
         if (result.status === 200) {
           setBarangay({
             brgy: "",
