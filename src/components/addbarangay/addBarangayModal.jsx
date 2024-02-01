@@ -45,7 +45,6 @@ function CreateAnnouncementModal() {
         e.target.name === "isOpen" ? e.target.checked : e.target.value,
     }));
   };
-  const [folder, setFolder] = useState({});
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -57,13 +56,11 @@ function CreateAnnouncementModal() {
       const response2 = await axios.get(
         `${API_LINK}/folder/specific/?brgy=${barangay.brgy}`
       );
-      setFolder(response2.data[0]);
 
-      console.log(response2.data[0].root);
       var formData = new FormData();
-
-      formData.append("files", logo);
       formData.append("files", banner);
+      formData.append("files", logo);
+     
 
       const obj = {
         brgy: barangay.brgy,

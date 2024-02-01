@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import EditDropbox from "./EditDropbox";
 import API_LINK from "../../config/API";
 import EditLoader from "./loaders/EditLoader";
-function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
+function ManageTouristSpotModal({brgy, touristspotInfo, settouristspotInfo }) {
   const [images, setImages] = useState([]);
   const [edit, setEdit] = useState(false);
   const [submitClicked, setSubmitClicked] = useState(false);
@@ -49,7 +49,6 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
     if (
       !touristspotInfo.name.trim() ||
       !touristspotInfo.details.trim() ||
-      !touristspotInfo.brgy.trim() ||
       images.length === 0
     ) {
      
@@ -58,6 +57,12 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
     }
     setSubmitClicked(true);
     setError(null)
+
+    const response = await axios.get(
+      `${API_LINK}/folder/specific/?brgy=${brgy}`
+    );
+
+    if(response.status === 200){
       let formData = new FormData();
 
       images.forEach((image) => {
@@ -71,7 +76,7 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
       formData.append("touristspot", JSON.stringify(touristspotInfo));
 
       const result = await axios.patch(
-        `${API_LINK}/tourist_spot/${touristspotInfo._id}`,
+        `${API_LINK}/tourist_spot/${touristspotInfo._id}/?folder_id=${response.data[0].tourist_spot}`,
         formData
       );
 
@@ -85,6 +90,7 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
           }, 3000);
         }, 1000);
       }
+    }
     } catch (err) {
       console.log(err);
       setSubmitClicked(false);
@@ -166,31 +172,7 @@ function ManageTouristSpotModal({ touristspotInfo, settouristspotInfo }) {
                   </p>
                 )}
               </div>
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="name"
-                >
-                  LOCATION
-                </label>
-                <input
-                  id="brgy"
-                  className={`shadow appearance-none border w-full py-2 px-3 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
-                    error && !touristspotInfo.brgy ? "border-red-500" : ""
-                  }`}
-                  name="brgy"
-                  type="text"
-                  value={touristspotInfo && touristspotInfo.brgy}
-                  onChange={handleChange}
-                  disabled={!edit}
-                  placeholder="Tourist spot location"
-                />
-                  {error && !touristspotInfo.brgy && (
-                  <p className="text-red-500 text-xs italic">
-                    Please enter a brgy location.
-                  </p>
-                )}
-              </div>
+             
 
               <div className="mb-4">
                 <label

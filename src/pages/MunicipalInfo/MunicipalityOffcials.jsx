@@ -84,6 +84,9 @@ const MunicipalityOfficials = () => {
 
     const fetchData = async () => {
       try {
+
+    
+    
         const response = await axios.get(
           `${API_LINK}/mofficials/?brgy=${brgy}&archived=false&page=${currentPage}&position=${positionFilter}`
         );

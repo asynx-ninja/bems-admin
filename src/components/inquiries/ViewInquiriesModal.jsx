@@ -11,8 +11,8 @@ import Dropbox from "./Dropbox";
 import ViewDropbox from "./ViewDropbox";
 import EditDropbox from "./EditDropbox";
 import ReplyLoader from "./loaders/ReplyLoader";
-
-function ViewInquiriesModal({ inquiry, setInquiry }) {
+import moment from "moment";
+function ViewInquiriesModal({ inquiry, setInquiry, brgy }) {
   const [reply, setReply] = useState(false);
   const [upload, setUpload] = useState(false);
   const [expandedIndexes, setExpandedIndexes] = useState([]);
@@ -31,7 +31,17 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
     message: "",
     date: new Date(),
   });
+  const [banner, setBanner] = useState({
+    link: "https://drive.google.com/thumbnail?id=1v009xuRjSNW8OGUyHbAYTJt3ynxjhtGW&sz=w1000",
+    name: "inquiries_banner.jpg",
+    id: "1SM_QPFb_NmyMTLdsjtEd-2M6ersJhBUc",
+  });
 
+  const [logo, setLogo] = useState({
+    link: "https://drive.google.com/thumbnail?id=1sh24YL7RQY_cHLcTZ_G3GXCG18Y6_JAL&sz=w1000",
+    name: "inquiries_logo.png",
+    id: "1SM_QPFb_NmyMTLdsjtEd-2M6ersJhBUc",
+  });
   useEffect(() => {
     setFiles(inquiry.length === 0 ? [] : inquiry.compose.file);
   }, [inquiry]);
@@ -108,10 +118,13 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
 
   const handleChange = (e) => {
     e.preventDefault();
-  
+
     const inputValue = e.target.value;
-  
-    if (statusChanger && (!newMessage.message || newMessage.message.trim() === "")) {
+
+    if (
+      statusChanger &&
+      (!newMessage.message || newMessage.message.trim() === "")
+    ) {
       setNewMessage((prev) => ({
         ...prev,
         message: `The status of your inquiry is ${inputValue}`,
@@ -123,7 +136,7 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
       }));
     }
   };
-  
+
   console.log("StatusChanger: ", statusChanger);
 
   console.log("New Message: ", newMessage.message);
@@ -147,39 +160,100 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
 
     setCreateFiles([...createFiles, ...e.target.files]);
   };
-
+  const getType = (type) => {
+    switch (type) {
+      case "MUNISIPYO":
+        return "Municipality";
+      default:
+        return "Barangay";
+    }
+  };
   const handleOnSend = async (e) => {
     e.preventDefault();
     setSubmitClicked(true);
     console.log(newMessage);
 
     try {
-      const obj = {
-        sender: `${userData.firstName} ${userData.lastName} (${userData.type})`,
-        type: newMessage.type,
-        message: newMessage.message,
-        date: newMessage.date,
-        folder_id: inquiry.folder_id,
-        status: inquiry.status,
-      };
-      var formData = new FormData();
-      formData.append("response", JSON.stringify(obj));
-      for (let i = 0; i < createFiles.length; i++) {
-        formData.append("files", createFiles[i]);
+      
+        const obj = {
+          sender: `${userData.firstName} ${userData.lastName} (${userData.type})`,
+          type: newMessage.type,
+          message: newMessage.message,
+          date: newMessage.date,
+          folder_id: inquiry.folder_id,
+          status: inquiry.status,
+        };
+        var formData = new FormData();
+        formData.append("response", JSON.stringify(obj));
+        for (let i = 0; i < createFiles.length; i++) {
+          formData.append("files", createFiles[i]);
+        }
+
+        const response = await axios.patch(
+          `${API_LINK}/inquiries/?inq_id=${inquiry._id}`,
+          formData
+        );
+
+        if (response.status === 200) {
+          const notify = {
+            category: "One",
+            compose: {
+              subject: `INQUIRIES - ${inquiry.compose.subject}`,
+              message: `A municipality has responded to your inquiry.\n\n
+            
+            
+            Inquiries Details:\n 
+            - Name: ${inquiry.name}\n
+            - Message: ${inquiry.compose.message}\n
+            - inquiry ID: ${inquiry.inq_id}\n
+            - Date Created: ${moment(inquiry.createdAt).format(
+              "MMM. DD, YYYY h:mm a"
+            )}\n
+            - Status: ${inquiry.isApproved}\n
+            - Staff Handled: ${userData.lastName}, ${userData.firstName} ${
+                userData.middleName
+              }\n\n
+            `,
+              go_to: "Inquiries",
+            },
+            target: {
+              user_id: inquiry.user_id,
+              area: inquiry.brgy,
+            },
+            type: "Resident",
+            banner: banner,
+            logo: logo,
+          };
+
+          console.log("Inquiry: ", inquiry);
+          console.log("Notify: ", notify);
+          console.log("Result: ", response);
+
+          const result = await axios.post(`${API_LINK}/notification/`, notify, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+console.log("pangetmo", result)
+          if (result.status === 200) {
+            setTimeout(() => {
+              setSubmitClicked(false);
+              setReplyStatus("success");
+              setTimeout(() => {
+                window.location.reload();
+              }, 3000);
+            }, 1000);
+          }
+        
+
+        // setTimeout(() => {
+        //   setSubmitClicked(false);
+        //   setReplyStatus("success");
+        //   setTimeout(() => {
+        //     window.location.reload();
+        //   }, 3000);
+        // }, 1000);
       }
-
-      const response = await axios.patch(
-        `${API_LINK}/inquiries/?inq_id=${inquiry._id}`,
-        formData
-      );
-
-      setTimeout(() => {
-        setSubmitClicked(false);
-        setReplyStatus("success");
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      }, 1000);
     } catch (error) {
       console.log(error);
       setSubmitClicked(false);
@@ -742,13 +816,10 @@ function ViewInquiriesModal({ inquiry, setInquiry }) {
               </div>
             </div>
           </div>
-        
         </div>
-         {/* <ReplyLoader /> */}
-         {submitClicked && <ReplyLoader replyStatus="replying" />}
-          {replyStatus && (
-            <ReplyLoader replyStatus={replyStatus} error={error} />
-          )}
+        {/* <ReplyLoader /> */}
+        {submitClicked && <ReplyLoader replyStatus="replying" />}
+        {replyStatus && <ReplyLoader replyStatus={replyStatus} error={error} />}
       </div>
     </div>
   );

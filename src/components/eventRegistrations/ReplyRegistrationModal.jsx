@@ -11,8 +11,8 @@ import ViewDropbox from "./ViewDropbox";
 import EditDropbox from "./EditDropbox";
 import { useSearchParams } from "react-router-dom";
 import ReplyLoader from "./loaders/ReplyLoader";
-
-function ReplyRegistrationModal({ application, setApplication }) {
+import moment from "moment";
+function ReplyRegistrationModal({ application, setApplication, brgy }) {
   const [reply, setReply] = useState(false);
   const [statusChanger, setStatusChanger] = useState(false);
   const [upload, setUpload] = useState(false);
@@ -30,7 +30,13 @@ function ReplyRegistrationModal({ application, setApplication }) {
   const [submitClicked, setSubmitClicked] = useState(false);
   const [replyingStatus, setReplyingStatus] = useState(null);
   const [error, setError] = useState(null);
-
+  const [event, setEvent] = useState({
+    collections: {
+      banner: {},
+      logo: {},
+    }
+  });
+  const [currentPage, setCurrentPage] = useState(0);
   useEffect(() => {
     setFiles(application.length === 0 ? [] : application.file);
   }, [application]);
@@ -49,6 +55,31 @@ function ReplyRegistrationModal({ application, setApplication }) {
     };
     fetch();
   }, [id]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!application.event_id) {
+          // If there is no event_id in the application, do not fetch events
+          return;
+        }
+        const eventsResponse = await axios.get(
+          `${API_LINK}/announcement/?brgy=${brgy}&event_id=${application.event_id}&archived=false`
+        );
+
+        if (eventsResponse.status === 200) {
+          setEvent(eventsResponse.data.result[0]);
+        } else {
+          setEventWithCounts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        console.error("Error response data:", error.response?.data);
+        console.error("Error response status:", error.response?.status);
+      }
+    };
+
+    fetchData();
+  }, [currentPage, brgy, application.event_id]);
 
   useEffect(() => {
     if (application && application.response.length !== 0) {
@@ -175,14 +206,69 @@ function ReplyRegistrationModal({ application, setApplication }) {
         formData
       );
 
-      setTimeout(() => {
-        setSubmitClicked(false);
-        setReplyingStatus("success");
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      }, 1000);
+      if (response.status === 200) {
+        const notify = {
+          category: "One",
+          compose: {
+            subject: `APPLICATION - ${application.event_name}`,
+            message: `A municipalit staff has updated your event application form for the event of ${
+              application.event_name
+            }.\n\n
+      
+            Application Details:\n
+            - Name: ${
+              application.form && application.form[0]
+                ? application.form[0].lastName.value
+                : ""
+            }, ${
+              application.form && application.form[0]
+                ? application.form[0].firstName.value
+                : ""
+            } ${
+              application.form && application.form[0]
+                ? application.form[0].middleName.value
+                : ""
+            }
+            - Event Applied: ${application.event_name}\n
+            - Application ID: ${application.application_id}\n
+            - Date Created: ${moment(application.createdAt).format(
+              "MMM. DD, YYYY h:mm a"
+            )}\n
+            - Status: ${application.status}\n
+            - Staff Handled: ${userData.lastName}, ${userData.firstName} ${
+              userData.middleName
+            }\n\n
+            Please update this application as you've seen this notification!\n\n
+            Thank you!!,`,
+            go_to: "Application",
+          },
+          target: {
+            user_id: application.form[0].user_id.value,
+            area: application.brgy,
+          },
+          type: "Resident",
+          banner: event.collections.banner,
+          logo: event.collections.logo,
+        };
 
+        console.log("Notify: ", notify);
+
+        const result = await axios.post(`${API_LINK}/notification/`, notify, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (result.status === 200) {
+          setTimeout(() => {
+            setSubmitClicked(false);
+            setReplyingStatus("success");
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
+          }, 1000);
+        }
+      }
       // window.location.reload();
     } catch (error) {
       console.log(error);

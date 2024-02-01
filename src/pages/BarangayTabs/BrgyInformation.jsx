@@ -70,24 +70,29 @@ const Information = () => {
   const handleSaveChanges = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      if (logo) formData.append("files", logo);
-      if (banner) formData.append("files", banner);
 
-      formData.append("brgyinfo", JSON.stringify(information));
-
-      const result = await axios.patch(
-        `${API_LINK}/brgyinfo/${brgy}`,
-        formData
+      const response = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${brgy}`
       );
-
-      // if (!response.ok) {
-      //   throw new Error("Info is not updated");
-      // }
-
-      console.log(result);
-      window.location.reload();
-      // setBrgyInformation({});
+          console.log("ede wiw",response.data[0])
+    
+      if (response.status === 200) {
+        const formData = new FormData();
+        if (logo) formData.append("files", logo);
+        if (banner) formData.append("files", banner);
+  
+        formData.append("brgyinfo", JSON.stringify(information));
+  
+        const result = await axios.patch(
+          `${API_LINK}/brgyinfo/${brgy}/?folder_id=${response.data[0].info}`,
+          formData
+        );
+        console.log(result);
+        window.location.reload();
+        // setBrgyInformation({});
+      }else {
+        console.error("No Data Found");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -135,7 +140,7 @@ const Information = () => {
       {/* Table */}
 
       <div className="mx-4 overflow-y-auto lg:h-[calc(100vh_-_80px)]">
-      <div>
+        <div>
           <div className="bg-cover bg-center h-96 rounded-lg">
             <div className="relative flex justify-end">
               {isEditingMode && (
@@ -181,7 +186,7 @@ const Information = () => {
                   >
                     <img
                       id="edit_logo"
-                      className="w-[120px] h-[120px] md:h-56 bg-cover md:w-56 rounded-full border-4 border-white mx-auto absolute left-0 right-0 -top-[65px] md:-top-[6rem]"
+                      className="w-[120px] h-[120px] md:h-56 object-contain md:w-56 rounded-full border-4 border-white mx-auto absolute left-0 right-0 -top-[65px] md:-top-[6rem]"
                     />
 
                     {isEditingMode && (
@@ -332,7 +337,6 @@ const Information = () => {
             </div>
           </div>
         </div>
-      
       </div>
     </>
   );

@@ -22,7 +22,7 @@ const MServicesInfo = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const brgy = "MUNICIPAL INFO";
+  const brgy = "MUNISIPYO";
   const [servicesinfos, setServicesInfos] = useState([]);
   const [servicesinfo, setServicesInfo] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -568,6 +568,7 @@ const MServicesInfo = () => {
         <AddServicesInfoModal brgy={brgy} />
         <ArchiveServicesInfoModal selectedItems={selectedItems} />
         <ManageServiceInfoModal
+          brgy={brgy}
           servicesinfos={servicesinfos}
           setServicesInfos={setServicesInfos}
         />

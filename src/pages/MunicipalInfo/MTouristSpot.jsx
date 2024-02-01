@@ -20,7 +20,8 @@ const MTouristSpot = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const section = "MUNICIPAL INFO";
+  const section = "MUNISIPYO";
+  const brgy = "MUNISIPYO";
   const [touristspot, settouristSpot] = useState([]);
   const [touristspotInfo, settouristspotInfo] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -563,9 +564,9 @@ const MTouristSpot = () => {
             renderOnZeroPageCount={null}
           />
         </div>
-        <AddAboutusModal section={section} />
+        <AddAboutusModal section={section} brgy={brgy}  />
         <ArchiveTouristSpotModal selectedItems={selectedItems} />
-        <ManageTouristSpotModal touristspotInfo = {touristspotInfo} settouristspotInfo = {settouristspotInfo}/>
+        <ManageTouristSpotModal brgy={brgy} touristspotInfo = {touristspotInfo} settouristspotInfo = {settouristspotInfo}/>
       </div>
     </div>
   );

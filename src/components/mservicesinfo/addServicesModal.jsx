@@ -39,44 +39,53 @@ function AddServicesInfo({ brgy }) {
 
   const handleSubmit = async (e) => {
     try {
-
       if (!servicesinfo.name.trim() || !servicesinfo.details.trim() || !icon) {
         // Highlight empty fields with red border
-       
-          setError("Please fill out all required fields.");
-          return; // Prevent further execution of handleSubmit
+
+        setError("Please fill out all required fields.");
+        return; // Prevent further execution of handleSubmit
       }
 
       e.preventDefault();
       setSubmitClicked(true);
       setError(null);
-      var formData = new FormData();
 
-      formData.append("files", icon);
+      const response = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${brgy}`
+      );
 
-      const obj = {
-        brgy: servicesinfo.brgy,
-        name: servicesinfo.name,
-        details: servicesinfo.details,
-      };
+      if (response.status === 200) {
+        var formData = new FormData();
 
-      formData.append("servicesinfo", JSON.stringify(obj));
+        formData.append("file", icon);
 
-      const result = await axios.post(`${API_LINK}/services_info`, formData);
+        const obj = {
+          brgy: servicesinfo.brgy,
+          name: servicesinfo.name,
+          details: servicesinfo.details,
+        };
 
-      if (result.status === 200) {
-        setServicesInfo({
-          brgy: "",
-          name: "",
-          details: "",
-        });
-        setIcon();
-        setSubmitClicked(false);
-        setCreationStatus("success");
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-       
+        formData.append("servicesinfo", JSON.stringify(obj));
+
+        const result = await axios.post(
+          `${API_LINK}/services_info/?folder_id=${response.data[0].
+            offered_services}`,
+          formData
+        );
+
+        if (result.status === 200) {
+          setServicesInfo({
+            brgy: "",
+            name: "",
+            details: "",
+          });
+          setIcon();
+          setSubmitClicked(false);
+          setCreationStatus("success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }
       }
     } catch (err) {
       console.log(err);
@@ -116,32 +125,32 @@ function AddServicesInfo({ brgy }) {
             </div>
 
             <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
-            {error && (
-                  <div
-                    className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
-                    role="alert"
-                  >
-                    <div className="flex p-4">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width={16}
-                          height={16}
-                          fill="currentColor"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
-                        </svg>
-                      </div>
-                      <div className="ms-3">
-                        <p className="text-sm text-gray-700 font-medium ">
-                          {error}
-                        </p>
-                      </div>
+              {error && (
+                <div
+                  className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
+                  role="alert"
+                >
+                  <div className="flex p-4">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={16}
+                        height={16}
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                      </svg>
+                    </div>
+                    <div className="ms-3">
+                      <p className="text-sm text-gray-700 font-medium ">
+                        {error}
+                      </p>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
               <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
                 <div className="w-full">
                   <label
@@ -185,7 +194,7 @@ function AddServicesInfo({ brgy }) {
                   </div>
                   {error && !icon && (
                     <p className="text-red-500 text-xs italic">
-                  Please select an icon image
+                      Please select an icon image
                     </p>
                   )}
                 </div>
@@ -209,7 +218,7 @@ function AddServicesInfo({ brgy }) {
                   onChange={handleChange}
                   placeholder="Service name"
                 />
-                 {error && !servicesinfo.name.trim() && (
+                {error && !servicesinfo.name.trim() && (
                   <p className="text-red-500 text-xs italic">
                     Please enter a service name.
                   </p>
@@ -229,11 +238,13 @@ function AddServicesInfo({ brgy }) {
                   value={servicesinfo.details}
                   onChange={handleChange}
                   className={`block p-2.5 w-full text-sm text-gray-700  rounded-lg border focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
-                    error && !servicesinfo.details.trim() ? "border-red-500" : ""
+                    error && !servicesinfo.details.trim()
+                      ? "border-red-500"
+                      : ""
                   }`}
                   placeholder="Enter service details..."
                 />
-                 {error && !servicesinfo.details.trim() && (
+                {error && !servicesinfo.details.trim() && (
                   <p className="text-red-500 text-xs italic">
                     Please enter a service details.
                   </p>
@@ -263,9 +274,9 @@ function AddServicesInfo({ brgy }) {
         </div>
       </div>
       {submitClicked && <AddLoader creationStatus="creating" />}
-        {creationStatus && (
-          <AddLoader creationStatus={creationStatus} error={error} />
-        )}
+      {creationStatus && (
+        <AddLoader creationStatus={creationStatus} error={error} />
+      )}
     </div>
   );
 }

@@ -3,10 +3,19 @@ import axios from "axios";
 import API_LINK from "../../../config/API";
 import { useState } from "react";
 import StatusLoader from "./loaders/StatusLoader";
-function ServiceStatus({ status, setStatus }) {
+function ServiceStatus({ status, setStatus, selectedService }) {
   const [submitClicked, setSubmitClicked] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(null);
   const [error, setError] = useState(null);
+  const getType = (type) => {
+    switch (type) {
+      case "MUNISIPYO":
+        return "Municipality";
+      default:
+        return "Barangay";
+    }
+  };
+console.log("panget",selectedService)
   const handleSave = async (e) => {
     try {
       e.preventDefault();
@@ -18,7 +27,33 @@ function ServiceStatus({ status, setStatus }) {
         },
         { headers: { "Content-Type": "application/json" } }
       );
+      let notify;
 
+      notify = {
+        category: "Many",
+        compose: {
+          subject: `SERVICES - ${selectedService.name}`,
+          message: `Municipality has ${status.status} your service named: ${selectedService.name}.\n`,
+          go_to: "Services",
+        },
+        target: {
+          user_id: null,
+          area: selectedService.brgy,
+        },
+        type: "Barangay",
+        banner: selectedService.collections.banner,
+        logo: selectedService.collections.logo,
+      };
+
+      console.log("Notify: ", notify);
+      console.log("Result: ", response);
+
+      const result = await axios.post(`${API_LINK}/notification/`, notify, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+        console.log("pangetnaman",result)
       if (response.status === 200) {
         setTimeout(() => {
           setSubmitClicked(false);

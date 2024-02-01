@@ -208,109 +208,119 @@ const Settings = () => {
       return; // Prevent further execution of handleSubmit
     }
 
-    const obj = {
-      firstName: userData.firstName,
-      middleName: userData.middleName,
-      lastName: userData.lastName,
-      suffix: userData.suffix,
-      religion: userData.religion,
-      email: userData.email,
-      birthday: userData.birthday,
-      age: userData.age,
-      contact: userData.contact,
-      sex: userData.sex,
-      address: {
-        street: userAddress.street,
-        brgy: userAddress.brgy,
-        city: userAddress.city,
-      },
-      occupation: userData.occupation,
-      civil_status: userData.civil_status,
-      type: userData.type,
-      isVoter: userData.isVoter,
-      isHead: userData.isHead,
-      username: userData.username,
-      profile: userData.profile,
-      socials: {
-        facebook: userSocials.facebook,
-        instagram: userSocials.instagram,
-        twitter: userSocials.twitter,
-      },
-    };
 
     try {
-      var formData = new FormData();
-      formData.append("users", JSON.stringify(obj));
-      formData.append("file", pfp);
-      const response = await axios.patch(
-        `${API_LINK}/users/?doc_id=${id}`,
-        formData
+      const result = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${userAddress.brgy}`
       );
+    console.log("wewewesss", userAddress.brgy)
+      if (result.status === 200) {
+        const obj = {
+          firstName: userData.firstName,
+          middleName: userData.middleName,
+          lastName: userData.lastName,
+          suffix: userData.suffix,
+          religion: userData.religion,
+          email: userData.email,
+          birthday: userData.birthday,
+          age: userData.age,
+          contact: userData.contact,
+          sex: userData.sex,
+          address: {
+            street: userAddress.street,
+            brgy: userAddress.brgy,
+            city: userAddress.city,
+          },
+          occupation: userData.occupation,
+          civil_status: userData.civil_status,
+          type: userData.type,
+          isVoter: userData.isVoter,
+          isHead: userData.isHead,
+          username: userData.username,
+          profile: userData.profile,
+          socials: {
+            facebook: userSocials.facebook,
+            instagram: userSocials.instagram,
+            twitter: userSocials.twitter,
+          },
+        };
+        var formData = new FormData();
+        formData.append("users", JSON.stringify(obj));
+        formData.append("file", pfp);
+        const response = await axios.patch(
+          `${API_LINK}/users/?doc_id=${id}&folder_id=${result.data[0].pfp}`,
+          formData
+        );
+
+
+
+
+        if (activeButton.credential === true) {
+          if (
+            userData.username &&
+            userCred.username &&
+            userData.username !== userCred.username
+          ) {
+            if (!userCred.username || !userCred.oldPass) {
+              setMessage({
+                display: false,
+              });
+              setError("Please provide both the new username and password.");
+              return; // Prevent further execution
+            }
+            changeCredentials(
+              userData.username,
+              userCred.username,
+              userCred.oldPass,
+              userCred.newPass
+            );
+          }
+        } else if (activeButton.pass === true) {
+          if (userCred.newPass !== "" || userCred.oldPass !== "") {
+            if (!userCred.newPass || !userCred.oldPass) {
+              setMessage({
+                display: false,
+              });
+              setError("Please provide both the new username and password.");
+              return; // Prevent further execution
+            }
+            changeCredentials(
+              userData.username,
+              userCred.username,
+              userCred.oldPass,
+              userCred.newPass
+            );
+          }
+        } else if (response.status === 200) {
+          setSubmitClicked(true);
+          setError(null);
+          console.log("Update successful:", response);
+          setUserData(response.data);
+          setUserAddress({
+            street: response.data.address.street,
+            brgy: response.data.address.brgy,
+            city: response.data.address.city,
+          });
+          setUserSocials({
+            facebook: response.data.socials.facebook,
+            instagram: response.data.socials.instagram,
+            twitter: response.data.socials.twitter,
+          });
+          setEditButton(true);
+          setTimeout(() => {
+            setSubmitClicked(false);
+            setUpdatingStatus("success");
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
+          }, 1000);
+        } else {
+          console.error("Update failed. Status:", response.status);
+        }
+      }
 
       // CHANGE USERNAME
-      if (activeButton.credential === true) {
-        if (
-          userData.username &&
-          userCred.username &&
-          userData.username !== userCred.username
-          
-        ) {
-          if (!userCred.username || !userCred.oldPass) {
-            setMessage({
-              display: false,
-            });
-            setError("Please provide both the new username and password.");
-            return; // Prevent further execution
-          }
-          changeCredentials(
-            userData.username,
-            userCred.username,
-            userCred.oldPass,
-            userCred.newPass
-          );
-        }
-      } else if (activeButton.pass === true) {
-        if (userCred.newPass !== "" || userCred.oldPass !== "") {
-          if (!userCred.newPass || !userCred.oldPass) {
-            setMessage({
-              display: false,
-            });
-            setError("Please provide both the new username and password.");
-            return; // Prevent further execution
-          }
-          changeCredentials(
-            userData.username,
-            userCred.username,
-            userCred.oldPass,
-            userCred.newPass
-          );
-        }
-      } else if (response.status === 200) {
-        setSubmitClicked(true);
-        setError(null);
-        console.log("Update successful:", response);
-        setUserData(response.data);
-        setUserAddress({
-          street: response.data.address.street,
-          brgy: response.data.address.brgy,
-          city: response.data.address.city,
-        });
-        setUserSocials({
-          facebook: response.data.socials.facebook,
-          instagram: response.data.socials.instagram,
-          twitter: response.data.socials.twitter,
-        });
-        setEditButton(true);
-        setTimeout(() => {
-          setSubmitClicked(false);
-          setUpdatingStatus("success");
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
-        }, 1000);
-      } else {
-        console.error("Update failed. Status:", response.status);
-      }
+    
     } catch (error) {
       console.error("Error saving changes:", error);
       setSubmitClicked(false);

@@ -18,7 +18,7 @@ const Inquiries = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const brgy = searchParams.get("brgy");
+  const brgy = "MUNISIPYO";
   const [inquiries, setInquiries] = useState([]);
   const [inquiry, setInquiry] = useState({
     compose: { file: [] },
@@ -227,8 +227,8 @@ const Inquiries = () => {
   }, []);
   return (
     <div className="mx-4 mt-4">
-      <div className="flex flex-col ">
-        <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
+    <div className="flex flex-col ">
+      <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
               className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[26px] xxxl:text-4xl xxxl:mt-1 text-white"
@@ -678,7 +678,7 @@ const Inquiries = () => {
           />
         </div>
         <ArchiveModal selectedItems={selectedItems} />
-        <ViewInquiriesModal inquiry={inquiry} setInquiry={setInquiry} />
+        <ViewInquiriesModal inquiry={inquiry} setInquiry={setInquiry} brgy={brgy}/>
         <Status status={status} setStatus={setStatus} />
       </div>
     </div>

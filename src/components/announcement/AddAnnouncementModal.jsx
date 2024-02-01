@@ -70,10 +70,10 @@ function CreateAnnouncementModal({ brgy }) {
     setLogo(null);
     setBanner(null);
     setFiles([]);
-    setError(null)
+    setError(null);
   };
 
-const getType = (type) => {
+  const getType = (type) => {
     switch (type) {
       case "MUNISIPYO":
         return "Municipality";
@@ -84,8 +84,14 @@ const getType = (type) => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      if (!announcement.title.trim() || !announcement.details.trim() || !announcement.date.trim() || !files || !banner || !logo) {
-
+      if (
+        !announcement.title.trim() ||
+        !announcement.details.trim() ||
+        !announcement.date.trim() ||
+        !files ||
+        !banner ||
+        !logo
+      ) {
         setError("Please fill out all required fields.");
         return; // Prevent further execution of handleSubmit
       }
@@ -115,16 +121,26 @@ const getType = (type) => {
 
       formData.append("announcement", JSON.stringify(obj));
 
-      const response = await axios.post(`${API_LINK}/announcement/`, formData);
-      if (response.status === 200) {
-        let notify;
+      const res_folder = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${brgy}`
+      );
+console.log(res_folder)
+      if (res_folder.status === 200) {
+        const response = await axios.post(
+          `${API_LINK}/announcement/?event_folder_id=${res_folder.data[0].events}`,
+          formData
+        );
 
-        if (announcement.isOpen) {
-          notify = {
-            category: "All",
-            compose: {
-              subject: `EVENT - ${announcement.title}`,
-              message: `Barangay ${brgy} has posted a new event named: ${announcement.title}.\n\n
+       
+        if (response.status === 200) {
+          let notify;
+
+          if (announcement.isOpen) {
+            notify = {
+              category: "All",
+              compose: {
+                subject: `EVENT - ${announcement.title}`,
+                message: `Barangay ${brgy} has posted a new event named: ${announcement.title}.\n\n
               
               Event Details:\n 
               ${announcement.details}\n\n
@@ -132,36 +148,32 @@ const getType = (type) => {
               Event Date:
               ${announcement.date}\n\n
               `,
-              go_to: "Events",
+                go_to: "Events",
+              },
+              target: {
+                user_id: null,
+                area: null,
+              },
+              type: getType(brgy),
+              banner: response.data.collections.banner,
+              logo: response.data.collections.logo,
+            };
+          }
+          const result = await axios.post(`${API_LINK}/notification/`, notify, {
+            headers: {
+              "Content-Type": "application/json",
             },
-            target: {
-              user_id: null,
-              area: null,
-            },
-            type: getType(brgy),
-            banner: response.data.collections.banner,
-            logo: response.data.collections.logo,
-          };
+          });
+          if (result.status === 200) {
+            clearForm();
+            setSubmitClicked(false);
+            setCreationStatus("success");
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
+          }
         }
-
-        console.log("Notify: ", notify);
-        console.log("Result: ", response);
-
-        const result = await axios.post(`${API_LINK}/notification/`, notify, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-      if (result.status === 200) {
-        clearForm();
-        setSubmitClicked(false);
-        setCreationStatus("success");
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
       }
-    }
     } catch (err) {
       console.error(err);
       setSubmitClicked(false);
@@ -202,7 +214,7 @@ const getType = (type) => {
             </div>
 
             <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
-            {error && (
+              {error && (
                 <div
                   className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
                   role="alert"
@@ -316,7 +328,8 @@ const getType = (type) => {
                   )}
                 </div>
               </div>
-              <div className="flex items-center justify-between mb-2">
+              
+              {/* <div className="flex items-center justify-between mb-2">
                 <label className="block sm:text-xs lg:text-sm text-gray-700 font-bold">
                   OPEN FOR ALL?
                 </label>
@@ -331,7 +344,7 @@ const getType = (type) => {
                   />
                   <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-400 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-800" />
                 </label>
-              </div>
+              </div> */}
               <div className="mb-4">
                 <label
                   className="block text-gray-700 text-sm font-bold mb-2"
@@ -342,7 +355,9 @@ const getType = (type) => {
                 <input
                   id="title"
                   className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
-                    error && !announcement.title ? "border-red-500" : "border-gray-300"
+                    error && !announcement.title
+                      ? "border-red-500"
+                      : "border-gray-300"
                   }`}
                   name="title"
                   type="text"
@@ -351,7 +366,7 @@ const getType = (type) => {
                   placeholder="Announcement title"
                   required
                 />
-                 {error && !announcement.title && (
+                {error && !announcement.title && (
                   <p className="text-red-500 text-xs italic">
                     Please enter a title.
                   </p>
@@ -371,12 +386,14 @@ const getType = (type) => {
                   value={announcement.details}
                   onChange={handleChange}
                   className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
-                    error && !announcement.details ? "border-red-500" : "border-gray-300"
+                    error && !announcement.details
+                      ? "border-red-500"
+                      : "border-gray-300"
                   }`}
                   placeholder="Enter announcement details..."
                   required
                 />
-                 {error && !announcement.details && (
+                {error && !announcement.details && (
                   <p className="text-red-500 text-xs italic">
                     Please enter a details.
                   </p>
@@ -391,7 +408,9 @@ const getType = (type) => {
                 </label>
                 <input
                   className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
-                    error && !announcement.date ? "border-red-500" : "border-gray-300"
+                    error && !announcement.date
+                      ? "border-red-500"
+                      : "border-gray-300"
                   }`}
                   id="date"
                   name="date"
@@ -400,7 +419,7 @@ const getType = (type) => {
                   onChange={handleChange}
                   required
                 />
-                 {error && !announcement.date && (
+                {error && !announcement.date && (
                   <p className="text-red-500 text-xs italic">
                     Please enter a date.
                   </p>
@@ -436,16 +455,13 @@ const getType = (type) => {
             </div>
           </div>
         </div>
-       
       </div>
-      {empty && (
-        <ErrorPopup />
-        )}
-        {/* <AddLoader /> */}
-        {submitClicked && <AddLoader creationStatus="creating" />}
-        {creationStatus && (
-          <AddLoader creationStatus={creationStatus} error={error} />
-        )}
+      {empty && <ErrorPopup />}
+      {/* <AddLoader /> */}
+      {submitClicked && <AddLoader creationStatus="creating" />}
+      {creationStatus && (
+        <AddLoader creationStatus={creationStatus} error={error} />
+      )}
     </div>
   );
 }

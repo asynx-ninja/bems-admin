@@ -677,6 +677,7 @@ const EventsRegistrations = () => {
       <ReplyRegistrationModal
         application={application}
         setApplication={setApplication}
+        brgy={brgy}
       />
       <ArchiveRegistrationModal selectedItems={selectedItems} />
     </div>

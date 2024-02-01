@@ -6,7 +6,7 @@ import EditDropbox from "./EditDropbox";
 import API_LINK from "../../config/API";
 import EditLoader from "./loaders/EditLoader";
 
-function ManageAnnouncementModal({ announcement, setAnnouncement }) {
+function ManageAnnouncementModal({ announcement, setAnnouncement, brgy }) {
   const [logo, setLogo] = useState();
   const [banner, setBanner] = useState();
   const [files, setFiles] = useState([]);
@@ -93,11 +93,11 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      if (!announcement.title.trim() || !announcement.details.trim() || !announcement.date.trim() || !files || !banner || !logo) {
+      // if (!announcement.title.trim() || !announcement.details.trim() || !announcement.date.trim() || !files || !banner || !logo) {
 
-        setError("Please fill out all required fields.");
-        return; // Prevent further execution of handleSubmit
-      }
+      //   setError("Please fill out all required fields.");
+      //   return; // Prevent further execution of handleSubmit
+      // }
       setSubmitClicked(true);
 
       var formData = new FormData();
@@ -126,13 +126,14 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
 
       console.log("announcement", announcement);
 
+
       formData.append("announcement", JSON.stringify(announcement));
 
       const response = await axios.patch(
         `${API_LINK}/announcement/${announcement._id}`,
         formData
       );
-
+console.log("ito na", response)
       if (response.status === 200) {
         var logoSrc = document.getElementById("logo");
         logoSrc.src =
@@ -143,7 +144,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
           "https://thenounproject.com/api/private/icons/4322871/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0";
           let notify;
 
-          if (announcement.isOpen) {
+
             notify = {
               category: "All",
               compose: {
@@ -163,10 +164,10 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                 area: null,
               },
               type: getType(brgy),
-              banner: announcement.data.collections.banner,
-              logo: announcement.data.collections.logo,
+              banner: response.data.collections.banner,
+              logo: response.data.collections.logo,
             };
-          } 
+          
   
           console.log("Notify: ", notify);
           console.log("Result: ", response);
@@ -301,7 +302,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between mb-2">
+                {/* <div className="flex items-center justify-between mb-2">
                   <label className="block sm:text-xs lg:text-sm text-gray-700 font-bold">
                     OPEN FOR ALL?
                   </label>
@@ -316,7 +317,7 @@ function ManageAnnouncementModal({ announcement, setAnnouncement }) {
                     />
                     <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-400 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-800" />
                   </label>
-                </div>
+                </div> */}
                 <div className="mb-4">
                   <label
                     className="block text-gray-700 text-sm font-bold mb-2"

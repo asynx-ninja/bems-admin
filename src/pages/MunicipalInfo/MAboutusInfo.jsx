@@ -22,7 +22,7 @@ const MHomepageInfo = () => {
   const [aboutus, setAboutus] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const brgy = "MUNICIPAL INFO";
+  const brgy = "MUNISIPYO";
   const [aboutusInfo, setAboutusinfo] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);

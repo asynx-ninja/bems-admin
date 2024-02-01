@@ -38,6 +38,9 @@ function Services() {
   };
   const handleStatus = (status) => {
     setStatus(status);
+    setSelectedService(status.service)
+    console.log("panget1", service)
+    console.log("panget2",status.service)
   };
 
   const tableHeader = [
@@ -480,6 +483,7 @@ function Services() {
                             handleStatus({
                               id: service._id,
                               status: service.isApproved,
+                              service: {...service}
                             })
                           }
                           className="text-white bg-yellow-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
@@ -529,7 +533,8 @@ function Services() {
         setSelectedService={setSelectedService}
       />
 
-      <StatusResident status={status} setStatus={setStatus} />
+      <StatusResident status={status} setStatus={setStatus}  selectedService={selectedService}
+        setSelectedService={setSelectedService} />
       <GenerateReportsModal />
     </div>
   );

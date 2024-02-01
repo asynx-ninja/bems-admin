@@ -53,7 +53,12 @@ function CreateOfficialModal({ brgy }) {
 
       setSubmitClicked(true);
       setError(null)
-      const formData = new FormData();
+      const response = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${brgy}`
+      );
+
+      if (response.status === 200){
+        const formData = new FormData();
       formData.append("file", pfp);
 
       const obj = {
@@ -70,7 +75,7 @@ function CreateOfficialModal({ brgy }) {
       formData.append("official", JSON.stringify(obj));
 
       const result = await axios.post(
-        `${API_LINK}/mofficials/?brgy=${brgy}`,
+        `${API_LINK}/mofficials/?brgy=${brgy}&folder_id=${response.data[0].pfp}`,
         formData
       );
 
@@ -90,6 +95,7 @@ function CreateOfficialModal({ brgy }) {
         setTimeout(() => {
           window.location.reload();
         }, 3000);
+      }
       }
     } catch (err) {
       console.log(err);

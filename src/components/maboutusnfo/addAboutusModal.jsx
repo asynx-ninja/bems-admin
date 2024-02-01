@@ -53,35 +53,43 @@ function AddAboutus({ brgy }) {
       setSubmitClicked(true);
       setError(null);
 
-      // Create form data
-      const formData = new FormData();
-      formData.append("file", banner);
-      formData.append(
-        "aboutusinfo",
-        JSON.stringify({
-          brgy: aboutus.brgy,
-          title: aboutus.title,
-          details: aboutus.details,
-        })
+      const response = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${brgy}`
       );
+      
 
-      // Submit form data
-      const result = await axios.post(`${API_LINK}/aboutus`, formData);
+      // Create form data
+      if (response.status === 200) {
+        const formData = new FormData();
+        formData.append("file", banner);
+        formData.append(
+          "aboutusinfo",
+          JSON.stringify({
+            brgy: aboutus.brgy,
+            title: aboutus.title,
+            details: aboutus.details,
+          })
+        );
 
-      if (result.status === 200) {
-        // Reset form fields
-        setAboutus({
-          brgy: "",
-          title: "",
-          details: "",
-        });
-        setBanner(null);
-        setSubmitClicked(false);
-        setCreationStatus("success");
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
+        // Submit form data
+        const result = await axios.post(`${API_LINK}/aboutus/?folder_id=${response.data[0].about_us}`, formData);
+        if (result.status === 200) {
+          // Reset form fields
+          setAboutus({
+            brgy: "",
+            title: "",
+            details: "",
+          });
+          setBanner(null);
+          setSubmitClicked(false);
+          setCreationStatus("success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }
       }
+
+     
     } catch (err) {
       console.error(err);
       setSubmitClicked(false);
@@ -181,7 +189,6 @@ function AddAboutus({ brgy }) {
                         accept="image/*"
                         value={!banner ? "" : banner.originalname}
                         className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4  file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100`}
-
                       />
                     </label>
                   </div>

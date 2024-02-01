@@ -19,8 +19,10 @@ function BarangayMenu() {
     document.title = "Barangay Information | Barangay E-Services Management";
     const fetchBarangays = async () => {
       try {
+
         const response = await axios.get(`${API_LINK}/brgyinfo/allinfo`);
         setBarangays(response.data);
+
       } catch (error) {
         console.error("Error fetching barangays:", error);
       }

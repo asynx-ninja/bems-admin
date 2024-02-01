@@ -46,17 +46,22 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
   const [pfp, setPfp] = useState();
 
   const handlePfpChange = (e) => {
-    setPfp(e.target.files[0]);
-
-    const output = document.getElementById("edit_pfp");
-    const reader = new FileReader();
-
-    reader.onload = function () {
-      output.src = reader.result;
+    if (e.target.name === "pfp") {
+      const file = e.target.files[0];
+      setPfp(file);
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+          editBannerRef.current.src = reader.result;
+        });
+        reader.readAsDataURL(e.target.files[0]);
+      } else {
+        setSelectedOfficial((prev) => ({
+          ...prev,
+          [e.target.name]: e.target.value,
+        }));
+      }
     };
-
-    reader.readAsDataURL(e.target.files[0]);
-  };
+  
 
   const handleSaveChanges = async (e) => {
     try {
@@ -78,12 +83,18 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
 
       setSubmitClicked(true);
       setError(null)
+
+      const response = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${brgy}`
+      );
+
+    if (response.status === 200){
       const formData = new FormData();
       if (pfp) formData.append("file", pfp);
       formData.append("official", JSON.stringify(selectedOfficial));
 
       const result = await axios.patch(
-        `${API_LINK}/mofficials/?brgy=${brgy}&doc_id=${selectedOfficial._id}`,
+        `${API_LINK}/mofficials/?brgy=${brgy}&doc_id=${selectedOfficial._id}&folder_id=${response.data[0].pfp}`,
         formData
       );
 
@@ -96,6 +107,7 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
           }, 3000);
         }, 1000);
       }
+    }
     } catch (err) {
       console.log(err);
       setSubmitClicked(false);
@@ -165,6 +177,7 @@ function ManageOfficialModal({ selectedOfficial, setSelectedOfficial, brgy }) {
                         <img
                           src={selectedOfficial.picture?.link || ""}
                           alt=""
+                          id="add_profile"
                           className="w-[250px] h-[250px] md:w-full md:h-[350px] lg:max-w-[450px] lg:h-[350px] mx-auto rounded-t-xl object-cover"
                         />
                       </div>
