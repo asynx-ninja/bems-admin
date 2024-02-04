@@ -126,7 +126,7 @@ const BarangayAccount = () => {
               className="text-center sm:text-[15px] mx-auto font-bold text-xs md:text-xl lg:text-[16px] xl:text-[20px] xxl:text-[1.5rem] xxxl:text-3xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
-              BARANGAY ACCOUNT
+              BARANGAY ADMIN ACCOUNT
             </h1>
           </div>
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">

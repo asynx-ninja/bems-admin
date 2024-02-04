@@ -45,6 +45,11 @@ const ArchivedEvents = () => {
     };
 
     fetch();
+    const intervalId = setInterval(() => {
+      fetch();
+    }, 3000);
+
+    return () => clearInterval(intervalId);
   }, [currentPage]);
 
   const handlePageChange = ({ selected }) => {
@@ -92,7 +97,7 @@ const ArchivedEvents = () => {
     "details",
     "creation date",
     "event date",
-    "# of attendees",
+    // "# of attendees",
     "actions",
   ];
 
@@ -439,13 +444,13 @@ const ArchivedEvents = () => {
                       </span>
                     </div>
                   </td>
-                    <td className="px-6 py-3 ">
+                    {/* <td className="px-6 py-3 ">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                           {item.attendees.length}
                         </span>
                       </div>
-                    </td>
+                    </td> */}
                     <td className="px-6 py-3">
                       <div className="flex justify-center space-x-1 sm:space-x-none">
                         <div className="hs-tooltip inline-block w-full">

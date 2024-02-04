@@ -56,6 +56,11 @@ const ArchivedRegistrations = () => {
     };
 
     fetch();
+    const intervalId = setInterval(() => {
+      fetch();
+    }, 3000);
+
+    return () => clearInterval(intervalId);
   }, [brgy, statusFilter, currentPage]);
 
   const handlePageChange = ({ selected }) => {

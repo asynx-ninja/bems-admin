@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import Information from "./BarangayTabs/Brgyinformation";
+import Information from "./BarangayTabs/BrgyInformation";
 import Profit from "./BarangayTabs/Reports";
 import Services from "./BarangayTabs/BrgyServices";
 import ServiceRequest from "./BarangayTabs/BrgyServiceRequests";
@@ -8,17 +8,34 @@ import Officials from "./BarangayTabs/BrgyOfficials";
 import ArchivedOfficials from "./BarangayTabs/BrgyArchivedOfficials";
 import Residents from "./BarangayTabs/BrgyResidents";
 import Inquiries from "./BarangayTabs/BrgyInquiries";
-import Application from "./BarangayTabs/BrgyEventsApplication"
+import Application from "./BarangayTabs/BrgyEventsApplication";
 import { useParams, useSearchParams } from "react-router-dom";
 import Announcement from "./BarangayTabs/BrgyAnnouncements";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 function BarangayDetails() {
   const [collapseOpen, setCollapseOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState(1); // Initial active tab
+  // const [activeTab, setActiveTab] = useState(1); // Initial active tab
   const handleTabChange = (tabIndex) => {
     setActiveTab(tabIndex);
-  }
+  };
+  const [activeTab, setActiveTab] = useState(() => {
+    // Get the active tab from local storage if it exists, otherwise default to 1
+    const savedTab = localStorage.getItem("activeTab");
+    return savedTab !== null ? Number(savedTab) : 1;
+  });
+
+  // This effect runs when activeTab state changes
+  useEffect(() => {
+    // Store the active tab in local storage whenever it changes
+    localStorage.setItem("activeTab", activeTab);
+  }, [activeTab]);
+  useEffect(() => {
+    return () => {
+      // Reset the active tab to the default value when the component unmounts
+      setActiveTab(1);
+    };
+  }, []);
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
   console.log("SAASA", id);
@@ -35,39 +52,39 @@ function BarangayDetails() {
         </h1>
       </div>
       <div className="px-4 py-4 items-center bg-gray-100">
-      <button
-        type="button"
-        className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 inline-flex uppercase font-bold items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-[#295141] to-[#408D51] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-        id="hs-basic-collapse"
-        data-hs-collapse="#hs-basic-collapse-heading"
-        onClick={() => setCollapseOpen(!collapseOpen)}
-      >
-        {activeTab === 1 && 'Information'}
-        {activeTab === 2 && 'Barangay Officials'}
-        {activeTab === 3 && 'Services'}
-        {activeTab === 4 && 'Service Requests'}
-        {activeTab === 5 && 'Residents'}
-        {activeTab === 6 && 'Events'}
-        {activeTab === 7 && 'Events Application'}
-        {activeTab === 8 && 'Inquiries'}
-        {activeTab === 9 && 'Reports'}
-        <svg
-          className={`hs-collapse-open ${
-            collapseOpen ? 'rotate-180' : ''
-          } flex-shrink-0 w-4 h-4 text-white`}
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <button
+          type="button"
+          className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 inline-flex uppercase font-bold items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-[#295141] to-[#408D51] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+          id="hs-basic-collapse"
+          data-hs-collapse="#hs-basic-collapse-heading"
+          onClick={() => setCollapseOpen(!collapseOpen)}
         >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
+          {activeTab === 1 && "Information"}
+          {activeTab === 2 && "Barangay Officials"}
+          {activeTab === 3 && "Services"}
+          {activeTab === 4 && "Service Requests"}
+          {activeTab === 5 && "Residents"}
+          {activeTab === 6 && "Events"}
+          {activeTab === 7 && "Events Application"}
+          {activeTab === 8 && "Inquiries"}
+          {activeTab === 9 && "Reports"}
+          <svg
+            className={`hs-collapse-open ${
+              collapseOpen ? "rotate-180" : ""
+            } flex-shrink-0 w-4 h-4 text-white`}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
 
         <div
           id="hs-basic-collapse-heading"
@@ -83,7 +100,11 @@ function BarangayDetails() {
           >
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active"
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+                activeTab === 1
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  : ""
+              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-1"
               aria-controls="basic-tabs-1"
@@ -94,7 +115,11 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1 font-bold my-1 hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+                activeTab === 2
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  : ""
+              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-2"
               aria-controls="basic-tabs-2"
@@ -105,7 +130,11 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+                activeTab === 3
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  : ""
+              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-3"
               aria-controls="basic-tabs-3"
@@ -116,7 +145,11 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+                activeTab === 4
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  : ""
+              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-4"
               aria-controls="basic-tabs-4"
@@ -127,7 +160,11 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+                activeTab === 5
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  : ""
+              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-5"
               aria-controls="basic-tabs-5"
@@ -138,7 +175,11 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1  my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+                activeTab === 6
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  : ""
+              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-6"
               aria-controls="basic-tabs-6"
@@ -149,7 +190,11 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1  my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+                activeTab === 7
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  : ""
+              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-7"
               aria-controls="basic-tabs-7"
@@ -160,7 +205,11 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+                activeTab === 8
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  : ""
+              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-8"
               aria-controls="basic-tabs-8"
@@ -171,7 +220,11 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className="hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141]"
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+                activeTab === 9
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  : ""
+              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-9"
               aria-controls="basic-tabs-9"
@@ -187,6 +240,7 @@ function BarangayDetails() {
       <div className="mt-3 py-4 px-4">
         <div
           id="basic-tabs-1"
+          className={activeTab === 1 ? "block" : "hidden"}
           role="tabpanel"
           aria-labelledby="basic-tabs-item-1"
         >
@@ -194,7 +248,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-2"
-          className="hidden"
+          className={activeTab === 2 ? "block" : "hidden"}
           role="tabpanel"
           aria-labelledby="basic-tabs-item-2"
         >
@@ -202,7 +256,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-3"
-          className="hidden"
+          className={activeTab === 3 ? "block" : "hidden"}
           role="tabpanel"
           aria-labelledby="basic-tabs-item-3"
         >
@@ -210,7 +264,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-4"
-          className="hidden"
+          className={activeTab === 4 ? "block" : "hidden"}
           role="tabpanel"
           aria-labelledby="basic-tabs-item-4"
         >
@@ -218,7 +272,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-5"
-          className="hidden"
+          className={activeTab === 5 ? "block" : "hidden"}
           role="tabpanel"
           aria-labelledby="basic-tabs-item-5"
         >
@@ -226,7 +280,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-6"
-          className="hidden"
+          className={activeTab === 6 ? "block" : "hidden"}
           role="tabpanel"
           aria-labelledby="basic-tabs-item-6"
         >
@@ -234,7 +288,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-7"
-          className="hidden"
+          className={activeTab === 7 ? "block" : "hidden"}
           role="tabpanel"
           aria-labelledby="basic-tabs-item-7"
         >
@@ -242,7 +296,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-8"
-          className="hidden"
+          className={activeTab === 8 ? "block" : "hidden"}
           role="tabpanel"
           aria-labelledby="basic-tabs-item-8"
         >
@@ -250,7 +304,7 @@ function BarangayDetails() {
         </div>
         <div
           id="basic-tabs-9"
-          className="hidden"
+          className={activeTab === 9 ? "block" : "hidden"}
           role="tabpanel"
           aria-labelledby="basic-tabs-item-9"
         >

@@ -17,13 +17,16 @@ function RestoreAnnouncementModal({ selectedItems }) {
         const response = await axios.patch(
           `${API_LINK}/announcement/archived/${selectedItems[i]}/false`
         );
-        setTimeout(() => {
-          setSubmitClicked(false);
-          setUpdatingStatus("success");
+        if (response.status === 200) {
           setTimeout(() => {
-            window.location.reload();
+            setSubmitClicked(false);
+            setUpdatingStatus("success");
+            setTimeout(() => {
+              setUpdatingStatus(null);
+              HSOverlay.close(document.getElementById("hs-modal-restore"));
+            }, 3000);
           }, 3000);
-        }, 1000);
+        }
       }
     } catch (err) {
       console.log(err);

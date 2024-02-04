@@ -59,7 +59,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className='bg-[url("/imgs/login-bg3.jpg")] bg-cover bg-center bg-no-repeat md:px-[3rem] md:py-[3rem] lg:px-[7rem] lg:py-[4rem] h-screen flex sm:flex-col md:flex-row sm:space-y-5 md:space-y-0'>
+    <div className='bg-[url("/imgs/login-bg.jpg")] bg-cover bg-center bg-no-repeat md:px-[3rem] md:py-[3rem] lg:px-[7rem] lg:py-[4rem] h-screen flex sm:flex-col md:flex-row sm:space-y-5 md:space-y-0'>
       <div className="sm:block md:hidden h-[320px] border-[5px] border-t-0 border-[#1C8058] bg-[url('/imgs/login.png)] flex flex-col w-full rounded-b-full overflow-hidden shadow-[0px_4px_4px_rgba(0,0,0,0.51)]">
         <img
           src={login}
@@ -166,7 +166,7 @@ const ForgotPassword = () => {
             <div className="flex flex-col w-full space-y-3">
               <button
                 onClick={handleOnSubmit}
-                className="w-full rounded-[12px] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] sm:py-1.5 lg:py-2.5 text-white font-medium text-base"
+                className="w-full rounded-[12px] bg-gradient-to-r from-[#295141] to-[#408D51] sm:py-1.5 lg:py-2.5 text-white font-medium text-base"
               >
                 Proceed
               </button>
@@ -175,7 +175,7 @@ const ForgotPassword = () => {
           <div className="hs-tooltip sm:hidden md:inline-block">
             <button
               type="button"
-              className="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#164c7e]  to-[#237ac9] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
+              className="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#295141] to-[#408D51] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
             >
               ?
               <span

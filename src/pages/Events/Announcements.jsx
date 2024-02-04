@@ -50,6 +50,11 @@ const EventsManagement = () => {
     };
 
     fetch();
+    const intervalId = setInterval(() => {
+      fetch();
+    }, 3000);
+
+    return () => clearInterval(intervalId);
   }, [currentPage]);
 
   const handlePageChange = ({ selected }) => {

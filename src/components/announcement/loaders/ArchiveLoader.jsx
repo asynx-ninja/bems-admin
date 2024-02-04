@@ -11,7 +11,7 @@ function ArchiveLoader({ updatingStatus, error }) {
   const [loadingText, setLoadingText] = useState(
     textPrompts[updatingStatus] || "Archiving the announcement.."
   );
-  const [loading, setLoading] = useState(updatingStatus === "archiving");
+  const [loading, setLoading] = useState(updatingStatus === "success");
 
   useEffect(() => {
     if (["success", "error"].includes(updatingStatus)) {

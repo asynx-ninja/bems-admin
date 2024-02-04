@@ -209,7 +209,7 @@ console.log(res_folder)
                 className="font-bold text-white mx-auto md:text-xl text-center"
                 style={{ letterSpacing: "0.3em" }}
               >
-                CREATE BARANGAY EVENT
+                CREATE MUNICIPALITY EVENT
               </h3>
             </div>
 
@@ -350,7 +350,7 @@ console.log(res_folder)
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="title"
                 >
-                  Announcement Title
+                  Event Title
                 </label>
                 <input
                   id="title"

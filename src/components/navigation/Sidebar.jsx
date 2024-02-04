@@ -540,11 +540,12 @@ const Sidebar = () => {
                       currentPath === "/barangaymenu/" ||
                       currentPath === "/barangayinformation/" ||
                       currentPath === "/brgyarchivedofficials/" ||
-                      currentPath === "/brgyarchivedservices/"  ||
+                      currentPath === "/brgyarchivedservices/" ||
                       currentPath === "/brgyarchivedservicesreq/" ||
                       currentPath === "/brgyarchivedresidents/" ||
                       currentPath === "/brgyarchivedannoucements/" ||
-                      currentPath === "/brgyarchivedinquiries/" 
+                      currentPath === "/brgyarchivedinquiries/" ||
+                      currentPath === "/brgyarchivedapplication/"
                         ? "bg-gradient-to-r from-[#295141] to-[#408D51] text-[#EFC586]"
                         : null
                     } flex items-center gap-x-3 py-2 px-2.5  text-sm rounded-md hover:text-[#EFC586] hover:bg-gradient-to-r from-[#295141] to-[#408D51]`}

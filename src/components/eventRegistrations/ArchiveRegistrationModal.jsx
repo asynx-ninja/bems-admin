@@ -17,10 +17,13 @@ function ArchiveRegistrationModal({ selectedItems }) {
           `${API_LINK}/application/archived/${selectedItems[i]}/true`
         );
         if (response.status === 200) {
-          setSubmitClicked(false);
-          setUpdatingStatus("success");
           setTimeout(() => {
-            window.location.reload();
+            setSubmitClicked(false);
+            setUpdatingStatus("success");
+            setTimeout(() => {
+              setUpdatingStatus(null);
+              HSOverlay.close(document.getElementById("hs-archive-requests-modal"));
+            }, 3000);
           }, 3000);
         }
       }
