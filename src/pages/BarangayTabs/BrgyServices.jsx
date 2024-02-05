@@ -199,7 +199,7 @@ function Services() {
               </div>
 
               {/* Service Type Sort */}
-              <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
+              {/* <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
                 <button
                   id="hs-dropdown"
                   type="button"
@@ -291,7 +291,7 @@ function Services() {
                     ENVIRONMENTAL
                   </a>
                 </ul>
-              </div>
+              </div> */}
             </div>
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">

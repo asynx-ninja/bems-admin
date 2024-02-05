@@ -9,8 +9,7 @@ import moment from "moment";
 import axios from "axios";
 import API_LINK from "../config/API";
 
-
-const ViewNotifications = ({ setNotification}) => {
+const ViewNotifications = ({ setNotification }) => {
   const location = useLocation();
   const [searchParams2, setSearchParams2] = useSearchParams();
   const brgy = searchParams2.get("brgy");
@@ -29,18 +28,19 @@ const ViewNotifications = ({ setNotification}) => {
 
   const TimeFormat = (date) => {
     if (!date) return "";
-  
+
     const formattedTime = moment(date).format("hh:mm A");
     return formattedTime;
   };
-
 
   useEffect(() => {
     const getSpecificID = async () => {
       try {
         const id = notification._id; // Replace with the actual notification ID
 
-        const response = await axios.get(`${API_LINK}/notification/get_id/?id=${id}`);
+        const response = await axios.get(
+          `${API_LINK}/notification/get_id/?id=${id}`
+        );
 
         console.log("itoba", response.data[0]);
         // Handle the response data here
@@ -56,21 +56,28 @@ const ViewNotifications = ({ setNotification}) => {
   useEffect(() => {
     const updateReadBy = async () => {
       try {
-        const response = await axios.get(`${API_LINK}/notification/check/?user_id=${id}&notification_id=${notification._id}`);
-  
-        console.log("itoulit", response.data);
-  
-        if (response.status === 200) {
-          const isUserRead = response.data.length > 0;
+        const response = await axios.get(
+          `${API_LINK}/notification/check/?user_id=${id}&notification_id=${notification._id}`
+        );
 
-          if (!isUserRead) {
+        console.log("itoulit", response.data);
+
+        if (response.status === 200) {
+          // const isRead = response.data.read_by.some((item) => item.readerId === id);
+
+          if (!response.data.read_by.some((item) => item.readerId === id)) {
             // Proceed with updating the 'read_by' array
-            const updateResponse = await axios.patch(`${API_LINK}/notification/?notification_id=${notification._id}`, {
-              readerId: id,
-            });
-  
+            const updateResponse = await axios.patch(
+              `${API_LINK}/notification/?notification_id=${notification._id}`,
+              {
+                readerId: id,
+              }
+            );
+
             console.log("Update response", updateResponse.data);
             // Handle the update response data here
+
+            return; // Exit the function after the update response is received
           } else {
             // User has already read the notification, do nothing
             console.log("User has already read the notification");
@@ -81,9 +88,9 @@ const ViewNotifications = ({ setNotification}) => {
         // Handle the error here
       }
     };
-  
+
     updateReadBy();
-  }, [id, notification._id]);
+  }, []);
 
   return (
     <div>
@@ -121,7 +128,8 @@ const ViewNotifications = ({ setNotification}) => {
                   {notification.compose.subject}
                 </h6>
                 <span className="font-light mb-2 uppercase text-normal sm:text-md">
-                  {dateFormat(notification.createdAt) || ""} at {TimeFormat(notification.createdAt) || ""}
+                  {dateFormat(notification.createdAt) || ""} at{" "}
+                  {TimeFormat(notification.createdAt) || ""}
                 </span>
               </div>
               <div className="lg:flex sm:grid lg:py-0 py-2 h-[600px] w-full overflow-hidden overflow-y-auto gap-6 justify-center items-center mx-auto">

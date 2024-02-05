@@ -14,11 +14,11 @@ const ForgotPassword = () => {
     error: false,
     message: "",
   });
-  
 
   const handleOnChange = (e) => {
-    setEmail(e.target.value)
-  }
+    setEmail(e.target.value);
+    console.log(email);
+  };
 
   const handleOnSubmit = async () => {
     if (!email) {
@@ -32,22 +32,35 @@ const ForgotPassword = () => {
     }
 
     try {
-      const res = await axios.patch(`${API_LINK}/auth/send_pin/${email}`, {type: "Admin"});
-      const encodedEmail = btoa(email);
+      const res1 = await axios.get(
+        `${API_LINK}/auth/findemail/?email=${email}`
+      );
+      console.log(res1.data);
+      if (res1.status === 200) {
+        if (res1.data.type === "Admin" || res1.data.type === "Head Admin") {
+          const res = await axios.patch(`${API_LINK}/auth/send_pin/${email}`, {
+            type: res1.data.type,
+          });
+          const encodedEmail = btoa(email);
 
-      if (res.status === 200) {
-        console.log(res)
-        setResponse({
-          success: true,
-          error: false,
-          message: "Code has been successfully sent to your Email!"
-        })
+          if (res.status === 200) {
+            console.log(res);
+            setResponse({
+              success: true,
+              error: false,
+              message: "Code has been successfully sent to your Email!",
+            });
 
-        console.log(encodedEmail)
+            console.log(encodedEmail);
 
-        setTimeout(()=> {
-          navigate(`/pin/${encodedEmail}`)
-        }, 3000)
+            setTimeout(() => {
+              navigate(`/pin/${encodedEmail}`);
+            }, 3000);
+          }
+        } else {
+          // Handle the case where the type is not "Admin" or "Head Admin"
+          console.log("User is not Admin or Head Admin");
+        }
       }
     } catch (error) {
       setResponse({

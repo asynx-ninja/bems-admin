@@ -25,10 +25,12 @@ function ServiceRequests() {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedReqFilter, setSelectedReqFilter] = useState("all");
+
   //status filter
   const [statusFilter, setStatusFilter] = useState("all");
   //request filter
-  const [requestFilter, setRequestFilter] = useState("all"); // Default is "all"
+  const [requestFilter, setRequestFilter] = useState([]); // Default is "all"
 
   //date filtering
   const [specifiedDate, setSpecifiedDate] = useState(new Date());
@@ -37,9 +39,32 @@ function ServiceRequests() {
 
   useEffect(() => {
     const fetch = async () => {
+       try{
+     const response = await axios.get(
+      `${API_LINK}/services/?brgy=${brgy}&archived=false&page=${currentPage}`
+    );
+      console.log(response.data.result)
+     if (response.status === 200){
+         let arr = [];
+         response.data.result.map((item) => {
+         arr.push(item.name);
+         })
+         setRequestFilter(arr);
+         }
+ 
+       }catch(err){
+     console.log(err)
+       }
+    }
+    fetch()
+ }, [brgy]);
+
+
+  useEffect(() => {
+    const fetch = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/requests/?brgy=${brgy}&archived=false&status=${statusFilter}&type=${requestFilter}&page=${currentPage}`
+          `${API_LINK}/requests/?brgy=${brgy}&archived=false&status=${statusFilter}&type=${selectedReqFilter}&page=${currentPage}`
         );
 
         if (response.status === 200) {
@@ -53,7 +78,7 @@ function ServiceRequests() {
     };
 
     fetch();
-  }, [brgy, statusFilter, requestFilter, currentPage]);
+  }, [brgy, statusFilter, selectedReqFilter, currentPage]);
 
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
@@ -66,12 +91,13 @@ function ServiceRequests() {
   const handleStatusFilter = (selectedStatus) => {
     setStatusFilter(selectedStatus);
   };
-  const handleRequestFilter = (selectedStatus) => {
-    setRequestFilter(selectedStatus);
+  const handleRequestFilter = (selectedType) => {
+    setSelectedReqFilter(selectedType);
   };
   const handleResetFilter = () => {
     setStatusFilter("all");
     setRequestFilter("all");
+    setSearchQuery("");
   };
 
 
@@ -79,6 +105,7 @@ function ServiceRequests() {
     setRequest(item);
   };
   const tableHeader = [
+    "Control #",
     "SERVICE NAME",
     "TYPE OF SERVICE",
     "DATE",
@@ -87,40 +114,11 @@ function ServiceRequests() {
   ];
 
   const Requests = requests.filter((item) =>
-  item.service_name.toLowerCase().includes(searchQuery.toLowerCase())
+  item.service_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  item.req_id.toLowerCase().includes(searchQuery.toLowerCase())
 );
 
-  const handleSort = (sortBy) => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    setSortColumn(sortBy);
 
-    const sortedData = requests.slice().sort((a, b) => {
-      if (sortBy === "request_id") {
-        return newSortOrder === "asc"
-          ? a.request_id.localeCompare(b.request_id)
-          : b.request_id.localeCompare(a.request_id);
-      } else if (sortBy === "service_name") {
-        return newSortOrder === "asc"
-          ? a.service_name.localeCompare(b.service_name)
-          : b.service_name.localeCompare(a.service_name);
-      } else if (sortBy === "status") {
-        const order = { Completed: 1, " Not Responded": 2, Pending: 3, Paid: 4, Processing: 5, Cancelled: 6, Rejected: 7 };
-        return newSortOrder === "asc"
-          ? order[a.status] - order[b.status]
-          : order[b.status] - order[a.status];
-      }
-
-      return 0;
-    });
-
-    setRequests(sortedData);
-  };
-
-  const DateFormat = (date) => {
-    const dateFormat = date === undefined ? "" : date.substr(0, 10);
-    return dateFormat;
-  };
 
   const filters = (choice, selectedDate) => {
     switch (choice) {
@@ -423,6 +421,7 @@ function ServiceRequests() {
               </div>
 
               {/* Service Type Sort */}
+                  {/* Service Type Sort */}
               <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
                 <button
                   id="hs-dropdown"
@@ -459,62 +458,16 @@ function ServiceRequests() {
                     RESET FILTERS
                   </a>
                   <hr className="border-[#4e4e4e] my-1" />
-                  <a
-                    onClick={() => handleRequestFilter("Healthcare")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    HEALTHCARE
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Education")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    EDUCATION
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Social Welfare")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    SOCIAL WELFARE
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Security and Safety")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    SECURITY AND SAFETY
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Infrastructure")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    INFRASTRUCTURE
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Community")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    COMMUNITY
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Administrative")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    ADMINISTRATIVE
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Environmental")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    ENVIRONMENTAL
-                  </a>
+                  {requestFilter.map((service_name, index) => (
+                    <a
+                      key={index}
+                      onClick={() => handleRequestFilter(service_name)}
+                      className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                      href="#"
+                    >
+                      {service_name}
+                    </a>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -549,14 +502,14 @@ function ServiceRequests() {
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    const Requests = requests.filter((item) =>
-                      item.service_name
-                        .toLowerCase()
-                        .includes(e.target.value.toLowerCase())
-                    );
-
+                    const Requests = requests.filter((item) => {
+                        const fullName = `${item.form[0].firstName.value} ${item.form[0].lastName.value}`;
+                        const reqId = item.req_id.toString(); // Assuming service_id is a number, convert it to string for case-insensitive comparison
+                        return fullName.toLowerCase().includes(e.target.value.toLowerCase()) || reqId.includes(e.target.value.toLowerCase());
+                    });
+                
                     setFilteredRequests(Requests);
-                  }}
+                }}
                 />
               </div>
 
@@ -598,6 +551,11 @@ function ServiceRequests() {
               ) : (
                 filteredRequests.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
+                     <td className="px-6 py-3">
+                      <span className="text-xs sm:text-sm text-black line-clamp-4">
+                        {item.req_id}
+                      </span>
+                    </td>
                     <td className="px-6 py-3">
                       <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                         {item.service_name}

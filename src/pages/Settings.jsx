@@ -208,12 +208,11 @@ const Settings = () => {
       return; // Prevent further execution of handleSubmit
     }
 
-
     try {
       const result = await axios.get(
         `${API_LINK}/folder/specific/?brgy=${userAddress.brgy}`
       );
-    console.log("wewewesss", userAddress.brgy)
+      console.log("wewewesss", userAddress.brgy);
       if (result.status === 200) {
         const obj = {
           firstName: userData.firstName,
@@ -251,9 +250,6 @@ const Settings = () => {
           `${API_LINK}/users/?doc_id=${id}&folder_id=${result.data[0].pfp}`,
           formData
         );
-
-
-
 
         if (activeButton.credential === true) {
           if (
@@ -320,7 +316,6 @@ const Settings = () => {
       }
 
       // CHANGE USERNAME
-    
     } catch (error) {
       console.error("Error saving changes:", error);
       setSubmitClicked(false);

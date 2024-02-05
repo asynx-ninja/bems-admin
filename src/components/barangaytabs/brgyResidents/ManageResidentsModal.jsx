@@ -6,9 +6,13 @@ import OccupationList from "./OccupationList";
 import { LiaRandomSolid } from "react-icons/lia";
 import { FaFacebookSquare, FaInstagram } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
+import EditLoader from "./loaders/EditLoader";
 
 function ManageResidentModal({ user, setUser }) {
   const [edit, setEdit] = useState(false);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleOnEdit = () => {
     setEdit(!edit);
@@ -59,23 +63,33 @@ function ManageResidentModal({ user, setUser }) {
   const handleSave = async (e) => {
     try {
       e.preventDefault();
+      setSubmitClicked(true);
 
       var formData = new FormData();
       formData.append("users", JSON.stringify(user));
 
       const response = await axios.patch(
-        `${API_LINK}/users/${user._id}`,
+        `${API_LINK}/users/?doc_id=${user._id}`,
         formData
       );
 
       if (response.status === 200) {
         console.log("Update successful:", response.data);
-        window.location.reload();
+        setTimeout(() => {
+          setSubmitClicked(false);
+          setUpdatingStatus("success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }, 1000);
       } else {
         console.error("Update failed. Status:", response.status);
       }
     } catch (err) {
       console.log(err);
+      setSubmitClicked(false);
+      setUpdatingStatus("error");
+      setError("An error occurred while creating the announcement.");
     }
   };
 
@@ -110,7 +124,7 @@ function ManageResidentModal({ user, setUser }) {
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full   md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
               {/* Header */}
-              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#396288] to-[#013D74] overflow-hidden rounded-t-2xl">
+              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]  overflow-hidden rounded-t-2xl">
                 <h3
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
@@ -119,7 +133,7 @@ function ManageResidentModal({ user, setUser }) {
                 </h3>
               </div>
 
-              <div className="flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+              <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
                 <form>
                   <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
                     <div className="flex flex-col mb-1 w-full">
@@ -624,12 +638,12 @@ function ManageResidentModal({ user, setUser }) {
                               password
                             </label>
                             <input
-                              type="text"
+                              type="password"
                               name="password"
                               id="password"
                               onChange={handleChange}
                               className="shadow appearance-none border w-full p-2 text-sm text-black rounded-r-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                              value={user.password}
+                              value={user.password?.substring(0, 8)}
                               disabled={!edit}
                             />
                           </div>
@@ -669,7 +683,7 @@ function ManageResidentModal({ user, setUser }) {
                             type="text"
                             id="facebook_name"
                             className="shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                            value={user.socials?.facebook?.name ?? ''}
+                            value={user.socials?.facebook?.name ?? ""}
                             placeholder=""
                             disabled
                           />
@@ -681,7 +695,7 @@ function ManageResidentModal({ user, setUser }) {
                               type="text"
                               id="facebook_link"
                               className="shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                              value={user.socials?.facebook?.link ?? ''}
+                              value={user.socials?.facebook?.link ?? ""}
                               placeholder=""
                               disabled
                             />
@@ -718,7 +732,7 @@ function ManageResidentModal({ user, setUser }) {
                             type="text"
                             id="facebook_name"
                             className="shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                            value={user.socials?.twitter?.name ?? ''}
+                            value={user.socials?.twitter?.name ?? ""}
                             placeholder=""
                             disabled
                           />
@@ -730,7 +744,7 @@ function ManageResidentModal({ user, setUser }) {
                               type="text"
                               id="facebook_link"
                               className="shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                              value={user.socials?.twitter?.link ?? ''}
+                              value={user.socials?.twitter?.link ?? ""}
                               placeholder=""
                               disabled
                             />
@@ -767,7 +781,7 @@ function ManageResidentModal({ user, setUser }) {
                             type="text"
                             id="facebook_name"
                             className="shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                            value={user.socials?.instagram?.name ?? ''}
+                            value={user.socials?.instagram?.name ?? ""}
                             placeholder=""
                             disabled
                           />
@@ -779,7 +793,7 @@ function ManageResidentModal({ user, setUser }) {
                               type="text"
                               id="facebook_link"
                               className="shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
-                              value={user.socials?.instagram?.link ?? ''}
+                              value={user.socials?.instagram?.link ?? ""}
                               placeholder=""
                               disabled
                             />
@@ -796,7 +810,7 @@ function ManageResidentModal({ user, setUser }) {
                   <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
                     <button
                       type="button"
-                      className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-[#013D74] text-white shadow-sm"
+                      className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-teal-900 text-white shadow-sm"
                       onClick={handleOnEdit}
                     >
                       EDIT
@@ -814,7 +828,7 @@ function ManageResidentModal({ user, setUser }) {
                     <button
                       type="submit"
                       onClick={handleSave}
-                      className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-[#013D74] text-white shadow-sm"
+                      className="h-[2.5rem] w-full py-1 px-6 gap-2 rounded-md borde text-sm font-base bg-teal-900 text-white shadow-sm"
                     >
                       SAVE CHANGES
                     </button>
@@ -830,6 +844,10 @@ function ManageResidentModal({ user, setUser }) {
               </div>
             </div>
           </div>
+          {submitClicked && <EditLoader updatingStatus="updating" />}
+          {updatingStatus && (
+            <EditLoader updatingStatus={updatingStatus} error={error} />
+          )}
         </div>
       </div>
     </div>

@@ -30,12 +30,12 @@ function BarangayDetails() {
     // Store the active tab in local storage whenever it changes
     localStorage.setItem("activeTab", activeTab);
   }, [activeTab]);
-  useEffect(() => {
-    return () => {
-      // Reset the active tab to the default value when the component unmounts
-      setActiveTab(1);
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     // Reset the active tab to the default value when the component unmounts
+  //     setActiveTab(1);
+  //   };
+  // }, []);
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
   console.log("SAASA", id);

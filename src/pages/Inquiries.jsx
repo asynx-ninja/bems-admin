@@ -213,7 +213,7 @@ const Inquiries = () => {
       const latestResponse = response[response.length - 1];
       return (
         latestResponse.type === "Resident" &&
-        !["Completed", "Pending"].includes(isApproved)
+        !["Completed"].includes(isApproved)
       );
     }
     return false;

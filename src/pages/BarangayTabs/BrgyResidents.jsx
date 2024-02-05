@@ -14,6 +14,9 @@ import ViewArchivedResident from "../../components/barangaytabs/brgyarchivedResi
 import PrintPDF from "../../components/barangaytabs/brgyResidents/form/PrintPDF";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import noData from "../../assets/image/no-data.png";
+import AddResidentsModal from "../../components/barangaytabs/brgyResidents/AddResidentModal";
+import StatusResident from "../../components/barangaytabs/brgyResidents/StatusResident";
+import ManageResidentModal from "../../components/barangaytabs/brgyResidents/ManageResidentsModal";
 const Residents = () => {
   const [users, setUsers] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -135,6 +138,27 @@ const Residents = () => {
           </div>
           <div className="lg:w-3/5 flex flex-row justify-end items-center ">
             <div className="sm:w-full md:w-full lg:w-2/5 flex sm:flex-col md:flex-row md:justify-center md:items-center sm:space-y-2 md:space-y-0 md:space-x-2 ">
+            <div className="w-full rounded-lg flex justify-center">
+                <div className="hs-tooltip inline-block w-full">
+                  <button
+                    type="button"
+                    data-hs-overlay="#hs-modal-addResident"
+                    className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm  text-center inline-flex items-center "
+                  >
+                    <FaPlus size={24} style={{ color: "#ffffff" }} />
+                    <span className="sm:block md:hidden sm:pl-5">
+                      Add Residents
+                    </span>
+
+                    <span
+                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-50 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                      role="tooltip"
+                    >
+                      Add Residents
+                    </span>
+                  </button>
+                </div>
+              </div>
               <div className="w-full rounded-lg ">
                 <Link to={`/brgyarchivedresidents/?id=${id}&brgy=${brgy}`}>
                   <div className="hs-tooltip inline-block w-full">
@@ -434,8 +458,11 @@ const Residents = () => {
           renderOnZeroPageCount={null}
         />
       </div>
+      <AddResidentsModal brgy={brgy} />
       <GenerateReportsModal />
       <ViewArchivedResident user={user} setUser={setUser} />
+      <StatusResident user={user} setUser={setUser} brgy={brgy} status={status} setStatus={setStatus} />
+        <ManageResidentModal user={user} setUser={setUser} />
     </div>
   );
 };

@@ -29,9 +29,14 @@ const Sidebar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const id = searchParams.get("id");
-  const brgy = searchParams.get("brgy");
+  const brgy = "MUNISIPYO";
   const [servicesReq, setServicesreq] = useState([]);
+  const [application, setApplication] = useState([]);
   const [inquiries, setInquiries] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [totalServices, setTotalServices] = useState(0);
+  const [totalEvents, setTotalEvents] = useState(0);
+
   const to = "Admin";
   useEffect(() => {
     const fetch = async () => {
@@ -63,13 +68,30 @@ const Sidebar = () => {
           `${API_LINK}/services/pendingservices/?archived=false&status=Pending`
         );
         setServicesreq(servicesResponse.data.result);
+        setTotalServices(servicesResponse.data.total);
+
+        const eventsResponse = await axios.get(
+          `${API_LINK}/application/?brgy=${brgy}&archived=false&status=Pending`
+        );
+   
+        setApplication(eventsResponse.data.result);
+        setTotalEvents(eventsResponse.data.total);
+
+        console.log("zzz", eventsResponse.data.total);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [brgy]);
+
+  useEffect(() => {
+    const total = (totalEvents || 0) + (totalServices || 0);
+    setTotal(total);
+    console.log("d", totalEvents);
+  }, [totalEvents, totalServices]);
+
   const [residentResponseCount, setResidentInquiriesLength] = useState(0);
   useEffect(() => {
     const fetchInquiries = async () => {
@@ -99,6 +121,7 @@ const Sidebar = () => {
 
           // Get the length of the filtered array
           const residentInquiriesLength = residentInquiries.length;
+          console.log("par", residentInquiriesLength);
           setResidentInquiriesLength(residentInquiriesLength); // Update the state variable with the length
         } else {
           // Handle error here
@@ -172,11 +195,11 @@ const Sidebar = () => {
                   >
                     <BiSolidDashboard size={15} />
                     Dashboard
-                    {servicesReq.length > 0 && (
+                    {total > 0 && (
                       <span className="flex relative ">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600" />
                         <span className="relative inline-flex text-xs bg-red-500 text-white rounded-full py-0.5 px-1.5">
-                          {servicesReq.length}
+                          {total}
                         </span>
                       </span>
                     )}
