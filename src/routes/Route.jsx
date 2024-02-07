@@ -39,6 +39,10 @@ import ArchiveBarangayAccount from "../pages/AccountManagement/ArchiveBarangayAc
 import ArchiveApplication from "../pages/BarangayTabs/BrgyArchiveApplication"
 import Reports from "../pages/Reports";
 import ViewNotifications from "../pages/ViewNotifications"
+import MRequests from "../pages/Requests";
+import MArchivedRequests from "../pages/ArchivedRequests";
+import MServices from "../pages/Services";
+import MArchivedServices from "../pages/ArchivedServices";
 const pages = [
   {
     path: "/",
@@ -56,15 +60,19 @@ const pages = [
     path: "/change/:email",
     element: <ChangePassword />,
   },
+  //end of login
+
   {
     path: "/dashboard",
     element: <Navbar comp={<Dashboard />} />,
   },
+
   {
     path: "/reports",
     element: <Navbar comp={<Reports />} />,
   },
 
+//EVENTS
   {
     path: "/announcements",
     element: <Navbar comp={<Announcements />} />,
@@ -81,6 +89,8 @@ const pages = [
     path: "/events_registration",
     element: <Navbar comp={<EventsRegistrations />} />,
   },
+
+  //  INQUIRIES
   {
     path: "/inquiries",
     element: <Navbar comp={<Inquiries />} />,
@@ -89,6 +99,8 @@ const pages = [
     path: "/archivedinquiries",
     element: <Navbar comp={<ArchivedInquiries/>} />,
   },
+
+//  MUNICIPAL INFO  
   {
     path: "/aboutus_info",
     element: <Navbar comp={<MAboutusInfo />} />,
@@ -121,6 +133,8 @@ const pages = [
     path: "/archivedmunicipalityofficials",
     element: <Navbar comp={<ArchivedMunicipalityOfficials />} />,
   },
+
+  //  ACCOUNT MANAGEMENT
   {
     path: "/municipal_account",
     element: <Navbar comp={<AccountManagement />} />,
@@ -137,6 +151,29 @@ const pages = [
     path: "/archive_brgy_account",
     element: <Navbar comp={<ArchiveBarangayAccount />} />,
   },
+
+  // REQUEST
+  {
+    path: "/request",
+    element: <Navbar comp={<MRequests />} />,
+  },
+  {
+    path: "/archive_request",
+    element: <Navbar comp={<MArchivedRequests />} />,
+  },
+
+  //SERVICES
+  {
+    path: "/services",
+    element: <Navbar comp={<MServices />} />,
+  },
+  {
+    path: "/archive_services",
+    element: <Navbar comp={<MArchivedServices />} />,
+  },
+
+
+  // BARANGAY MANAGEMENT
   {
     path: "/brgyarchivedservices",
     element: <Navbar comp={<ArchivedServices />} />,

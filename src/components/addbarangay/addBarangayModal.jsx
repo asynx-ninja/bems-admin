@@ -4,18 +4,19 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { CiImageOn } from "react-icons/ci";
-
+import { SketchPicker } from "react-color";
 function CreateAnnouncementModal() {
   const [barangay, setBarangay] = useState({
     brgy: "",
     story: "",
     mission: "",
     vision: "",
+    color: "#ffffff",
   });
 
   const [logo, setLogo] = useState();
   const [banner, setBanner] = useState();
-
+  const [showColorPicker, setShowColorPicker] = useState(false); // State to toggle color picker
   const navigate = useNavigate();
 
   const handleLogoChange = (e) => {
@@ -45,6 +46,14 @@ function CreateAnnouncementModal() {
         e.target.name === "isOpen" ? e.target.checked : e.target.value,
     }));
   };
+
+  const handleColorChange = (color) => {
+    setBarangay((prev) => ({
+      ...prev,
+      color: color.hex, // Update color value
+    }));
+  };
+console.log("cc",barangay.color)
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -60,7 +69,6 @@ function CreateAnnouncementModal() {
       var formData = new FormData();
       formData.append("files", banner);
       formData.append("files", logo);
-     
 
       const obj = {
         brgy: barangay.brgy,
@@ -72,7 +80,10 @@ function CreateAnnouncementModal() {
       formData.append("brgyinfo", JSON.stringify(obj));
 
       if (response.status === 200) {
-        const result = await axios.post(`${API_LINK}/brgyinfo/?folder_id=${response2.data[0].info}`, formData);
+        const result = await axios.post(
+          `${API_LINK}/brgyinfo/?folder_id=${response2.data[0].info}`,
+          formData
+        );
         if (result.status === 200) {
           setBarangay({
             brgy: "",
@@ -248,6 +259,27 @@ function CreateAnnouncementModal() {
                   className="block p-2.5 w-full text-sm text-gray-700  rounded-lg border border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline "
                   placeholder="Enter barangay vision..."
                 />
+              </div>
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="color"
+                >
+                  Color
+                </label>
+                <div className="flex items-center">
+                  <div
+                    className="w-6/12 h-8  border border-gray-300 mr-2 cursor-pointer"
+                    style={{ backgroundColor: barangay.color }}
+                    onClick={() => setShowColorPicker((prev) => !prev)} // Toggle color picker
+                  />
+                  {showColorPicker && (
+                    <SketchPicker
+                      color={barangay.color}
+                      onChange={handleColorChange}
+                    />
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700">

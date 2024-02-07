@@ -33,7 +33,7 @@ const SubPendingRequest = () => {
     setCurrentPage(selected);
   };
   return (
-    <div className="w-full lg:w-6/12 flex flex-col h-full ">
+    <div className="w-full lg:w-6/12 md:w-full flex flex-col h-full ">
       <div className="flex flex-col max-h-screen">
         <b className="border-solid border-0 border-black border-b-2 pb-2 uppercase font-heavy text-lg md:text-xl mb-4 shrink-0">
           PENDING BARANGAY SERVICES
