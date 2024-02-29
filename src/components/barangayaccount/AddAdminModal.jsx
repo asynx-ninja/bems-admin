@@ -119,7 +119,7 @@ function AddAdminModal({ occupation, type }) {
         username: user.username,
         password: user.password,
       };
-      const result = await axios.post(`${API_LINK}/users/`, obj);
+      const result = await axios.post(`${API_LINK}/brgy_admin/`, obj);
 
       if (result.status === 200) {
         setUser({
@@ -625,6 +625,7 @@ function AddAdminModal({ occupation, type }) {
                                 name="brgy"
                                 className="shadow appearance-none border w-full p-2 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
                               >
+                                <option value="">-- Select Barangay --</option>
                                 {barangays.map((barangay, index) => (
                                   <option key={index} value={barangay.brgy}>
                                     {barangay.brgy}

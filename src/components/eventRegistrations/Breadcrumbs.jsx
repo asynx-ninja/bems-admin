@@ -1,30 +1,36 @@
-import React from "react";
-import { GrFormNext } from "react-icons/gr";
-import { BiMessageSquareDetail } from "react-icons/bi";
-import { useSearchParams } from "react-router-dom";
-
-const Breadcrumbs = ({ id }) => {
+import React from 'react';
+import {FaArchive, FaHome} from "react-icons/fa";
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+const Breadcrumb = ({ id, brgy }) => {
+  const navigate = useNavigate();
   return (
     <nav className="flex ">
-    <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
-      <BiMessageSquareDetail size={22} />
-      <li>
-        <a
-          href={`/events_registration/?id=${id}`}
-          className="text-gray-600 font-bold hover:underline text-xs md:text-lg"
+      <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
+      <li className="flex items-center">
+        <FaHome className="mr-2 text-gray-900" />
+        <Link
+              //  href={`/barangayinformation/?id=${id}&brgy=${brgy}`}
+              to={'..'}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}  
+          className="text-gray-900 font-bold hover:underline uppercase"
         >
-            EVENTS APPLICATION
-        </a>
+                 Events Application
+        </Link>
       </li>
       <li>
-        <GrFormNext size={24} style={{ color: "#ffffff" }} />
+        <span>/</span>
       </li>
-      <li className="text-[10px] md:text-lg text-[#295141] font-bold">
-        ARCHIVED APPLICATIONS
+      <li className="flex items-center font-bold text-teal-600 uppercase">
+        <FaArchive className="mr-2" />
+        Archived Events Application
       </li>
     </ol>
   </nav>
   );
 };
 
-export default Breadcrumbs;
+export default Breadcrumb;

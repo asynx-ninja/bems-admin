@@ -47,13 +47,13 @@ const SubPendingApplication = () => {
   };
 
   return (
-    <div className="w-full lg:w-6/12 flex md:w-full flex-col h-full ">
+    <div className="w-full lg:w-6/12 flex md:w-full flex-col h-full over ">
       <div className="flex flex-col max-h-screen">
         <b className="border-solid border-0 border-black border-b-2 pb-2 uppercase font-heavy text-lg md:text-xl mb-4 shrink-0">
           PENDING EVENT APPLICATIONS
         </b>
-        <div className="relative scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-auto lg:h-[calc(100vh_-_400px)] xxl:h-[calc(100vh_-_465px)] xxxl:h-[calc(100vh_-_410px)] w-full">
-          <table className="table-auto w-full">
+        <div className=" scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-auto lg:h-[calc(100vh_-_480px)] xxl:h-[calc(100vh_-_465px)] xxxl:h-[calc(100vh_-_410px)] w-full">
+        <table className="relative table-auto w-full ">
             <thead className="uppercase text-xs md:text-sm bg-gray-100 sticky top-0">
               <tr>
                 <th className="px-4 py-1 md:px-5 md:py-2 lg:px-6 lg:py-3">

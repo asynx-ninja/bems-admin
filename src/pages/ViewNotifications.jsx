@@ -59,13 +59,13 @@ const ViewNotifications = ({ setNotification }) => {
         const response = await axios.get(
           `${API_LINK}/notification/check/?user_id=${id}&notification_id=${notification._id}`
         );
-
+        const isRead = response.data.read_by.some(
+          (item) => item.readerId === id
+        );
         console.log("itoulit", response.data);
 
         if (response.status === 200) {
-          // const isRead = response.data.read_by.some((item) => item.readerId === id);
-
-          if (!response.data.read_by.some((item) => item.readerId === id)) {
+          if (!isRead) {
             // Proceed with updating the 'read_by' array
             const updateResponse = await axios.patch(
               `${API_LINK}/notification/?notification_id=${notification._id}`,
@@ -75,9 +75,7 @@ const ViewNotifications = ({ setNotification }) => {
             );
 
             console.log("Update response", updateResponse.data);
-            // Handle the update response data here
 
-            return; // Exit the function after the update response is received
           } else {
             // User has already read the notification, do nothing
             console.log("User has already read the notification");
@@ -122,9 +120,9 @@ const ViewNotifications = ({ setNotification }) => {
               </div>
             </div>
 
-            <div className="flex flex-col bg-white p-5 text-black justify-center items-center mx-auto rounded-lg mt-28 lg:mt-36 lg:w-full shadow-md text-center">
+            <div className="flex flex-col bg-white p-5  text-black justify-center items-center mx-auto rounded-lg mt-28 lg:mt-36 lg:w-full shadow-md text-center">
               <div className="border-b-[2px] w-full mb-2 pb-5 border-b-gray-200">
-                <h6 className="font-bold mb-2 uppercase text-normal sm:text-xl">
+                <h6 className="font-bold mb-2 uppercase  text-normal sm:text-xl">
                   {notification.compose.subject}
                 </h6>
                 <span className="font-light mb-2 uppercase text-normal sm:text-md">
@@ -133,7 +131,7 @@ const ViewNotifications = ({ setNotification }) => {
                 </span>
               </div>
               <div className="lg:flex sm:grid lg:py-0 py-2 h-[600px] w-full overflow-hidden overflow-y-auto gap-6 justify-center items-center mx-auto">
-                <h5 className="md:px-5 py-10 whitespace-pre-wrap text-left">
+                <h5 className="md:px-5 py-10 whitespace-pre-line text-left">
                   {notification.compose.message}
                 </h5>
               </div>
@@ -151,9 +149,9 @@ const ViewNotifications = ({ setNotification }) => {
             >
               <button
                 type="button"
-                className="h-[2.5rem] w-full py-1 px-6  gap-2 rounded-b-xl borde text-sm font-base bg-teal-700 text-white shadow-sm"
+                className="h-[2.5rem] w-full py-1 px-6  gap-2 rounded-b-xl borde text-sm font-base bg-teal-700 text-white shadow-sm uppercase"
               >
-                RETURN TO DASHBOARD
+                RETURN TO {notification.compose.go_to}
               </button>
             </Link>
           </div>

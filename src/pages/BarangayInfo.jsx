@@ -12,9 +12,15 @@ import Application from "./BarangayTabs/BrgyEventsApplication";
 import { useParams, useSearchParams } from "react-router-dom";
 import Announcement from "./BarangayTabs/BrgyAnnouncements";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
+import axios from "axios";
+import API_LINK from "../config/API";
+import GetBrgy from "../components/GETBrgy/getbrgy";
 function BarangayDetails() {
   const [collapseOpen, setCollapseOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const brgy = searchParams.get("brgy");
+  const information = GetBrgy(brgy);
   // const [activeTab, setActiveTab] = useState(1); // Initial active tab
   const handleTabChange = (tabIndex) => {
     setActiveTab(tabIndex);
@@ -36,17 +42,15 @@ function BarangayDetails() {
   //     setActiveTab(1);
   //   };
   // }, []);
-  const id = searchParams.get("id");
-  const brgy = searchParams.get("brgy");
+
   console.log("SAASA", id);
 
-  useEffect(() => {
-    document.title = `Barangay ${brgy} Information | Barangay E-Services Management`;
-  }, []);
-
   return (
-    <div className="mx-4 lg:mt-[1rem] overflow-y-auto lg:h-[calc(100vh_-_90px)] ">
-      <div className="w-full flex items-center justify-center bg-[#295141] rounded-t-lg">
+    <div className="mx-4 lg:mt-[1rem] mt-4 overflow-y-auto lg:h-[calc(100vh_-_90px)] ">
+      <div
+        className="w-full flex items-center justify-center rounded-t-lg bg-[#295141]"
+        style={{ backgroundColor: information?.theme?.primary }}
+      >
         <h1 className="text-white lg:text-3xl py-2 px-5 font-heavy ">
           BARANGAY {brgy ? brgy.toUpperCase() : ""} INFORMATION
         </h1>
@@ -54,8 +58,11 @@ function BarangayDetails() {
       <div className="px-4 py-4 items-center bg-gray-100">
         <button
           type="button"
-          className="hs-collapse-toggle py-3 px-4 mb-2 mt-2 inline-flex uppercase font-bold items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-[#295141] to-[#408D51] text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+          className="hs-collapse-toggle bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-3 px-4 mb-2 mt-2 inline-flex uppercase font-bold items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent  text-white hover:bg-[#408D51] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
           id="hs-basic-collapse"
+          style={{
+            background: `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+          }}
           data-hs-collapse="#hs-basic-collapse-heading"
           onClick={() => setCollapseOpen(!collapseOpen)}
         >
@@ -100,12 +107,20 @@ function BarangayDetails() {
           >
             <button
               type="button"
-              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active ${
                 activeTab === 1
-                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] "
                   : ""
-              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
-              id="basic-tabs-item-1"
+              } `}
+              id="basic-tabs-item-1 "
+              style={{
+                background:
+                  activeTab === 1
+                    ? `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`
+                    : "",
+                textTransform: activeTab === 1 ? "uppercase" : "",
+                color: activeTab === 1 ? "#ffffff" : "",
+              }}
               data-hs-tab="#basic-tabs-1"
               aria-controls="basic-tabs-1"
               role="tab"
@@ -115,11 +130,19 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active ${
                 activeTab === 2
-                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] "
                   : ""
-              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
+              } `}
+              style={{
+                background:
+                  activeTab === 2
+                    ? `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`
+                    : "",
+                textTransform: activeTab === 2 ? "uppercase" : "",
+                color: activeTab === 2 ? "#ffffff" : "",
+              }}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-2"
               aria-controls="basic-tabs-2"
@@ -130,11 +153,19 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active ${
                 activeTab === 3
-                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] "
                   : ""
-              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
+              } `}
+              style={{
+                background:
+                  activeTab === 3
+                    ? `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`
+                    : "",
+                textTransform: activeTab === 3 ? "uppercase" : "",
+                color: activeTab === 3 ? "#ffffff" : "",
+              }}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-3"
               aria-controls="basic-tabs-3"
@@ -145,11 +176,20 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold 
+               py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active ${
                 activeTab === 4
-                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] "
                   : ""
-              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
+              } `}
+              style={{
+                background:
+                  activeTab === 4
+                    ? `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`
+                    : "",
+                textTransform: activeTab === 4 ? "uppercase" : "",
+                color: activeTab === 4 ? "#ffffff" : "",
+              }}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-4"
               aria-controls="basic-tabs-4"
@@ -160,11 +200,19 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active ${
                 activeTab === 5
-                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] "
                   : ""
-              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
+              } `}
+              style={{
+                background:
+                  activeTab === 5
+                    ? `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`
+                    : "",
+                textTransform: activeTab === 5 ? "uppercase" : "",
+                color: activeTab === 5 ? "#ffffff" : "",
+              }}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-5"
               aria-controls="basic-tabs-5"
@@ -175,11 +223,19 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active ${
                 activeTab === 6
-                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] "
                   : ""
-              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
+              } `}
+              style={{
+                background:
+                  activeTab === 6
+                    ? `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`
+                    : "",
+                textTransform: activeTab === 6 ? "uppercase" : "",
+                color: activeTab === 6 ? "#ffffff" : "",
+              }}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-6"
               aria-controls="basic-tabs-6"
@@ -190,11 +246,19 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active ${
                 activeTab === 7
-                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] "
                   : ""
-              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
+              } `}
+              style={{
+                background:
+                  activeTab === 7
+                    ? `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`
+                    : "",
+                textTransform: activeTab === 7 ? "uppercase" : "",
+                color: activeTab === 7 ? "#ffffff" : "",
+              }}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-7"
               aria-controls="basic-tabs-7"
@@ -205,11 +269,19 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active ${
                 activeTab === 8
-                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] "
                   : ""
-              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
+              } `}
+              style={{
+                background:
+                  activeTab === 8
+                    ? `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`
+                    : "",
+                textTransform: activeTab === 8 ? "uppercase" : "",
+                color: activeTab === 8 ? "#ffffff" : "",
+              }}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-8"
               aria-controls="basic-tabs-8"
@@ -220,11 +292,19 @@ function BarangayDetails() {
             </button>
             <button
               type="button"
-              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold ${
+              className={`hs-tab-active:font-semibold uppercase mx-1 my-1 font-bold  py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active ${
                 activeTab === 9
-                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] hs-tab-active:uppercase hs-tab-active:text-white"
+                  ? "hs-tab-active:bg-gradient-to-r from-[#295141] to-[#408D51] "
                   : ""
-              } py-2 px-6 inline-flex items-center gap-2 rounded-full text-xs lg:text-sm whitespace-nowrap text-black hover:bg-white hover:text-[#295141] active`}
+              } `}
+              style={{
+                background:
+                  activeTab === 9
+                    ? `linear-gradient(to left, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`
+                    : "",
+                textTransform: activeTab === 9 ? "uppercase" : "",
+                color: activeTab === 9 ? "#ffffff" : "",
+              }}
               id="basic-tabs-item-1"
               data-hs-tab="#basic-tabs-9"
               aria-controls="basic-tabs-9"

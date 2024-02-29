@@ -77,7 +77,7 @@ const AccountManagement = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/users/?brgy=${brgy}&page=${currentPage}&type=${adminFilter}`
+          `${API_LINK}/municipal_admin/?brgy=${brgy}&page=${currentPage}&type=${adminFilter}`
         );
         if (response.status === 200) {
           setPageCount(response.data.pageCount);
@@ -119,7 +119,7 @@ const AccountManagement = () => {
     <div className="mx-4 mt-4">
     <div className="flex flex-col ">
       <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
-          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
+          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
               className="text-center sm:text-[15px] mx-auto font-bold text-xs md:text-xl lg:text-[16px] xl:text-[20px] xxl:text-[1.5rem] xxxl:text-3xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
@@ -281,22 +281,7 @@ const AccountManagement = () => {
                   }}
                 />
               </div>
-              <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                {/* <div className="hs-tooltip inline-block w-full">
-                <PDFDownloadLink
-                  document={<PrintPDF users={users} tableHeader={tableHeader} />}
-                  fileName="SAMPLE.pdf"
-                  className="hs-tooltip-toggle sm:w-full md:w-full cursor-pointer text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                >
-                  <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Generate Report
-                    </span>
-                </PDFDownloadLink>
-                </div> */}
+              <div className="sm:mt-2 md:mt-0 flex w-64 items-center justify-center">
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"
@@ -416,21 +401,21 @@ const AccountManagement = () => {
                     </td> */}
                     <td className="px-6 py-3">
                       {item.isApproved === "Registered" && (
-                        <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2">
+                        <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
                           <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             REGISTERED
                           </span>
                         </div>
                       )}
                       {item.isApproved === "Denied" && (
-                        <div className="flex w-full items-center justify-center bg-custom-red-button m-2">
+                        <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
                           <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             DENIED
                           </span>
                         </div>
                       )}
                       {item.isApproved === "Pending" && (
-                        <div className="flex w-full items-center justify-center bg-custom-amber m-2">
+                        <div className="flex w-full items-center justify-center bg-custom-amber m-2 rounded-lg">
                           <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                             PENDING
                           </span>

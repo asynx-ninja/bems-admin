@@ -10,13 +10,13 @@ import GenerateReportsModal from "../../components/barangaytabs/brgyarchivedResi
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
-import ViewArchivedResident from "../../components/barangaytabs/brgyarchivedResidents/ViewArchivedResident";
 import PrintPDF from "../../components/barangaytabs/brgyResidents/form/PrintPDF";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import noData from "../../assets/image/no-data.png";
 import AddResidentsModal from "../../components/barangaytabs/brgyResidents/AddResidentModal";
 import StatusResident from "../../components/barangaytabs/brgyResidents/StatusResident";
 import ManageResidentModal from "../../components/barangaytabs/brgyResidents/ManageResidentsModal";
+import GetBrgy from "../../components/GETBrgy/getbrgy";
 const Residents = () => {
   const [users, setUsers] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,6 +32,7 @@ const Residents = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [filteredResident, setFilteredResidents] = useState([])
+  const information = GetBrgy(brgy);
   const sortedAndFilteredUsers = useMemo(() => {
     let filteredUsers = [...users];
 
@@ -128,9 +129,14 @@ const Residents = () => {
     <div className="">
       <div className="flex flex-col ">
         <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
-          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
-            <h1
-              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-2xl xxxl:text-3xl xxxl:mt-1 text-white"
+        <div
+            className="sm:mt-5 md:mt-4 lg:mt-0  py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem] bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]"
+            style={{
+              background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+            }}
+          >
+        <h1
+              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[15px] xl:text-xl xxl:text-2xl xxxl:text-4xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
               MANAGE RESIDENTS
@@ -143,8 +149,11 @@ const Residents = () => {
                   <button
                     type="button"
                     data-hs-overlay="#hs-modal-addResident"
-                    className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm  text-center inline-flex items-center "
-                  >
+                    className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg  w-full text-white font-medium text-sm text-center inline-flex items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]"
+                      style={{
+                        background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+                      }}
+                    >
                     <FaPlus size={24} style={{ color: "#ffffff" }} />
                     <span className="sm:block md:hidden sm:pl-5">
                       Add Residents
@@ -165,7 +174,10 @@ const Residents = () => {
                     <button
                       type="button"
                       data-hs-overlay="#hs-modal-add"
-                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm text-center inline-flex items-center"
+                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg  w-full text-white font-medium text-sm text-center inline-flex items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]"
+                      style={{
+                        background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+                      }}
                     >
                       <FaArchive size={24} style={{ color: "#ffffff" }} />
                       <span className="sm:block md:hidden sm:pl-5">
@@ -193,7 +205,7 @@ const Residents = () => {
                 <button
                   id="hs-dropdown"
                   type="button"
-                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                  className=" sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm bg-[#295141] " style={{ backgroundColor: information?.theme?.primary }}
                 >
                   STATUS
                   <svg
@@ -252,7 +264,7 @@ const Residents = () => {
 
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">
-                <button className="bg-[#295141] p-3 rounded-l-md">
+                <button className=" p-3 rounded-l-md bg-[#295141]" style={{ backgroundColor: information?.theme?.primary }}>
                   <div className="w-full overflow-hidden">
                     <svg
                       className="h-3.5 w-3.5 text-white"
@@ -306,7 +318,7 @@ const Residents = () => {
         {/* Table */}
          <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll lg:overflow-x-hidden h-[calc(100vh_-_275px)] xxl:h-[calc(100vh_-_275px)] xxxl:h-[calc(100vh_-_300px)]">
           <table className="relative table-auto w-full">
-            <thead className="bg-[#295141] sticky top-0">
+            <thead className=" sticky top-0 bg-[#295141]" style={{ backgroundColor: information?.theme?.primary }}>
               <tr className="">
                 {tableHeader.map((item, idx) => (
                   <th
@@ -344,10 +356,10 @@ const Residents = () => {
                             <img
                               src={item.profile.link}
                               alt="Profile"
-                              className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4 border-[#013D74] rounded-full mx-auto"
+                              className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4  rounded-full mx-auto border-[#295141]" style={{ borderColor: information?.theme?.primary }}
                             />
                           ) : (
-                            <FaUserCircle className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4 border-[#013D74] rounded-full text-gray-500 mx-auto" />
+                            <FaUserCircle className="lg:w-20 lg:h-20 w-16 h-16 object-cover border border-4  rounded-full text-gray-500 mx-auto border-[#295141]" style={{ borderColor: information?.theme?.primary }} />
                           )}
                         </div>
                       </span>
@@ -410,7 +422,7 @@ const Residents = () => {
                       <div className="flex justify-center space-x-1 sm:space-x-none">
                         <button
                           type="button"
-                          data-hs-overlay="#hs-modal-viewResident"
+                          data-hs-overlay="#hs-modal-editResident"
                           onClick={() => handleView({ ...item })}
                           className="text-white bg-teal-800 font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
                         >
@@ -425,7 +437,7 @@ const Residents = () => {
           </table>
         </div>
       </div>
-      <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
+      <div className="md:py-4 md:px-4  flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3 bg-[#295141]" style={{ backgroundColor: information?.theme?.primary }}>
         <span className="font-medium text-white sm:text-xs text-sm">
           Showing {currentPage + 1} out of {pageCount} pages
         </span>
@@ -460,9 +472,9 @@ const Residents = () => {
       </div>
       <AddResidentsModal brgy={brgy} />
       <GenerateReportsModal />
-      <ViewArchivedResident user={user} setUser={setUser} />
+     
       <StatusResident user={user} setUser={setUser} brgy={brgy} status={status} setStatus={setStatus} />
-        <ManageResidentModal user={user} setUser={setUser} />
+        <ManageResidentModal user={user} brgy={brgy} setUser={setUser} />
     </div>
   );
 };

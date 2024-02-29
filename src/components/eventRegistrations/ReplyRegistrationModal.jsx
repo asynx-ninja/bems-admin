@@ -34,7 +34,7 @@ function ReplyRegistrationModal({ application, setApplication, brgy }) {
     collections: {
       banner: {},
       logo: {},
-    }
+    },
   });
   const [currentPage, setCurrentPage] = useState(0);
   useEffect(() => {
@@ -125,19 +125,26 @@ function ReplyRegistrationModal({ application, setApplication, brgy }) {
   // };
 
   const handleChange = (e) => {
-    e.preventDefault();
-  
     const inputValue = e.target.value;
   
-    if (statusChanger && (!newMessage.message || newMessage.message.trim() === "")) {
+    if (e.target.name === "isRepliable") {
+      // If isRepliable checkbox is changed, update isRepliable accordingly
+      setNewMessage((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.checked,
+      }));
+    } else if (statusChanger && (!newMessage.message || newMessage.message.trim() === "")) {
+      // If statusChanger is true and message is not set, update message with status
       setNewMessage((prev) => ({
         ...prev,
         message: `The status of your event application is ${inputValue}`,
+        [e.target.name]: inputValue,
       }));
     } else {
+      // Otherwise, update the input value normally
       setNewMessage((prev) => ({
         ...prev,
-        [e.target.name]: e.target.name === "isRepliable" ? e.target.checked : inputValue,
+        [e.target.name]: inputValue,
       }));
     }
   };
@@ -207,6 +214,7 @@ function ReplyRegistrationModal({ application, setApplication, brgy }) {
       );
 
       if (response.status === 200) {
+       
         const notify = {
           category: "One",
           compose: {
@@ -658,17 +666,23 @@ function ReplyRegistrationModal({ application, setApplication, brgy }) {
                                                       if (
                                                         statusChanger &&
                                                         (!newMessage.message ||
-                                                          newMessage.message.trim() === "")
+                                                          newMessage.message.trim() ===
+                                                            "")
                                                       ) {
-                                                        setNewMessage((prev) => ({
-                                                          ...prev,
-                                                          message: `The status of your event application is ${e.target.value}`,
-                                                        }));
+                                                        setNewMessage(
+                                                          (prev) => ({
+                                                            ...prev,
+                                                            message: `The status of your event application is ${e.target.value}`,
+                                                          })
+                                                        );
                                                       }
-                                                      setApplication((prev) => ({
-                                                        ...prev,
-                                                        status: e.target.value,
-                                                      }));
+                                                      setApplication(
+                                                        (prev) => ({
+                                                          ...prev,
+                                                          status:
+                                                            e.target.value,
+                                                        })
+                                                      );
                                                     }}
                                                     className="shadow ml-4 border w-5/6 py-2 px-4 text-sm text-black rounded-lg focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:shadow-outline"
                                                     value={application.status}
@@ -770,12 +784,11 @@ function ReplyRegistrationModal({ application, setApplication, brgy }) {
             </div>
           </div>
         </div>
-     
       </div>
       {submitClicked && <ReplyLoader replyingStatus="replying" />}
-        {replyingStatus && (
-          <ReplyLoader replyingStatus={replyingStatus} error={error} />
-        )}
+      {replyingStatus && (
+        <ReplyLoader replyingStatus={replyingStatus} error={error} />
+      )}
     </div>
   );
 }

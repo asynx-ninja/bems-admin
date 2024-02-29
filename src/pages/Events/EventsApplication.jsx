@@ -33,31 +33,84 @@ const EventsRegistrations = () => {
   const [specifiedDate, setSpecifiedDate] = useState(new Date());
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [selected, setSelected] = useState("date");
+  const [eventFilter, setEventFilter] = useState([]);
+  const [selecteEventFilter, setSelectedEventFilter] = useState("all");
+  const [officials, setOfficials] = useState([]);
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/announcement/?brgy=${brgy}&page=${currentPage}`
+        );
+        console.log(response.data.result);
+        if (response.status === 200) {
+          let arr = [];
+          response.data.result.map((item) => {
+            arr.push(item.title);
+          });
+          setEventFilter(arr);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetch();
+  }, [brgy]);
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/application/?brgy=${brgy}&archived=false&status=${statusFilter}&page=${currentPage}`
+          `${API_LINK}/application/?brgy=${brgy}&archived=false&status=${statusFilter}&title=${selecteEventFilter}&page=${currentPage}`
         );
-
+        console.log("wew", selecteEventFilter);
         if (response.status === 200) {
           setApplications(response.data.result);
           setPageCount(response.data.pageCount);
           setFilteredApplications(response.data.result);
         } else setApplications([]);
+        console.log(response.data.result);
       } catch (err) {
         console.log(err);
       }
     };
 
     fetch();
-    const intervalId = setInterval(() => {
-      fetch();
-    }, 3000);
+  }, [brgy, statusFilter, selecteEventFilter, currentPage]);
 
-    return () => clearInterval(intervalId);
-  }, [brgy, statusFilter, currentPage]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/mofficials/?brgy=${brgy}&archived=false`
+        );
+        console.log("erer", response);
+
+        if (response.status === 200) {
+          const officialsData = response.data.result || [];
+
+          if (officialsData.length > 0) {
+            setOfficials(officialsData);
+          } else {
+            setOfficials([]);
+            console.log(`No officials found for Barangay ${brgy}`);
+          }
+        } else {
+          setOfficials([]);
+          console.error("Failed to fetch officials:", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setOfficials([]);
+      }
+    };
+
+    fetchData();
+  }, [currentPage, brgy]); // Add positionFilter dependency
+
+  const handleEventFilter = (selectedType) => {
+    setSelectedEventFilter(selectedType);
+  };
 
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
@@ -71,6 +124,7 @@ const EventsRegistrations = () => {
     setStatusFilter("all");
     setApplications();
     setSearchQuery("");
+    setEventFilter("all");
   };
 
   useEffect(() => {
@@ -121,7 +175,12 @@ const EventsRegistrations = () => {
     const dateFormat = date === undefined ? "" : date.substr(0, 10);
     return dateFormat;
   };
+  const TimeFormat = (date) => {
+    if (!date) return "";
 
+    const formattedTime = moment(date).format("hh:mm A");
+    return formattedTime;
+  };
   const filters = (choice, selectedDate) => {
     switch (choice) {
       case "date":
@@ -205,13 +264,13 @@ const EventsRegistrations = () => {
 
   return (
     <div className="mx-4 ">
-    {/* Body */}
-    <div>
-      {/* Header */}
-      <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
+      {/* Body */}
+      <div>
+        {/* Header */}
+        <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
             <h1
-              className="text-center mx-auto font-bold text-xs md:text-xl lg:text-[16px] xl:text-[20px] xxl:text-2xl xxxl:text-3xl xxxl:mt-1 text-white"
+              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[15px] xl:text-xl xxl:text-2xl xxxl:text-4xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
               EVENTS APPLICATIONS
@@ -424,6 +483,57 @@ const EventsRegistrations = () => {
                   </div>
                 </ul>
               </div>
+              <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
+                <button
+                  id="hs-dropdown"
+                  type="button"
+                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                >
+                  EVENT TYPE
+                  <svg
+                    className={`hs-dropdown-open:rotate-${
+                      sortOrder === "asc" ? "180" : "0"
+                    } w-2.5 h-2.5 text-white`}
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+                <ul
+                  className="bg-[#f8f8f8] border-2 border-[#ffb13c] hs-dropdown-menu w-72 transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden z-10  shadow-xl rounded-xl p-2 "
+                  aria-labelledby="hs-dropdown"
+                >
+                  <a
+                    onClick={handleResetFilter}
+                    className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-2 text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 hover:rounded-[12px] focus:ring-2 focus:ring-blue-500"
+                    href="#"
+                  >
+                    RESET FILTERS
+                  </a>
+                  <hr className="border-[#4e4e4e] my-1" />
+                  <div className="flex flex-col scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll h-44">
+                    {eventFilter.map((title, index) => (
+                      <a
+                        key={index}
+                        onClick={() => handleEventFilter(title)}
+                        className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                        href="#"
+                      >
+                        {title}
+                      </a>
+                    ))}
+                  </div>
+                </ul>
+              </div>
             </div>
 
             <div className="sm:flex-col md:flex-row flex sm:w-full lg:w-7/12">
@@ -545,7 +655,8 @@ const EventsRegistrations = () => {
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
-                          {DateFormat(item.createdAt) || ""}
+                        {moment(item.createdAt).format("MMMM DD, YYYY")} -{" "}
+                          {TimeFormat(item.createdAt) || ""}
                         </span>
                       </div>
                     </td>
@@ -642,18 +753,18 @@ const EventsRegistrations = () => {
                 ))
               ) : (
                 <tr>
-                <td
-                  colSpan={tableHeader.length + 1}
-                  className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
-                >
-                  <img
-                    src={noData}
-                    alt=""
-                    className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
-                  />
-                  <strong className="text-[#535353]">NO DATA FOUND</strong>
-                </td>
-              </tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -677,7 +788,11 @@ const EventsRegistrations = () => {
         />
       </div>
       {Object.hasOwn(application, "event_id") ? (
-        <ViewRegistrationModal application={application} />
+        <ViewRegistrationModal
+          application={application}
+          officials={officials}
+          brgy={brgy}
+        />
       ) : null}
       <ReplyRegistrationModal
         application={application}

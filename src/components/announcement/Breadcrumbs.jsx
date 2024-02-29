@@ -1,24 +1,32 @@
 import React from "react";
-import { TfiAnnouncement } from "react-icons/tfi";
-import { GrFormNext } from "react-icons/gr";
-const Breadcrumb = ({ id }) => {
+import { FaArchive, FaHome } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+const Breadcrumb = ({ id, brgy }) => {
+  const navigate = useNavigate();
   return (
     <nav className="flex ">
       <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
-        <TfiAnnouncement size={22} />
-        <li>
-          <a
-            href={`/announcements/?id=${id}`}
-            className="text-gray-600 font-bold hover:underline text-xs md:text-lg"
+        <li className="flex items-center">
+          <FaHome className="mr-2 text-gray-900" />
+          <Link
+            //  href={`/barangayinformation/?id=${id}&brgy=${brgy}`}
+            to={".."}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(-1);
+            }}
+            className="text-gray-900 font-bold hover:underline uppercase"
           >
-            EVENT MANAGEMENT
-          </a>
+            Events Management
+          </Link>
         </li>
         <li>
-          <GrFormNext size={24} style={{ color: "#ffffff" }} />
+          <span>/</span>
         </li>
-        <li className="text-[10px] md:text-lg text-[#295141] font-bold">
-          ARCHIVED EVENT
+        <li className="flex items-center font-bold text-teal-600 uppercase">
+          <FaArchive className="mr-2" />
+          Archived Events
         </li>
       </ol>
     </nav>

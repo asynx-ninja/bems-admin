@@ -1,5 +1,6 @@
 import React from "react";
 import { FaTrashRestore, FaUserCircle } from "react-icons/fa";
+import { MdRestartAlt } from "react-icons/md";
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import { BsPrinter } from "react-icons/bs";
@@ -89,7 +90,12 @@ const ArchivedServicesInfo = () => {
     const eventdate = date === undefined ? "" : date.substr(0, 10);
     return eventdate;
   };
+  const TimeFormat = (date) => {
+    if (!date) return "";
 
+    const formattedTime = moment(date).format("hh:mm A");
+    return formattedTime;
+  };
   const handleView = (item) => {
     setServicesInfos(item);
   };
@@ -190,9 +196,9 @@ const ArchivedServicesInfo = () => {
       <div>
         <Breadcrumbs id={id} />
         <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
-          <div className="flex justify-center items-center sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
-            <h1
-              className="sm:text-[15px] mx-auto font-bold md:text-xl text-center lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-[1.5rem] xxxl:text-4xl text-white"
+          <div className="flex justify-center items-center sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
+          <h1
+              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[15px] xl:text-xl xxl:text-2xl xxxl:text-4xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
               ARCHIVED SERVICES
@@ -335,28 +341,13 @@ const ArchivedServicesInfo = () => {
                   }}
                 />
               </div>
-              <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                {/* <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-generate-reports-modal"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Generate Report
-                    </span>
-                  </button>
-                </div> */}
+              <div className="sm:mt-2 md:mt-0 flex w-64 items-center justify-center">
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     data-hs-overlay="#hs-restore-servicesinfo-modal"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md  bg-pink-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
+                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md  bg-[#295141]  font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
                   >
-                    <FaTrashRestore size={24} style={{ color: "#ffffff" }} />
+                    <MdRestartAlt size={24} style={{ color: "#ffffff" }} />
                     <span
                       className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                       role="tooltip"
@@ -458,7 +449,8 @@ const ArchivedServicesInfo = () => {
                   <td className="px-6 py-3">
                     <div className="flex justify-center items-center">
                       <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
-                        {dateFormat(item.createdAt) || ""}
+                      {moment(item.createdAt).format("MMMM DD, YYYY")} -{" "}
+                          {TimeFormat(item.createdAt) || ""}
                       </span>
                     </div>
                   </td>

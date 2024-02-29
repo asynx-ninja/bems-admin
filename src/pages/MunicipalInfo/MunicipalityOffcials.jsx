@@ -84,9 +84,6 @@ const MunicipalityOfficials = () => {
 
     const fetchData = async () => {
       try {
-
-    
-    
         const response = await axios.get(
           `${API_LINK}/mofficials/?brgy=${brgy}&archived=false&page=${currentPage}&position=${positionFilter}`
         );
@@ -118,6 +115,7 @@ const MunicipalityOfficials = () => {
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
+
   const handleEditClick = async (official) => {
     setSelectedOfficial(official);
   };
@@ -152,9 +150,9 @@ const MunicipalityOfficials = () => {
     <div className="mx-4 mt-4">
     <div className="flex flex-col ">
       <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
-          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
-            <h1
-              className="text-center mx-auto font-bold text-xs md:text-xl lg:text-[16px] xl:text-[20px] xxl:text-[1.5rem] xxxl:text-3xl xxxl:mt-1 text-white"
+          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
+          <h1
+              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[15px] xl:text-xl xxl:text-2xl xxxl:text-4xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
               MUNICIPALITY OFFICIALS
@@ -334,22 +332,7 @@ const MunicipalityOfficials = () => {
                   }}
                 />
               </div>
-              <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                {/* <div className="hs-tooltip inline-block w-full">
-                  <button
-                    type="button"
-                    data-hs-overlay="#hs-generate-reports-modal"
-                    className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                  >
-                    <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                    <span
-                      className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                      role="tooltip"
-                    >
-                      Generate Report
-                    </span>
-                  </button>
-                </div> */}
+              <div className="sm:mt-2 md:mt-0 flex w-64 items-center justify-center">
                 <div className="hs-tooltip inline-block w-full">
                   <button
                     type="button"

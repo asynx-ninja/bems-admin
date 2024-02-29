@@ -106,7 +106,7 @@ console.log("g",user.type)
         username: user.username,
         password: user.password,
       };
-      const result = await axios.post(`${API_LINK}/users/`, obj);
+      const result = await axios.post(`${API_LINK}/municipal_admin/`, obj);
 
       if (result.status === 200) {
         setUser({

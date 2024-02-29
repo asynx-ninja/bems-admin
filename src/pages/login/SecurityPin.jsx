@@ -2,7 +2,7 @@ import React from "react";
 import login from "../../assets/login/login.png";
 import montalban_logo from "../../assets/login/montalban-logo.png";
 import { useState, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import useCountdown from "../../hooks/useCountdown";
 import axios from "axios";
 import API_LINK from "../../config/API";
@@ -214,18 +214,19 @@ const SecurityPin = () => {
             </div>
           </div>
           <div className="hs-tooltip sm:hidden md:inline-block">
-            <button
+          <Link
+            to="/tooltip"
               type="button"
-              className="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#295141] to-[#408D51] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
+              class="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#408D51] to-[#295141] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
             >
               ?
               <span
-                className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                 role="tooltip"
               >
-                Tooltip on top
+                Bagong Montalban Barangay Application
               </span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>

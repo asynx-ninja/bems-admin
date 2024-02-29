@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 
 function ArchiveLoader({ updatingStatus, error }) {
   const textPrompts = {
-    updating: "Archiving tourist spot...",
+    updating: "Archiving tourist spot, Please wait...",
     waiting: "Please wait...",
-    success: "Tourist Spot Archived Successful!",
+    success: "Tourist Spot Archived Successfully!",
     error: "Error archiving tourist spot. Please try again.",
   };
 
@@ -25,13 +25,29 @@ function ArchiveLoader({ updatingStatus, error }) {
 
   return (
     <div className="absolute top-0 lg:top-10 lg:end-0 mb-20 lg:mr-5 z-[80]">
-      <div
-        className="w-screen md:w-auto bg-[#295141] border border-gray-200 rounded-xl shadow-lg"
-        role="alert"
-        style={{ animation: "slideIn 0.3s ease-out" }}
-      >
-        <div className="flex items-center justify-start p-4">
-          <div role="status" className="flex items-center justify-center mr-3">
+    <div
+      className={`w-screen md:w-auto ${
+        updatingStatus === "error" ? "bg-red-500" : "bg-[#295141]"
+      } border border-gray-200 rounded-xl shadow-lg`}
+      role="alert"
+      style={{ animation: "slideIn 0.3s ease-out" }}
+    >
+      <div className="flex items-center justify-start p-4">
+        <div role="status" className="flex items-center justify-center mr-3">
+          {updatingStatus === "error" ? (
+            <svg
+              aria-hidden="true"
+              className="w-6 h-6 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 1.75C6.2 1.75 1.75 6.2 1.75 12C1.75 17.8 6.2 22.25 12 22.25C17.8 22.25 22.25 17.8 22.25 12C22.25 6.2 17.8 1.75 12 1.75ZM12 20.5C7.3 20.5 3.5 16.7 3.5 12C3.5 7.3 7.3 3.5 12 3.5C16.7 3.5 20.5 7.3 20.5 12C20.5 16.7 16.7 20.5 12 20.5ZM12 6.75C11.3 6.75 10.75 7.3 10.75 8V14C10.75 14.7 11.3 15.25 12 15.25C12.7 15.25 13.25 14.7 13.25 14V8C13.25 7.3 12.7 6.75 12 6.75ZM12 16.75C11.3 16.75 10.75 17.3 10.75 18C10.75 18.7 11.3 19.25 12 19.25C12.7 19.25 13.25 18.7 13.25 18C13.25 17.3 12.7 16.75 12 16.75Z"
+                fill="currentColor"
+              />
+            </svg>
+          ) : (
             <svg
               aria-hidden="true"
               className="w-6 h-6 text-[#414141] animate-spin fill-[#08fcf0]"
@@ -48,19 +64,22 @@ function ArchiveLoader({ updatingStatus, error }) {
                 fill="currentFill"
               />
             </svg>
-            <span className="sr-only">Loading...</span>
-          </div>
-          <div className="flex flex-col justify-center">
+          )}
+          <span className="sr-only">Loading...</span>
+        </div>
+        <div className="flex flex-col justify-center">
+          {updatingStatus !== "error" && (
             <span className="text-sm text-white font-semibold">
               {loadingText}
             </span>
-            {error && (
-              <span className="text-sm text-red-500 mt-1">{error}</span>
-            )}
-          </div>
+          )}
+          {error && (
+            <span className="text-sm text-white font-semibold">{error}</span>
+          )}
         </div>
       </div>
     </div>
+  </div>
   );
 }
 

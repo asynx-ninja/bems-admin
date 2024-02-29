@@ -8,7 +8,7 @@ import { CiImageOn } from "react-icons/ci";
 import AddLoader from "./loaders/AddLoader";
 import { MdError } from "react-icons/md";
 import ErrorPopup from "./popup/ErrorPopup";
-
+import moment from "moment";
 function CreateAnnouncementModal({ brgy }) {
   const [announcement, setAnnouncement] = useState({
     title: "",
@@ -124,41 +124,42 @@ function CreateAnnouncementModal({ brgy }) {
       const res_folder = await axios.get(
         `${API_LINK}/folder/specific/?brgy=${brgy}`
       );
-console.log(res_folder)
+      console.log(res_folder);
       if (res_folder.status === 200) {
         const response = await axios.post(
           `${API_LINK}/announcement/?event_folder_id=${res_folder.data[0].events}`,
           formData
         );
 
-       
         if (response.status === 200) {
           let notify;
 
-          if (announcement.isOpen) {
-            notify = {
-              category: "All",
-              compose: {
-                subject: `EVENT - ${announcement.title}`,
-                message: `Barangay ${brgy} has posted a new event named: ${announcement.title}.\n\n
+          const formattedDate = moment(announcement.date).format(
+            "MMMM Do YYYY, h:mm:ss a"
+          );
+          notify = {
+            category: "All",
+            compose: {
+              subject: `EVENT - ${announcement.title}`,
+              message: `Barangay ${brgy} has posted a new event named: ${announcement.title}.\n\n
               
               Event Details:\n 
               ${announcement.details}\n\n
   
               Event Date:
-              ${announcement.date}\n\n
+              ${formattedDate}\n\n
               `,
-                go_to: "Events",
-              },
-              target: {
-                user_id: null,
-                area: null,
-              },
-              type: getType(brgy),
-              banner: response.data.collections.banner,
-              logo: response.data.collections.logo,
-            };
-          }
+              go_to: "Events",
+            },
+            target: {
+              user_id: null,
+              area: null,
+            },
+            type: getType(brgy),
+            banner: response.data.collections.banner,
+            logo: response.data.collections.logo,
+          };
+
           const result = await axios.post(`${API_LINK}/notification/`, notify, {
             headers: {
               "Content-Type": "application/json",
@@ -328,7 +329,7 @@ console.log(res_folder)
                   )}
                 </div>
               </div>
-              
+
               {/* <div className="flex items-center justify-between mb-2">
                 <label className="block sm:text-xs lg:text-sm text-gray-700 font-bold">
                   OPEN FOR ALL?

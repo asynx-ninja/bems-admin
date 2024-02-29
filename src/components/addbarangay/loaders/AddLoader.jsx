@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 
 function AddLoader({ creationStatus, error }) {
   const textPrompts = {
-    creating: "Creating new municipal info...",
+    creating: "Creating new barangay, Please wait...",
     waiting: "Please wait...",
-    success: "Municipal Info Created Successful!",
+    success: "Municipal Info Created Successfully!",
     error: "Error creating info. Please try again.",
   };
 
   const [loadingText, setLoadingText] = useState(
-    textPrompts[creationStatus] || "Creating new municipal info..."
+    textPrompts[creationStatus] || "Creating new barangay, Please wait..."
   );
   const [loading, setLoading] = useState(creationStatus === "creating");
 

@@ -93,7 +93,7 @@ function ViewRegistrationModal({ application, id, brgy }) {
             <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700">
               <div className="sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0 w-full flex sm:flex-col md:flex-row">
                 <Link
-                  to={`/events_registrations/?id=${id}&brgy=${brgy}`}
+                  to={`/events_registration/?id=${id}`}
                   className="w-full"
                   onClick={() => {
                     window.innerWidth >= 300 && window.innerWidth <= 1920

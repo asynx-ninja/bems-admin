@@ -4,13 +4,13 @@ import PersonalDetails from "./PersonalDetails";
 import OtherDetails from "./OtherDetails";
 import PrintForm from "./form/PrintForm";
 import PrintPDF from "./form/PrintPDF";
-
+import GetBrgy from "../../GETBrgy/getbrgy";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
-function ViewRegistrationModal({ application }) {
+function ViewRegistrationModal({ application, brgy }) {
   const [detail, ] = useState(application);
   const [empty, ] = useState(false);
-
+const information = GetBrgy(brgy)
   const returnFile = (string) => {
     for (const item of detail.file) {
       if (item.name.includes(string)) {
@@ -67,7 +67,9 @@ function ViewRegistrationModal({ application }) {
         <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
           <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
             {/* Header */}
-            <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] overflow-hidden rounded-t-2xl">
+            <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] overflow-hidden rounded-t-2xl"  style={{
+              background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+            }}>
               <h3
                 className="font-bold text-white mx-auto md:text-xl text-center"
                 style={{ letterSpacing: "0.3em" }}

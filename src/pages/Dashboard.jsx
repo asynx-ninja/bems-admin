@@ -10,9 +10,9 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="mx-4 my-4 overflow-y-auto lg:h-[calc(100vh_-_105px)]">
+    <div className="mx-4 my-4 overflow-y-auto overflow-x-hidden lg:h-[calc(100vh_-_105px)]">
     <StatisticsDashboard />
-    <div className="flex flex-col md:flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0">
+    <div className="flex flex-col md:flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0 ">
       <SubPendingApplication />
       <SubPendingRequest />
       {/* <EventsCalendar /> */}

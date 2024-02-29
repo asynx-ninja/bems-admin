@@ -1,26 +1,32 @@
 import React from 'react';
-import {AiFillNotification} from "react-icons/ai";
-import {FaArchive} from "react-icons/fa";
+import {FaArchive, FaHome} from "react-icons/fa";
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 const Breadcrumb = ({ id, brgy }) => {
+  const navigate = useNavigate();
   return (
     <nav className="flex p-6 mt-4 ">
     <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
       <li className="flex items-center">
-        <AiFillNotification className="mr-2 text-gray-900" />
-        <a
-               href={`/barangayinformation/?id=${id}&brgy=${brgy}`}
-            
+        <FaHome className="mr-2 text-gray-900" />
+        <Link
+              //  href={`/barangayinformation/?id=${id}&brgy=${brgy}`}
+              to={'..'}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}  
           className="text-gray-900 font-bold hover:underline uppercase"
         >
-                 Barangay Information
-        </a>
+                 Events
+        </Link>
       </li>
       <li>
         <span>/</span>
       </li>
       <li className="flex items-center font-bold text-teal-600 uppercase">
         <FaArchive className="mr-2" />
-        Archived Announcement
+        Archived Events
       </li>
     </ol>
   </nav>

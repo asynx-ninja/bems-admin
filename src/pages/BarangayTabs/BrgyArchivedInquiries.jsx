@@ -11,19 +11,21 @@ import ViewArchivedModal from "../../components/barangaytabs/brgyInquiries/ViewA
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
-import Tabss from "../../pages/BarangayInfoExt"
+import Tabss from "../../pages/BarangayInfoExt";
 import moment from "moment";
 import noData from "../../assets/image/no-data.png";
+import GetBrgy from "../../components/GETBrgy/getbrgy";
 const BrgyArchivedInquiries = () => {
-  const [searchParams] = useSearchParams();
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
-  const to = "Staff";
   const [inquiries, setInquiries] = useState([]);
-  const [inquiry, setInquiry] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [pageCount, setPageCount] = useState(0);
-
+  const [inquiry, setInquiry] = useState({
+    compose: { file: [] },
+    response: [{ file: [] }],
+  });
+  const information = GetBrgy(brgy);
   //status filtering
   const [status, setStatus] = useState({});
   const [statusFilter, setStatusFilter] = useState("all");
@@ -31,18 +33,40 @@ const BrgyArchivedInquiries = () => {
   //query
   const [searchQuery, setSearchQuery] = useState("");
 
+  //pagination
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   //date filtering
   const [specifiedDate, setSpecifiedDate] = useState(new Date());
   const [selected, setSelected] = useState("date");
   const [filteredInquiries, setFilteredInquiries] = useState([]);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const isLatestResponseResident = (inquiry) => {
+    const { response, isApproved } = inquiry;
+    if (response && response.length > 0) {
+      const latestResponse = response[response.length - 1];
+      return (
+        latestResponse.type === "Resident" &&
+        !["Completed"].includes(isApproved)
+      );
+    }
+    return false;
+  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowTooltip((prev) => !prev);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     document.title = "Inquiries | Barangay E-Services Management";
 
     const fetchInquiries = async () => {
       const response = await axios.get(
-        `${API_LINK}/inquiries/staffinquiries/?id=${id}&brgy=${brgy}&archived=true&status=${statusFilter}&page=${currentPage}`
+        `${API_LINK}/inquiries/staffinquiries/?id=${id}&brgy=${brgy}&archived=true&status=${statusFilter}&page=${currentPage}&label=Staff`
       );
       console.log("API URL:");
 
@@ -60,50 +84,58 @@ const BrgyArchivedInquiries = () => {
 
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
-  }
+  };
+
+  console.log("inquiries: ", filteredInquiries);
+
+  const checkboxHandler = (e) => {
+    let isSelected = e.target.checked;
+    let value = e.target.value;
+
+    if (isSelected) {
+      setSelectedItems([...selectedItems, value]);
+    } else {
+      setSelectedItems((prevData) => {
+        return prevData.filter((id) => {
+          return id !== value;
+        });
+      });
+    }
+  };
+
+  const checkAllHandler = () => {
+    const inquiriesToCheck = Inquiries.length > 0 ? Inquiries : inquiries;
+
+    if (inquiriesToCheck.length === selectedItems.length) {
+      setSelectedItems([]);
+    } else {
+      const postIds = inquiriesToCheck.map((item) => {
+        return item._id;
+      });
+
+      setSelectedItems(postIds);
+    }
+  };
 
   const tableHeader = [
     "name",
     "e-mail",
+    "message",
     "date",
     "status",
     "actions",
   ];
-
-  useEffect(() => {
-    document.title = "Inquiries | Barangay E-Services Management";
-  }, []);
 
   const DateFormat = (date) => {
     const dateFormat = date === undefined ? "" : date.substr(0, 10);
     return dateFormat;
   };
 
-  const handleSort = (sortBy) => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    setSortColumn(sortBy);
+  const TimeFormat = (date) => {
+    if (!date) return "";
 
-    const sortedData = inquiries.slice().sort((a, b) => {
-      if (sortBy === "inquiries_id") {
-        return newSortOrder === "asc"
-          ? a.inquiries_id.localeCompare(b.inquiries_id)
-          : b.inquiries_id.localeCompare(a.inquiries_id);
-      } else if (sortBy === "lastName") {
-        return newSortOrder === "asc"
-          ? a.lastName.localeCompare(b.lastName)
-          : b.lastName.localeCompare(a.lastName);
-      } else if (sortBy === "isApproved") {
-        const order = { Completed: 1, "In Progress": 2, "Not Responded": 3 };
-        return newSortOrder === "asc"
-          ? order[a.isApproved] - order[b.isApproved]
-          : order[b.isApproved] - order[a.isApproved];
-      }
-
-      return 0;
-    });
-
-    setInquiries(sortedData);
+    const formattedTime = moment(date).format("hh:mm A");
+    return formattedTime;
   };
 
   const handleView = (item) => {
@@ -127,9 +159,9 @@ const BrgyArchivedInquiries = () => {
           console.log(typeof new Date(item.compose.date), selectedDate);
           return (
             new Date(item.compose.date).getFullYear() ===
-            selectedDate.getFullYear() &&
+              selectedDate.getFullYear() &&
             new Date(item.compose.date).getMonth() ===
-            selectedDate.getMonth() &&
+              selectedDate.getMonth() &&
             new Date(item.compose.date).getDate() === selectedDate.getDate()
           );
         });
@@ -144,7 +176,7 @@ const BrgyArchivedInquiries = () => {
         return inquiries.filter(
           (item) =>
             new Date(item.compose.date).getFullYear() ===
-            startDate.getFullYear() &&
+              startDate.getFullYear() &&
             new Date(item.compose.date).getMonth() === startDate.getMonth() &&
             new Date(item.compose.date).getDate() >= startDate.getDate() &&
             new Date(item.compose.date).getDate() <= endDate.getDate()
@@ -153,7 +185,7 @@ const BrgyArchivedInquiries = () => {
         return inquiries.filter(
           (item) =>
             new Date(item.compose.date).getFullYear() ===
-            selectedDate.getFullYear() &&
+              selectedDate.getFullYear() &&
             new Date(item.compose.date).getMonth() === selectedDate.getMonth()
         );
       case "year":
@@ -205,23 +237,26 @@ const BrgyArchivedInquiries = () => {
 
   return (
     <div className="mx-4 mt-8 overflow-y-auto lg:h-[calc(100vh_-_110px)]">
-      <div className="w-full flex items-center justify-center bg-[#295141] rounded-t-lg">
-        <h1 className="text-white text-3xl py-2 px-5 font-heavy ">
+      <div className="w-full flex items-center justify-center  rounded-t-lg bg-[#295141]" style={{ backgroundColor: information?.theme?.primary }}>
+        <h1 className="text-white text-3xl py-2 px-5 font-heavy " >
           BARANGAY {brgy ? brgy.toUpperCase() : ""} INFORMATION
         </h1>
       </div>
       <div className="flex items-center justify-start bg-gray-100">
-
         <Breadcrumbs brgy={brgy} id={id} />
       </div>
       <div className="mt-3 py-4 px-4">
         <div>
-
           <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
-            <div className="flex justify-center items-center sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
-              <h1
-                className="sm:text-[15px] mx-auto font-bold md:text-xl text-center lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-[1.5rem] xxxl:text-4xl text-white"
-                style={{ letterSpacing: "0.2em" }}
+          <div
+            className="sm:mt-5 md:mt-4 lg:mt-0  py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem] bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]"
+            style={{
+              background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+            }}
+          >
+           <h1
+              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[15px] xl:text-xl xxl:text-2xl xxxl:text-4xl xxxl:mt-1 text-white"
+              style={{ letterSpacing: "0.2em" }}
               >
                 ARCHIVED INQUIRIES
               </h1>
@@ -236,7 +271,7 @@ const BrgyArchivedInquiries = () => {
                   <button
                     id="hs-dropdown"
                     type="button"
-                    className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                    className=" sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm bg-[#295141] " style={{ backgroundColor: information?.theme?.primary }}
                   >
                     STATUS
                     <svg
@@ -290,13 +325,13 @@ const BrgyArchivedInquiries = () => {
                     </a>
                   </ul>
                 </div>
-
+              
                 {/* Date Sort */}
                 <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
                   <button
                     id="hs-dropdown"
                     type="button"
-                    className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                    className=" sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  bg-[#295141]"   style={{ backgroundColor: information?.theme?.primary }}
                   >
                     DATE
                     <svg
@@ -386,9 +421,9 @@ const BrgyArchivedInquiries = () => {
                   </ul>
                 </div>
               </div>
-              <div className="sm:flex-col md:flex-row flex sm:w-full md:w-7/12">
+              <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
                 <div className="flex flex-row w-full md:mr-2">
-                  <button className=" bg-[#295141] p-3 rounded-l-md">
+                  <button className=" p-3 rounded-l-md bg-[#295141]"   style={{ backgroundColor: information?.theme?.primary }}>
                     <div className="w-full overflow-hidden">
                       <svg
                         className="h-3.5 w-3.5 text-white"
@@ -426,35 +461,18 @@ const BrgyArchivedInquiries = () => {
                             .toLowerCase()
                             .includes(e.target.value.toLowerCase())
                       );
-  
+
                       setFilteredInquiries(Inquiries);
                     }}
                   />
-                </div>
-                <div className="sm:mt-2 md:mt-0 flex w-full items-center justify-center space-x-2">
-                  <div className="hs-tooltip inline-block w-full">
-                    <button
-                      type="button"
-                      data-hs-overlay="#hs-generate-reports-modal"
-                      className="hs-tooltip-toggle sm:w-full md:w-full text-white rounded-md bg-blue-800 font-medium text-xs sm:py-1 md:px-3 md:py-2 flex items-center justify-center"
-                    >
-                      <BsPrinter size={24} style={{ color: "#ffffff" }} />
-                      <span
-                        className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
-                        role="tooltip"
-                      >
-                        Generate Report
-                      </span>
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll lg:overflow-x-hidden h-[calc(100vh_-_320px)] xxxl:h-[calc(100vh_-_340px)]">
-          <table className="relative table-auto w-full">
-              <thead className="bg-[#295141] sticky top-0">
+            <table className="relative table-auto w-full">
+              <thead className=" sticky top-0 bg-[#295141]"   style={{ backgroundColor: information?.theme?.primary }}>
                 <tr className="">
                   {tableHeader.map((item, idx) => (
                     <th
@@ -469,7 +487,7 @@ const BrgyArchivedInquiries = () => {
               </thead>
               <tbody className="odd:bg-slate-100">
                 {filteredInquiries.length === 0 ? (
-                    <tr>
+                  <tr>
                     <td
                       colSpan={tableHeader.length + 1}
                       className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
@@ -485,28 +503,33 @@ const BrgyArchivedInquiries = () => {
                 ) : (
                   filteredInquiries.map((item, index) => (
                     <tr key={index} className="odd:bg-slate-100 text-center">
-
-                      <td className="px-6 py-3">
-                        <div className="flex justify-center items-center">
-                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black  line-clamp-2 ">
-                            {item.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-3">
-                        <div className="flex justify-center items-center">
-                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black  line-clamp-2 ">
-                            {item.email}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-3">
-                        <div className="flex justify-center items-center">
-                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
-                            {DateFormat(item.compose.date) || ""}
-                          </span>
-                        </div>
-                      </td>
+                      <td className="xl:px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="xl:px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                          {item.email}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-2 xl:px-6 py-3">
+                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
+                        {item.compose.message}
+                      </span>
+                    </td>
+                    <td className="xl:px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        {moment(item.compose.date).format("MMMM DD, YYYY")} -{" "}
+                          {TimeFormat(item.compose.date) || ""}
+                        </span>
+                      </div>
+                    </td>
                       <td className="px-6 py-3">
                         <div className="flex justify-center items-center">
                           {item.isApproved === "Completed" && (
@@ -562,7 +585,7 @@ const BrgyArchivedInquiries = () => {
             </table>
           </div>
         </div>
-        <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
+        <div className="md:py-4 md:px-4 ] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3 bg-[#295141]"   style={{ backgroundColor: information?.theme?.primary }}>
           <span className="font-medium text-white sm:text-xs text-sm">
             Showing {currentPage + 1} out of {pageCount} pages
           </span>
@@ -596,7 +619,7 @@ const BrgyArchivedInquiries = () => {
           />
         </div>
       </div>
-      <ViewArchivedModal inquiry={inquiry} setInquiry={setInquiry} />
+      <ViewArchivedModal inquiry={inquiry} setInquiry={setInquiry}  brgy={brgy} />
     </div>
   );
 };

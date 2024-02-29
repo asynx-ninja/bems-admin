@@ -1224,7 +1224,7 @@ const Settings = () => {
                       htmlFor="username"
                       className="block sm:text-xs lg:text-sm font-medium mb-2"
                     >
-                      Username
+                      Change Username
                     </label>
                     <input
                       type="text"

@@ -43,10 +43,15 @@ import MRequests from "../pages/Requests";
 import MArchivedRequests from "../pages/ArchivedRequests";
 import MServices from "../pages/Services";
 import MArchivedServices from "../pages/ArchivedServices";
+import Tooltip from "../pages/login/Tooltip";
 const pages = [
   {
     path: "/",
     element: <Login />,
+  },
+  {
+    path: "/tooltip",
+    element: <Tooltip />,
   },
   {
     path: "/forgot",

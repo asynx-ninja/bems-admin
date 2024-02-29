@@ -203,7 +203,7 @@ const AddServicesDocument = ({ service_id, brgy, officials }) => {
                         {officials
                           .filter(
                             (official) =>
-                              official.position === "Barangay Chairman"
+                              official.position === "City Mayor"
                           )
                           .map((official) => (
                             <option
@@ -234,7 +234,7 @@ const AddServicesDocument = ({ service_id, brgy, officials }) => {
                         {officials
                           .filter(
                             (official) =>
-                              official.position === "Barangay Kagawad"
+                              official.position === "Vice Mayor"
                           )
                           .map((official) => (
                             <option

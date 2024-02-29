@@ -1,27 +1,35 @@
-import React from "react";
-import { TfiAnnouncement } from "react-icons/tfi";
-import { GrFormNext } from "react-icons/gr";
-const Breadcrumb = ({ id }) => {
+import React from 'react';
+import {FaArchive, FaHome} from "react-icons/fa";
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+const Breadcrumb = ({ id, brgy }) => {
+  const navigate = useNavigate();
   return (
     <nav className="flex ">
-    <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
-        <TfiAnnouncement size={22} />
-        <li>
-          <a
-            href={`/tourist_spot/?id=${id}`}
-            className="text-gray-600 font-bold hover:underline text-xs md:text-lg"
-          >
-            MUNICPAL INFO
-          </a>
+      <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
+      <li className="flex items-center">
+        <FaHome className="mr-2 text-gray-900" />
+        <Link
+              //  href={`/barangayinformation/?id=${id}&brgy=${brgy}`}
+              to={'..'}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}  
+          className="text-gray-900 font-bold hover:underline uppercase"
+        >
+                 tourist spot
+        </Link>
+      </li>
+      <li>
+        <span>/</span>
+      </li>
+      <li className="flex items-center font-bold text-teal-600 uppercase">
+        <FaArchive className="mr-2" />
+        Archived tourist spot
         </li>
-        <li>
-          <GrFormNext size={24} style={{ color: "#ffffff" }} />
-        </li>
-        <li className="text-[10px] md:text-lg text-[#295141] font-bold">
-          ARCHIVED TOURIST SPOT
-        </li>
-      </ol>
-    </nav>
+    </ol>
+  </nav>
   );
 };
 

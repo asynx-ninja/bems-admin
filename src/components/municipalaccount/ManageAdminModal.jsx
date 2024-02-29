@@ -77,16 +77,17 @@ function ManageAdminModal({ user, setUser }) {
         !user.street ||
         !user.username ||
         !user.password
-      ) {
-        setError("Please fill out all required fields.");
-        return; // Prevent further execution of handleSubmit
-      }
+      ) 
+      // {
+      //   setError("Please fill out all required fields.");
+      //   return; // Prevent further execution of handleSubmit
+      // }
       setSubmitClicked(true);
       var formData = new FormData();
       formData.append("users", JSON.stringify(user));
 
       const response = await axios.patch(
-        `${API_LINK}/users/?doc_id=${user._id}`,
+        `${API_LINK}/municipal_admin/?doc_id=${user._id}`,
         formData
       );
 

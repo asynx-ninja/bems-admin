@@ -35,61 +35,73 @@ const Notifications = () => {
     };
     fetch();
   }, [id, brgy]);
+  const notificationSound = new Audio("/notification/notif.mp3");
+  useEffect(() => {
+ 
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/notification/?user_id=${userData.user_id}&area=MUNISIPYO&type=Municipality`
+        );
+        console.log(response.data);
+        if (response.status === 200) {
+          const notificationsWithTimestamp = response.data.map(
+            (notification) => {
+              const notificationDate = moment(notification.createdAt);
+              const now = moment();
+              const timeDiff = moment.duration(now.diff(notificationDate));
+              let timeAgo = "";
 
-useEffect(() => {
-  const fetchNotifications = async () => {
-    try {
-      const response = await axios.get(
-        `${API_LINK}/notification/?user_id=${userData.user_id}&area=MUNISIPYO&type=Municipality`
-      );
-      console.log(response.data);
-      if (response.status === 200) {
-        const notificationsWithTimestamp = response.data.map((notification) => {
-          const notificationDate = moment(notification.createdAt);
-          const now = moment();
-          const timeDiff = moment.duration(now.diff(notificationDate));
-          let timeAgo = "";
+              if (timeDiff.asMinutes() < 60) {
+                timeAgo = `${Math.floor(timeDiff.asMinutes())} minutes ago`;
+              } else if (timeDiff.asHours() < 24) {
+                timeAgo = `${Math.floor(timeDiff.asHours())} hours ago`;
+              } else if (timeDiff.asDays() === 1) {
+                timeAgo = "Yesterday at " + notificationDate.format("h:mm A");
+              } else {
+                timeAgo = notificationDate.format("ddd [at] MMM D, h:mm A");
+              }
 
-          if (timeDiff.asMinutes() < 60) {
-            timeAgo = `${Math.floor(timeDiff.asMinutes())} minutes ago`;
-          } else if (timeDiff.asHours() < 24) {
-            timeAgo = `${Math.floor(timeDiff.asHours())} hours ago`;
-          } else if (timeDiff.asDays() === 1) {
-            timeAgo = "Yesterday at " + notificationDate.format("h:mm A");
-          } else {
-            timeAgo = notificationDate.format("ddd [at] MMM D, h:mm A");
+              return {
+                ...notification,
+                timestamp: timeAgo,
+              };
+            }
+          );
+
+          const unreadCount = notificationsWithTimestamp.filter(
+            (notification) =>
+              notification.read_by.every((item) => item.readerId !== id)
+          ).length;
+
+          // play sound if there are new notifications
+          if (unreadCount > unreadNotifications) {
+            notificationSound.currentTime = 0; // Reset the audio to the beginning
+            notificationSound.play();
           }
 
-          return {
-            ...notification,
-            timestamp: timeAgo,
-          };
-        });
-
-        setNotifications(notificationsWithTimestamp);
-        setUnreadNotifications(
-          notificationsWithTimestamp.filter((notification) =>
-            notification.read_by.every((item) => item.readerId !== id)
-          ).length
-        );
-      } else {
+          setNotifications(notificationsWithTimestamp);
+          setUnreadNotifications(unreadCount);
+        } else {
+          setNotifications([]);
+          setUnreadNotifications(0);
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
         setNotifications([]);
         setUnreadNotifications(0);
       }
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-      setNotifications([]);
-      setUnreadNotifications(0);
-    }
-  };
+    };
 
-  fetchNotifications();
-  const intervalId = setInterval(() => {
     fetchNotifications();
-  }, 3000);
+    // const intervalId = setInterval(() => {
+    //   fetchNotifications();
+    // }, 3000);
 
-  return () => clearInterval(intervalId);
-}, [brgy]);
+    // return () => {
+    //   clearInterval(intervalId);
+    // };
+  }, [brgy, unreadNotifications]);
 
   const handleView = (item) => {
     setNotification(item);
@@ -108,7 +120,9 @@ useEffect(() => {
           {notifications && notifications.length > 0 && (
             <span className="flex absolute top-0 end-0 h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 dark:bg-red-600"></span>
-              <span className="relative inline-flex items-center justify-center rounded-full h-4 w-4 bg-red-500">{unreadNotifications}</span>
+              <span className="relative inline-flex items-center justify-center rounded-full h-4 w-4 bg-red-500">
+                {unreadNotifications}
+              </span>
             </span>
           )}
         </button>
