@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import EditDropbox from "./EditDropbox";
 import ViewDropbox from "./ViewDropbox";
 import GetBrgy from "../../GETBrgy/getbrgy";
+
 function ViewArchivedModal({ inquiry, setInquiry, brgy }) {
   const [expandedIndexes, setExpandedIndexes] = useState([]);
   const [files, setFiles] = useState([]);

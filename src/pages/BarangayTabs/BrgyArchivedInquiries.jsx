@@ -7,7 +7,7 @@ import imgSrc from "/imgs/bg-header.png";
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import Breadcrumbs from "../../components/barangaytabs/brgyarchivedInquiries/Breadcrumbs";
-import ViewArchivedModal from "../../components/barangaytabs/brgyInquiries/ViewArchived";
+import ViewArchivedModal from "../../components/barangaytabs/brgyInquiries/ViewArchivedModal";
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
@@ -15,6 +15,7 @@ import Tabss from "../../pages/BarangayInfoExt";
 import moment from "moment";
 import noData from "../../assets/image/no-data.png";
 import GetBrgy from "../../components/GETBrgy/getbrgy";
+
 const BrgyArchivedInquiries = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();

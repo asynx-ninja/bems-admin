@@ -46,6 +46,7 @@ import MArchivedServices from "../pages/ArchivedServices";
 import Tooltip from "../pages/login/Tooltip";
 import ArchivedBlotters from "../pages/BarangayTabs/BrgyArchivedBlotters";
 import Blotters from "../pages/BarangayTabs/BrgyBlotters";
+
 const pages = [
   {
     path: "/",

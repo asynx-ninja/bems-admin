@@ -9,7 +9,7 @@ import ReactPaginate from "react-paginate";
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
-import ViewInquiriesModal from "../../components/barangaytabs/brgyinquiries/ViewArchived";
+import ViewInquiriesModal from "../../components/barangaytabs/brgyInquiries/ViewArchivedModal";
 import noData from "../../assets/image/no-data.png";
 import GetBrgy from "../../components/GETBrgy/getbrgy";
 const Inquiries = () => {
