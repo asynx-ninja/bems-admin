@@ -44,6 +44,8 @@ import MArchivedRequests from "../pages/ArchivedRequests";
 import MServices from "../pages/Services";
 import MArchivedServices from "../pages/ArchivedServices";
 import Tooltip from "../pages/login/Tooltip";
+import ArchivedBlotters from "../pages/BarangayTabs/BrgyArchivedBlotters";
+import Blotters from "../pages/BarangayTabs/BrgyBlotters";
 const pages = [
   {
     path: "/",
@@ -182,6 +184,10 @@ const pages = [
   {
     path: "/brgyarchivedservices",
     element: <Navbar comp={<ArchivedServices />} />,
+  },
+  {
+    path: "/brgyarchivedblotters",
+    element: <Navbar comp={<ArchivedBlotters />} />,
   },
   {
     path: "/brgyarchivedservicesreq",
