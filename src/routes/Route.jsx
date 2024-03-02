@@ -6,7 +6,7 @@ import Announcements from "../pages/Events/Announcements";
 import Navbar from "../components/global/Navbar";
 import Inquiries from "../pages/Inquiries";
 import Residents from "../pages/BarangayTabs/BrgyResidents";
-import Information from "../pages/BarangayTabs/Brgyinformation";
+import Information from "../pages/BarangayTabs/BrgyInformation";
 import Settings from "../pages/Settings";
 import Login from "../pages/login/Login";
 import ForgotPassword from "../pages/login/ForgotPassword";
