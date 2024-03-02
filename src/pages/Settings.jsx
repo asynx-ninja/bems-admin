@@ -32,6 +32,7 @@ const Settings = () => {
   const [activeButton, setActiveButton] = useState({
     personal: true,
     credential: false,
+    pass: false,
   });
   const [editButton, setEditButton] = useState(true);
   const [pfp, setPfp] = useState();
@@ -207,128 +208,146 @@ const Settings = () => {
       return; // Prevent further execution of handleSubmit
     }
 
-    setSubmitClicked(true);
-    const obj = {
-      firstName: userData.firstName,
-      middleName: userData.middleName,
-      lastName: userData.lastName,
-      suffix: userData.suffix,
-      religion: userData.religion,
-      email: userData.email,
-      birthday: userData.birthday,
-      age: userData.age,
-      contact: userData.contact,
-      sex: userData.sex,
-      address: {
-        street: userAddress.street,
-        brgy: userAddress.brgy,
-        city: userAddress.city,
-      },
-      occupation: userData.occupation,
-      civil_status: userData.civil_status,
-      type: userData.type,
-      isVoter: userData.isVoter,
-      isHead: userData.isHead,
-      username: userData.username,
-      profile: userData.profile,
-      socials: {
-        facebook: userSocials.facebook,
-        instagram: userSocials.instagram,
-        twitter: userSocials.twitter,
-      },
-    };
-
     try {
-      var formData = new FormData();
-      formData.append("users", JSON.stringify(obj));
-      formData.append("file", pfp);
-      const response = await axios.patch(
-        `${API_LINK}/users/?doc_id=${id}`,
-        formData
+      const result = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${userAddress.brgy}`
       );
+      console.log("wewewesss", userAddress.brgy);
+      if (result.status === 200) {
+        const obj = {
+          firstName: userData.firstName,
+          middleName: userData.middleName,
+          lastName: userData.lastName,
+          suffix: userData.suffix,
+          religion: userData.religion,
+          email: userData.email,
+          birthday: userData.birthday,
+          age: userData.age,
+          contact: userData.contact,
+          sex: userData.sex,
+          address: {
+            street: userAddress.street,
+            brgy: userAddress.brgy,
+            city: userAddress.city,
+          },
+          occupation: userData.occupation,
+          civil_status: userData.civil_status,
+          type: userData.type,
+          isVoter: userData.isVoter,
+          isHead: userData.isHead,
+          username: userData.username,
+          profile: userData.profile,
+          socials: {
+            facebook: userSocials.facebook,
+            instagram: userSocials.instagram,
+            twitter: userSocials.twitter,
+          },
+        };
+        var formData = new FormData();
+        formData.append("users", JSON.stringify(obj));
+        formData.append("file", pfp);
+        const response = await axios.patch(
+          `${API_LINK}/users/?doc_id=${id}&folder_id=${result.data[0].pfp}`,
+          formData
+        );
 
-      // CHANGE USER CREDENTIALS
+        if (activeButton.credential === true) {
+          if (
+            userData.username &&
+            userCred.username &&
+            userData.username !== userCred.username
+          ) {
+            if (!userCred.username || !userCred.oldPass) {
+              setMessage({
+                display: false,
+              });
+              setError("Please provide both the new username and password.");
+              return; // Prevent further execution
+            }
+            changeCredentials(
+              userData.username,
+              userCred.username,
+              userCred.oldPass,
+              userCred.newPass
+            );
+          }
+        } else if (activeButton.pass === true) {
+          if (userCred.newPass !== "" || userCred.oldPass !== "") {
+            if (!userCred.newPass || !userCred.oldPass) {
+              setMessage({
+                display: false,
+              });
+              setError("Please provide both the new username and password.");
+              return; // Prevent further execution
+            }
+            changeCredentials(
+              userData.username,
+              userCred.username,
+              userCred.oldPass,
+              userCred.newPass
+            );
+          }
+        } else if (response.status === 200) {
+          setSubmitClicked(true);
+          setError(null);
+          console.log("Update successful:", response);
+          setUserData(response.data);
+          setUserAddress({
+            street: response.data.address.street,
+            brgy: response.data.address.brgy,
+            city: response.data.address.city,
+          });
+          setUserSocials({
+            facebook: response.data.socials.facebook,
+            instagram: response.data.socials.instagram,
+            twitter: response.data.socials.twitter,
+          });
+          setEditButton(true);
+          setTimeout(() => {
+            setSubmitClicked(false);
+            setUpdatingStatus("success");
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
+          }, 1000);
+        } else {
+          console.error("Update failed. Status:", response.status);
+        }
+      }
 
       // CHANGE USERNAME
-      if (userCred.username !== userData.username) {
-        changeCredentials(
-          userData.username,
-          userCred.username,
-          userCred.oldPass,
-          userCred.newPass
-        );
-      }
-
-      // CHANGE PASSWORD
-      if (userCred.newPass !== "") {
-        changeCredentials(
-          userData.username,
-          userCred.username,
-          userCred.oldPass,
-          userCred.newPass
-        );
-      }
-
-      if (response.status === 200) {
-        console.log("Update successful:", response);
-        setUserData(response.data);
-        setUserAddress({
-          street: response.data.address.street,
-          brgy: response.data.address.brgy,
-          city: response.data.address.city,
-        });
-        setUserSocials({
-          facebook: response.data.socials.facebook,
-          instagram: response.data.socials.instagram,
-          twitter: response.data.socials.twitter,
-        });
-        setEditButton(true);
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 3000);
-        setTimeout(() => {
-          setSubmitClicked(false);
-          setUpdatingStatus("success");
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
-        }, 1000);
-      } else {
-        console.error("Update failed. Status:", response.status);
-        setSubmitClicked(false);
-        setUpdatingStatus(null);
-        setError("An error occurred while updating the info.");
-      }
     } catch (error) {
       console.error("Error saving changes:", error);
       setSubmitClicked(false);
       setUpdatingStatus(null);
-      setError("An error occurred while updating the info.");
+      setError(
+        error.response
+          ? error.response.data.message
+          : "An unknown error occurred"
+      );
     }
   };
-
   const changeCredentials = async (
     oldUsername,
     newUsername,
     oldPassword,
     newPassword
   ) => {
-    setSubmitClicked(true);
-    const user = {
-      username: newUsername !== oldUsername ? newUsername : oldUsername,
-      password: newPassword !== "" ? newPassword : oldPassword,
-    };
-
-    console.log("mm", user);
-
     try {
+      const user = {
+        username: newUsername !== oldUsername ? newUsername : oldUsername,
+        password: newPassword !== "" ? newPassword : oldPassword,
+      };
+
       const response = await axios.get(
         `${API_LINK}/auth/${oldUsername}/${oldPassword}`
       );
 
+      console.log("mm", user);
       console.log(response);
-
       if (response.status === 200) {
+        setSubmitClicked(true);
+        setError(null);
         await axios.patch(`${API_LINK}/auth/${id}`, user);
         setMessage({
           display: true,
@@ -345,6 +364,7 @@ const Settings = () => {
         }, 1000);
       }
     } catch (err) {
+      setError(null);
       setMessage({
         display: true,
         success: false,
@@ -353,7 +373,7 @@ const Settings = () => {
       });
       setSubmitClicked(false);
       setUpdatingStatus(null);
-      setError("An error occurred while updating the info.");
+      // setError("The password you entered is incorrect");
     }
   };
 
@@ -382,11 +402,23 @@ const Settings = () => {
       setActiveButton({
         personal: true,
         credential: false,
+        pass: false,
       });
-    } else {
+    }
+
+    if (e.target.name === "credential") {
       setActiveButton({
         personal: false,
         credential: true,
+        pass: false,
+      });
+    }
+
+    if (e.target.name === "pass") {
+      setActiveButton({
+        personal: false,
+        credential: false,
+        pass: true,
       });
     }
   };
@@ -403,7 +435,7 @@ const Settings = () => {
   };
   return (
     <div>
-      <div className="mx-4 mt-[10rem] lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
+      <div className="mx-4 overflow-y-auto lg:mt-[1rem] mt-0 scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb h-[calc(100vh_-_80px)] lg:h-[calc(100vh_-_90px)]">
         <div className="flex flex-col">
           <div className="relative w-full">
             <div className="relative">
@@ -530,6 +562,18 @@ const Settings = () => {
                   }
                 >
                   Account Info
+                </button>
+
+                <button
+                  name="pass"
+                  onClick={handleOnActive}
+                  className={
+                    activeButton.pass
+                      ? "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-[#295141]  text-white font-medium"
+                      : "sm:text-[14px] md:text-[18px] h-[50px] px-[20px] rounded-md bg-white text-black font-medium transition-all ease-in-out hover:bg-[#295141]  hover:text-white"
+                  }
+                >
+                  Change Password
                 </button>
               </div>
 
@@ -1116,6 +1160,7 @@ const Settings = () => {
                   </div>
                 </div>
               </div>
+
               <div
                 className={
                   activeButton.credential
@@ -1124,6 +1169,32 @@ const Settings = () => {
                 }
               >
                 <div className="flex flex-col w-[80%] justify-center mx-auto gap-4">
+                  {error && (
+                    <div
+                      className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
+                      role="alert"
+                    >
+                      <div className="flex p-4">
+                        <div className="flex-shrink-0">
+                          <svg
+                            className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width={16}
+                            height={16}
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                          </svg>
+                        </div>
+                        <div className="ms-3">
+                          <p className="text-sm text-gray-700 font-medium ">
+                            {error}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div className={message.display ? "block" : "hidden"}>
                     <div
                       className={
@@ -1148,18 +1219,22 @@ const Settings = () => {
                       </p>
                     </div>
                   </div>
-                  <div className={!changePass ? "flex flex-col" : "hidden"}>
+                  <div className="flex flex-col">
                     <label
                       htmlFor="username"
                       className="block sm:text-xs lg:text-sm font-medium mb-2"
                     >
-                      Username
+                      Change Username
                     </label>
                     <input
                       type="text"
                       disabled={editButton}
                       id="username"
-                      className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                      className={`py-3 px-4 block w-full border-2 text-black rounded-md text-sm  bg-white ${
+                        error && !userCred.username.trim()
+                          ? "border-red-500"
+                          : "border-gray-200"
+                      }`}
                       placeholder="username"
                       aria-describedby="hs-input-helper-text"
                       value={userCred.username || ""}
@@ -1167,6 +1242,11 @@ const Settings = () => {
                         handleUserChangeCred("username", e.target.value)
                       }
                     />
+                    {error && !userCred.username.trim() && (
+                      <p className="text-red-500 text-xs italic">
+                        Please enter a username.
+                      </p>
+                    )}
                   </div>
 
                   <div className="relative z-0">
@@ -1174,19 +1254,28 @@ const Settings = () => {
                       htmlFor="oldpass"
                       className="block sm:text-xs lg:text-sm font-medium mb-2"
                     >
-                      Enter your old password
+                      Enter your password
                     </label>
                     <input
                       type={oldpasswordShown ? "text" : "password"}
                       disabled={editButton}
                       id="oldpass"
-                      className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
+                      className={`py-3 px-4 block w-full  text-black rounded-md text-sm border-2 bg-white ${
+                        error && !userCred.oldPass.trim()
+                          ? "border-red-500"
+                          : "border-gray-200"
+                      }`}
                       placeholder="password"
                       aria-describedby="hs-input-helper-text"
                       onChange={(e) =>
                         handleUserChangeCred("oldPass", e.target.value)
                       }
                     />
+                    {error && !userCred.oldPass.trim() && (
+                      <p className="text-red-500 text-xs italic">
+                        Please enter a old password.
+                      </p>
+                    )}
                     <button
                       name="old"
                       type="button"
@@ -1203,88 +1292,8 @@ const Settings = () => {
                       )}
                     </button>
                   </div>
-                  <div className={changePass ? "flex flex-col" : "hidden"}>
-                    <div className="relative z-0">
-                      <label
-                        htmlFor="newpass"
-                        className="block sm:text-xs lg:text-sm font-medium mb-2"
-                      >
-                        Enter your new password
-                      </label>
-                      <input
-                        type={newpasswordShown ? "text" : "password"}
-                        disabled={editButton}
-                        readOnly={userCred.oldPass === ""}
-                        id="newpass"
-                        className="py-3 px-4 block w-full border-gray-200 text-black rounded-md text-sm focus:border-green-500 focus:ring-green-500 bg-white"
-                        placeholder="password"
-                        aria-describedby="hs-input-helper-text"
-                        onChange={(e) =>
-                          handleUserChangeCred("newPass", e.target.value)
-                        }
-                      />
-                      <button
-                        name="new"
-                        type="button"
-                        onClick={toggleNewPassword}
-                        className="absolute right-2 sm:top-5 lg:top-7 p-2.5 mt-1 text-sm font-medium text-white"
-                      >
-                        {newpasswordShown ? (
-                          <AiOutlineEye style={{ color: "green" }} size={20} />
-                        ) : (
-                          <AiOutlineEyeInvisible
-                            style={{ color: "green" }}
-                            size={20}
-                          />
-                        )}
-                      </button>
-                    </div>
-                    <div>
-                      {userCred.newPass && (
-                        <div className="flex w-full h-1.5 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700">
-                          <div
-                            className={`flex flex-col justify-center overflow-hidden ${
-                              passwordStrength < 25
-                                ? "bg-red-500"
-                                : passwordStrength < 50
-                                ? "bg-yellow-500"
-                                : passwordStrength < 75
-                                ? "bg-amber-500"
-                                : passwordStrength < 100
-                                ? "bg-blue-500"
-                                : "bg-green-500"
-                            }`}
-                            role="progressbar"
-                            style={{ width: `${passwordStrength}%` }}
-                            aria-valuenow={passwordStrength}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                          />
-                        </div>
-                      )}
-                      {passwordStrengthSuccess && (
-                        <div
-                          className="bg-green-50 border border-green-200 text-sm text-green-600 rounded-md p-4 mt-2"
-                          role="alert"
-                        >
-                          <span className="font-bold">Sucess:</span> Password is
-                          already strong
-                        </div>
-                      )}
-                      {passwordStrengthError && passwordStrength < 100 && (
-                        <div
-                          className="bg-orange-50 border border-orange-200 text-sm text-orange-600 rounded-md p-4 mt-2"
-                          role="alert"
-                        >
-                          <span className="font-bold">Warning:</span> Password
-                          must contain at least 8 characters, one uppercase
-                          letter, one lowercase letter, one number, and one
-                          special character
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className={editButton ? "hidden" : "mx-auto"}>
+
+                  {/* <div className={editButton ? "hidden" : "mx-auto"}>
                     <button
                       className={
                         changePass
@@ -1305,6 +1314,167 @@ const Settings = () => {
                     >
                       Change Password
                     </button>
+                  </div> */}
+                </div>
+              </div>
+              <div className={activeButton.pass ? "flex flex-col" : "hidden"}>
+                <div className=" shadow-lg px-[100px] pb-[30px] ">
+                  {error && (
+                    <div
+                      className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
+                      role="alert"
+                    >
+                      <div className="flex p-4">
+                        <div className="flex-shrink-0">
+                          <svg
+                            className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width={16}
+                            height={16}
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                          </svg>
+                        </div>
+                        <div className="ms-3">
+                          <p className="text-sm text-gray-700 font-medium ">
+                            {error}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="relative z-0">
+                    <label
+                      htmlFor="oldpass"
+                      className="block sm:text-xs lg:text-sm font-medium mb-2"
+                    >
+                      Enter your current password
+                    </label>
+                    <input
+                      type={oldpasswordShown ? "text" : "password"}
+                      disabled={editButton}
+                      id="oldpass"
+                      className={`py-3 px-4 block w-full  text-black rounded-md text-sm border-2 bg-white ${
+                        error && !userCred.oldPass.trim()
+                          ? "border-red-500"
+                          : "border-gray-200"
+                      }`}
+                      placeholder="password"
+                      aria-describedby="hs-input-helper-text"
+                      onChange={(e) =>
+                        handleUserChangeCred("oldPass", e.target.value)
+                      }
+                    />
+                    {error && !userCred.oldPass.trim() && (
+                      <p className="text-red-500 text-xs italic">
+                        Please enter a old password.
+                      </p>
+                    )}
+                    <button
+                      name="old"
+                      type="button"
+                      onClick={toggleOldPassword}
+                      className="absolute right-2 sm:top-5 lg:top-7 p-2.5 mt-1 text-sm font-medium text-white"
+                    >
+                      {oldpasswordShown ? (
+                        <AiOutlineEye style={{ color: "green" }} size={20} />
+                      ) : (
+                        <AiOutlineEyeInvisible
+                          style={{ color: "green" }}
+                          size={20}
+                        />
+                      )}
+                    </button>
+                  </div>
+                  <div className="relative z-0">
+                    <label
+                      htmlFor="newpass"
+                      className="block sm:text-xs lg:text-sm font-medium mb-2"
+                    >
+                      Enter your new password
+                    </label>
+                    <input
+                      type={newpasswordShown ? "text" : "password"}
+                      disabled={editButton}
+                      readOnly={userCred.oldPass === ""}
+                      id="newpass"
+                      className={`py-3 px-4 block w-full  text-black rounded-md text-sm border-2 bg-white ${
+                        error && !userCred.newPass.trim()
+                          ? "border-red-500"
+                          : "border-gray-200"
+                      }`}
+                      placeholder="password"
+                      aria-describedby="hs-input-helper-text"
+                      onChange={(e) =>
+                        handleUserChangeCred("newPass", e.target.value)
+                      }
+                    />
+                    {error && !userCred.newPass.trim() && (
+                      <p className="text-red-500 text-xs italic">
+                        Please enter a new password.
+                      </p>
+                    )}
+                    <button
+                      name="new"
+                      type="button"
+                      onClick={toggleNewPassword}
+                      className="absolute right-2 sm:top-5 lg:top-7 p-2.5 mt-1 text-sm font-medium text-white"
+                    >
+                      {newpasswordShown ? (
+                        <AiOutlineEye style={{ color: "green" }} size={20} />
+                      ) : (
+                        <AiOutlineEyeInvisible
+                          style={{ color: "green" }}
+                          size={20}
+                        />
+                      )}
+                    </button>
+                  </div>
+                  <div>
+                    {userCred.newPass && (
+                      <div className="flex w-full h-1.5 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700">
+                        <div
+                          className={`flex flex-col justify-center overflow-hidden ${
+                            passwordStrength < 25
+                              ? "bg-red-500"
+                              : passwordStrength < 50
+                              ? "bg-yellow-500"
+                              : passwordStrength < 75
+                              ? "bg-amber-500"
+                              : passwordStrength < 100
+                              ? "bg-blue-500"
+                              : "bg-green-500"
+                          }`}
+                          role="progressbar"
+                          style={{ width: `${passwordStrength}%` }}
+                          aria-valuenow={passwordStrength}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        />
+                      </div>
+                    )}
+                    {passwordStrengthSuccess && (
+                      <div
+                        className="bg-green-50 border border-green-200 text-sm text-green-600 rounded-md p-4 mt-2"
+                        role="alert"
+                      >
+                        <span className="font-bold">Sucess:</span> Password is
+                        already strong
+                      </div>
+                    )}
+                    {passwordStrengthError && passwordStrength < 100 && (
+                      <div
+                        className="bg-orange-50 border border-orange-200 text-sm text-orange-600 rounded-md p-4 mt-2"
+                        role="alert"
+                      >
+                        <span className="font-bold">Warning:</span> Password
+                        must contain at least 8 characters, one uppercase
+                        letter, one lowercase letter, one number, and one
+                        special character
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1330,10 +1500,10 @@ const Settings = () => {
                 Save
               </button>
               <button
-               onClick={() => {
-                handleOnEdit({ target: { name: "cancel" } });
-                resetForm();
-              }}
+                onClick={() => {
+                  handleOnEdit({ target: { name: "cancel" } });
+                  resetForm();
+                }}
                 name="cancel"
                 className="bg-custom-red-button text-white font-medium px-[20px] py-[5px] rounded-md"
               >

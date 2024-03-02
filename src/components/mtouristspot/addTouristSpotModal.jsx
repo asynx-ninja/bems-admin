@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Dropbox from "./Dropbox";
 import API_LINK from "../../config/API";
 import AddLoader from "./loaders/AddLoader";
-function AddTouristSpot({ section }) {
+function AddTouristSpot({ brgy, section }) {
   const [submitClicked, setSubmitClicked] = useState(false);
   const [creationStatus, setCreationStatus] = useState(null);
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ function AddTouristSpot({ section }) {
     section: section,
     name: "",
     details: "",
-    brgy: "",
+    brgy: brgy,
   });
   const [images, setImages] = useState([]);
 
@@ -45,14 +45,19 @@ function AddTouristSpot({ section }) {
       if (
         !touristSpot.name.trim() ||
         !touristSpot.details.trim() ||
-        !touristSpot.brgy.trim() ||
         images.length === 0
       ) {
         setError("Please fill out all required fields.");
         return; // Prevent further execution of handleSubmit
       }
       setSubmitClicked(true);
+      setError(null)
 
+      const response = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${brgy}`
+      );
+
+    if (response.status === 200){
       let formData = new FormData();
 
       images.forEach((image) => {
@@ -65,7 +70,7 @@ function AddTouristSpot({ section }) {
 
       formData.append("touristspot", JSON.stringify(touristSpot));
 
-      const result = await axios.post(`${API_LINK}/tourist_spot`, formData);
+      const result = await axios.post(`${API_LINK}/tourist_spot/?folder_id=${response.data[0].tourist_spot}`, formData);
 
       if (result.status === 200) {
         settouristSpot({
@@ -81,6 +86,7 @@ function AddTouristSpot({ section }) {
           window.location.reload();
         }, 3000);
       }
+    }
     } catch (err) {
       console.log(err);
       setSubmitClicked(false);
@@ -168,7 +174,7 @@ function AddTouristSpot({ section }) {
                   </p>
                 )}
               </div>
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <label
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="name"
@@ -191,7 +197,7 @@ function AddTouristSpot({ section }) {
                     Please enter a brgy location.
                   </p>
                 )}
-              </div>
+              </div> */}
 
               <div className="mb-4">
                 <label

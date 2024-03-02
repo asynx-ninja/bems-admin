@@ -25,7 +25,7 @@ function ReplyLoader({ replyingStatus, error }) {
   }, [replyingStatus]);
 
   return (
-    <div className="absolute top-0 lg:top-0 lg:end-0 mb-20 lg:mr-5 z-[80]">
+    <div className="absolute top-0 lg:top-10 lg:end-0 mb-20 lg:mr-5 z-[80]">
     <div
       className="w-screen md:w-auto bg-[#295141] border border-gray-200 rounded-xl shadow-lg"
       role="alert"

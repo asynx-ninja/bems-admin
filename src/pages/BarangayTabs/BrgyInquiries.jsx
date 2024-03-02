@@ -3,27 +3,26 @@ import { Link } from "react-router-dom";
 import { AiOutlineStop, AiOutlineEye } from "react-icons/ai";
 import { FaArchive } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
-import { BsPrinter } from "react-icons/bs";
-import ViewInquiry from "../../components/barangaytabs/brgyInquiries/ViewArchived";
+import moment from "moment";
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import axios from "axios";
 import API_LINK from "../../config/API";
 import { useSearchParams } from "react-router-dom";
-import moment from "moment";
+import ViewInquiriesModal from "../../components/barangaytabs/brgyinquiries/ViewArchived";
 import noData from "../../assets/image/no-data.png";
+import GetBrgy from "../../components/GETBrgy/getbrgy";
 const Inquiries = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
   const brgy = searchParams.get("brgy");
-  const to = "Staff";
   const [inquiries, setInquiries] = useState([]);
-  const [inquiry, setInquiry] = useState([]);
-
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [sortColumn, setSortColumn] = useState(null);
-
+  const [inquiry, setInquiry] = useState({
+    compose: { file: [] },
+    response: [{ file: [] }],
+  });
+  const information = GetBrgy(brgy);
   //status filtering
   const [status, setStatus] = useState({});
   const [statusFilter, setStatusFilter] = useState("all");
@@ -39,41 +38,32 @@ const Inquiries = () => {
   const [specifiedDate, setSpecifiedDate] = useState(new Date());
   const [selected, setSelected] = useState("date");
   const [filteredInquiries, setFilteredInquiries] = useState([]);
-
-
-  const handleSort = (sortBy) => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    setSortColumn(sortBy);
-
-    const sortedData = inquiries.slice().sort((a, b) => {
-      if (sortBy === "inquiries_id") {
-        return newSortOrder === "asc"
-          ? a.inquiries_id.localeCompare(b.inquiries_id)
-          : b.inquiries_id.localeCompare(a.inquiries_id);
-      } else if (sortBy === "lastName") {
-        return newSortOrder === "asc"
-          ? a.lastName.localeCompare(b.lastName)
-          : b.lastName.localeCompare(a.lastName);
-      } else if (sortBy === "isApproved") {
-        const order = { Completed: 1, "In Progress": 2, "Not Responded": 3 };
-        return newSortOrder === "asc"
-          ? order[a.isApproved] - order[b.isApproved]
-          : order[b.isApproved] - order[a.isApproved];
-      }
-
-      return 0;
-    });
-
-    setInquiries(sortedData);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const isLatestResponseResident = (inquiry) => {
+    const { response, isApproved } = inquiry;
+    if (response && response.length > 0) {
+      const latestResponse = response[response.length - 1];
+      return (
+        latestResponse.type === "Resident" &&
+        !["Completed"].includes(isApproved)
+      );
+    }
+    return false;
   };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowTooltip((prev) => !prev);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     document.title = "Inquiries | Barangay E-Services Management";
 
     const fetchInquiries = async () => {
       const response = await axios.get(
-        `${API_LINK}/inquiries/staffinquiries/?id=${id}&brgy=${brgy}&archived=false&status=${statusFilter}&page=${currentPage}`
+        `${API_LINK}/inquiries/staffinquiries/?id=${id}&brgy=${brgy}&archived=false&status=${statusFilter}&page=${currentPage}&label=Staff`
       );
       console.log("API URL:");
 
@@ -89,35 +79,65 @@ const Inquiries = () => {
     fetchInquiries();
   }, [id, brgy, statusFilter, currentPage]);
 
-
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
 
-  console.log(inquiries);
+  console.log("inquiries: ", filteredInquiries);
+
+  const checkboxHandler = (e) => {
+    let isSelected = e.target.checked;
+    let value = e.target.value;
+
+    if (isSelected) {
+      setSelectedItems([...selectedItems, value]);
+    } else {
+      setSelectedItems((prevData) => {
+        return prevData.filter((id) => {
+          return id !== value;
+        });
+      });
+    }
+  };
+
+  const checkAllHandler = () => {
+    const inquiriesToCheck = Inquiries.length > 0 ? Inquiries : inquiries;
+
+    if (inquiriesToCheck.length === selectedItems.length) {
+      setSelectedItems([]);
+    } else {
+      const postIds = inquiriesToCheck.map((item) => {
+        return item._id;
+      });
+
+      setSelectedItems(postIds);
+    }
+  };
 
   const tableHeader = [
     "name",
     "e-mail",
+    "message",
     "date",
     "status",
     "actions",
   ];
-
-  useEffect(() => {
-    document.title = "Inquiries | Barangay E-Services Management";
-  }, []);
 
   const DateFormat = (date) => {
     const dateFormat = date === undefined ? "" : date.substr(0, 10);
     return dateFormat;
   };
 
+  const TimeFormat = (date) => {
+    if (!date) return "";
+
+    const formattedTime = moment(date).format("hh:mm A");
+    return formattedTime;
+  };
+
   const handleView = (item) => {
     setInquiry(item);
   };
-
-
 
   const handleStatusFilter = (status) => {
     setStatusFilter(status);
@@ -125,7 +145,8 @@ const Inquiries = () => {
 
   const handleResetFilter = () => {
     setStatusFilter("all");
-    setFilteredInquiries([]);
+    setSearchQuery("");
+    setFilteredInquiries();
   };
 
   const filters = (choice, selectedDate) => {
@@ -135,9 +156,9 @@ const Inquiries = () => {
           console.log(typeof new Date(item.compose.date), selectedDate);
           return (
             new Date(item.compose.date).getFullYear() ===
-            selectedDate.getFullYear() &&
+              selectedDate.getFullYear() &&
             new Date(item.compose.date).getMonth() ===
-            selectedDate.getMonth() &&
+              selectedDate.getMonth() &&
             new Date(item.compose.date).getDate() === selectedDate.getDate()
           );
         });
@@ -152,7 +173,7 @@ const Inquiries = () => {
         return inquiries.filter(
           (item) =>
             new Date(item.compose.date).getFullYear() ===
-            startDate.getFullYear() &&
+              startDate.getFullYear() &&
             new Date(item.compose.date).getMonth() === startDate.getMonth() &&
             new Date(item.compose.date).getDate() >= startDate.getDate() &&
             new Date(item.compose.date).getDate() <= endDate.getDate()
@@ -161,7 +182,7 @@ const Inquiries = () => {
         return inquiries.filter(
           (item) =>
             new Date(item.compose.date).getFullYear() ===
-            selectedDate.getFullYear() &&
+              selectedDate.getFullYear() &&
             new Date(item.compose.date).getMonth() === selectedDate.getMonth()
         );
       case "year":
@@ -213,13 +234,16 @@ const Inquiries = () => {
 
   return (
     <div className="">
-      {/* Body */}
-      <div>
-        {/* Header */}
-        <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
-          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
+      <div className="flex flex-col ">
+        <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
+          <div
+            className="sm:mt-5 md:mt-4 lg:mt-0  py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]  bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]"
+            style={{
+              background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+            }}
+          >
             <h1
-              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-[2.1rem] xxxl:text-4xl xxxl:mt-1 text-white"
+              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[15px] xl:text-xl xxl:text-2xl xxxl:text-4xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
               INQUIRIES
@@ -232,7 +256,10 @@ const Inquiries = () => {
                   <div className="hs-tooltip inline-block w-full">
                     <button
                       type="button"
-                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm text-center inline-flex items-center"
+                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg  w-full text-white font-medium text-sm text-center inline-flex items-center  bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]"
+                      style={{
+                        background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+                      }}
                     >
                       <FaArchive size={24} style={{ color: "#ffffff" }} />
                       <span className="sm:block md:hidden sm:pl-5">
@@ -260,7 +287,8 @@ const Inquiries = () => {
                 <button
                   id="hs-dropdown"
                   type="button"
-                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                  className=" sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm bg-[#295141] "
+                  style={{ backgroundColor: information?.theme?.primary }}
                 >
                   STATUS
                   <svg
@@ -320,7 +348,8 @@ const Inquiries = () => {
                 <button
                   id="hs-dropdown"
                   type="button"
-                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                  className=" sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm bg-[#295141] "
+                  style={{ backgroundColor: information?.theme?.primary }}
                 >
                   DATE
                   <svg
@@ -410,9 +439,13 @@ const Inquiries = () => {
                 </ul>
               </div>
             </div>
+
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">
-                <button className=" bg-[#295141] p-3 rounded-l-md">
+                <button
+                  className="  p-3 rounded-l-md bg-[#295141]"
+                  style={{ backgroundColor: information?.theme?.primary }}
+                >
                   <div className="w-full overflow-hidden">
                     <svg
                       className="h-3.5 w-3.5 text-white"
@@ -436,29 +469,36 @@ const Inquiries = () => {
                   type="text"
                   name="hs-table-with-pagination-search"
                   id="hs-table-with-pagination-search"
-                  className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500 "
+                  className="sm:px-3 sm:py-1 md:px-3 md:py-1 block w-full text-black border-gray-200 rounded-r-md text-sm focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Search for items"
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    const Inquiries = inquiries.filter((item) =>
-                      item.name
-                        .toLowerCase()
-                        .includes(e.target.value.toLowerCase())
+                    const Inquiries = inquiries.filter(
+                      (item) =>
+                        item.name
+                          .toLowerCase()
+                          .includes(e.target.value.toLowerCase()) ||
+                        item.inq_id
+                          .toLowerCase()
+                          .includes(e.target.value.toLowerCase())
                     );
 
                     setFilteredInquiries(Inquiries);
                   }}
                 />
               </div>
-
+            
             </div>
           </div>
         </div>
 
-        <div className="overflow-y-auto sm:overflow-x-auto h-[calc(100vh_-_270px)] xxxl:h-[calc(100vh_-_286px)]">
-          <table className="w-full ">
-            <thead className="bg-[#295141] sticky top-0">
+        <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll lg:overflow-x-hidden h-[calc(100vh_-_280px)] xxxl:h-[calc(100vh_-_300px)]">
+          <table className="relative table-auto w-full">
+            <thead
+              className=" sticky top-0 bg-[#295141]"
+              style={{ backgroundColor: information?.theme?.primary }}
+            >
               <tr className="">
                 {tableHeader.map((item, idx) => (
                   <th
@@ -472,65 +512,56 @@ const Inquiries = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-              {filteredInquiries.length === 0 ? (
-                <tr>
-                <td
-                  colSpan={tableHeader.length + 1}
-                  className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
-                >
-                  <img
-                    src={noData}
-                    alt=""
-                    className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
-                  />
-                  <strong className="text-[#535353]">NO DATA FOUND</strong>
-                </td>
-              </tr>
-              ) : (
+              {filteredInquiries.length > 0 ? (
                 filteredInquiries.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
-
-                    <td className="px-6 py-3">
+                    <td className="xl:px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
                           {item.name}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-3">
+                    <td className="xl:px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
                           {item.email}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-3">
+                    <td className="px-2 xl:px-6 py-3">
+                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
+                        {item.compose.message}
+                      </span>
+                    </td>
+                    <td className="xl:px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {DateFormat(item.compose.date) || ""}
+                          {moment(item.compose.date).format("MMMM DD, YYYY")} -{" "}
+                          {TimeFormat(item.compose.date) || ""}
                         </span>
                       </div>
                     </td>
 
-                    <td className="px-6 py-3 xxl:w-4/12">
+                    <td className="xl:px-6 py-3 xxl:w-2/12">
                       <div className="flex justify-center items-center">
                         {item.isApproved === "Completed" && (
                           <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
-                            <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            <span className="text-xs sm:text-sm font-bold text-white p-3 xl:mx-5">
                               COMPLETED
                             </span>
                           </div>
                         )}
                         {item.isApproved === "Pending" && (
                           <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
-                            <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            <span className="text-xs sm:text-sm font-bold text-white p-3 xl:mx-5">
                               PENDING
                             </span>
                           </div>
                         )}
                         {item.isApproved === "In Progress" && (
                           <div className="flex w-full items-center justify-center bg-custom-amber m-2 rounded-lg">
-                            <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            <span className="text-xs sm:text-sm font-bold text-white p-3 xl:mx-5">
                               IN PROGRESS
                             </span>
                           </div>
@@ -538,9 +569,20 @@ const Inquiries = () => {
                       </div>
                     </td>
 
-                    <td className="px-6 py-3">
+                    <td className="xl:px-6 py-3">
                       <div className="flex justify-center space-x-1 sm:space-x-none">
                         <div className="hs-tooltip inline-block">
+                          {isLatestResponseResident(item) && (
+                            <span className="tooltip   inline-block relative -top-9 left-8 z-10">
+                              <span className="absolute inline-flex rounded-full bg-red-500 text-white h-3 w-3"></span>
+                              <span className="absolute animate-ping inline-flex rounded-full bg-red-500 text-white h-3 w-3"></span>
+                              {showTooltip && (
+                                <span className="tooltiptext bg-red-500 text-white text-xs py-1 px-2 rounded absolute -left-full top-1/2 transform -translate-y-1/2 -translate-x-full whitespace-nowrap">
+                                  You have a new reply
+                                </span>
+                              )}
+                            </span>
+                          )}
                           <button
                             type="button"
                             data-hs-overlay="#hs-modal-viewArchived"
@@ -552,6 +594,7 @@ const Inquiries = () => {
                               style={{ color: "#ffffff" }}
                             />
                           </button>
+
                           <span
                             className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                             role="tooltip"
@@ -563,44 +606,49 @@ const Inquiries = () => {
                     </td>
                   </tr>
                 ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center sm:h-[18.7rem] xl:py-1 lg:h-[20rem] xxl:py-32 xl:h-[20rem]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className=" w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-[15rem] xl:w-80 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
-        <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
+        <div
+          className="md:py-4 md:px-4  flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3 bg-[#295141]"
+          style={{ backgroundColor: information?.theme?.primary }}
+        >
           <span className="font-medium text-white sm:text-xs text-sm">
             Showing {currentPage + 1} out of {pageCount} pages
           </span>
           <ReactPaginate
             breakLabel="..."
-            nextLabel={
-              pageCount > currentPage + 1 ? (
-                <span className="text-white">&gt;&gt;</span>
-              ) : (
-                <span className="text-gray-300 cursor-not-allowed">
-                  &gt;&gt;
-                </span>
-              )
-            }
+            nextLabel=">>"
             onPageChange={handlePageChange}
             pageRangeDisplayed={3}
             pageCount={pageCount}
-            previousLabel={
-              currentPage > 0 ? (
-                <span className="text-white"> &lt;&lt;</span>
-              ) : (
-                <span className="text-gray-300 cursor-not-allowed">
-                  &lt;&lt;
-                </span>
-              )
-            }
+            previousLabel="<<"
             className="flex space-x-3 text-white font-bold"
             activeClassName="text-yellow-500"
-            disabledLinkClassName="text-gray-300"
+            disabledLinkClassName="text-gray-400"
             renderOnZeroPageCount={null}
           />
         </div>
-        <ViewInquiry inquiry={inquiry} setInquiry={setInquiry} />
+        <ViewInquiriesModal
+          inquiry={inquiry}
+          setInquiry={setInquiry}
+          brgy={brgy}
+        />
       </div>
     </div>
   );

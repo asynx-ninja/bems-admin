@@ -8,14 +8,14 @@ import { CiImageOn } from "react-icons/ci";
 import AddLoader from "./loaders/AddLoader";
 import { MdError } from "react-icons/md";
 import ErrorPopup from "./popup/ErrorPopup";
-
+import moment from "moment";
 function CreateAnnouncementModal({ brgy }) {
   const [announcement, setAnnouncement] = useState({
     title: "",
     details: "",
     date: "",
     brgy: brgy,
-    isOpen: false,
+    isOpen: true,
   });
 
   const [logo, setLogo] = useState();
@@ -24,14 +24,12 @@ function CreateAnnouncementModal({ brgy }) {
   const [submitClicked, setSubmitClicked] = useState(false);
   const [creationStatus, setCreationStatus] = useState(null);
   const [error, setError] = useState(null);
-  const [emptyFields, setEmptyFields] = useState([]);
   const [empty, setEmpty] = useState(false);
-  const navigate = useNavigate();
 
   const handleLogoChange = (e) => {
     setLogo(e.target.files[0]);
 
-    var output = document.getElementById("logo");
+    var output = document.getElementById("add_logo");
     output.src = URL.createObjectURL(e.target.files[0]);
     output.onload = function () {
       URL.revokeObjectURL(output.src); // free memory
@@ -41,7 +39,7 @@ function CreateAnnouncementModal({ brgy }) {
   const handleBannerChange = (e) => {
     setBanner(e.target.files[0]);
 
-    var output = document.getElementById("banner");
+    var output = document.getElementById("add_banner");
     output.src = URL.createObjectURL(e.target.files[0]);
     output.onload = function () {
       URL.revokeObjectURL(output.src); // free memory
@@ -72,19 +70,39 @@ function CreateAnnouncementModal({ brgy }) {
     setLogo(null);
     setBanner(null);
     setFiles([]);
+    setError(null);
   };
 
+  const getType = (type) => {
+    switch (type) {
+      case "MUNISIPYO":
+        return "Municipality";
+      default:
+        return "Barangay";
+    }
+  };
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      setSubmitClicked(true);
-      const emptyFieldsArr = checkEmptyFieldsForAnnouncement();
-
-      if (emptyFieldsArr.length > 0) {
-        setEmpty(true);
-        setSubmitClicked(false);
-        return;
+      if (
+        !announcement.title.trim() ||
+        !announcement.details.trim() ||
+        !announcement.date.trim() ||
+        !files ||
+        !banner ||
+        !logo
+      ) {
+        setError("Please fill out all required fields.");
+        return; // Prevent further execution of handleSubmit
       }
+      setSubmitClicked(true);
+      // const emptyFieldsArr = checkEmptyFieldsForAnnouncement();
+
+      // if (emptyFieldsArr.length > 0) {
+      //   setEmpty(true);
+      //   setSubmitClicked(false);
+      //   return;
+      // }
 
       const formData = new FormData();
       const newFiles = [banner, logo, ...files].filter((file) => file);
@@ -103,15 +121,59 @@ function CreateAnnouncementModal({ brgy }) {
 
       formData.append("announcement", JSON.stringify(obj));
 
-      const result = await axios.post(`${API_LINK}/announcement/`, formData);
+      const res_folder = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${brgy}`
+      );
+      console.log(res_folder);
+      if (res_folder.status === 200) {
+        const response = await axios.post(
+          `${API_LINK}/announcement/?event_folder_id=${res_folder.data[0].events}`,
+          formData
+        );
 
-      if (result.status === 200) {
-        clearForm();
-        setSubmitClicked(false);
-        setCreationStatus("success");
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
+        if (response.status === 200) {
+          let notify;
+
+          const formattedDate = moment(announcement.date).format(
+            "MMMM Do YYYY, h:mm:ss a"
+          );
+          notify = {
+            category: "All",
+            compose: {
+              subject: `EVENT - ${announcement.title}`,
+              message: `Barangay ${brgy} has posted a new event named: ${announcement.title}.\n\n
+              
+              Event Details:\n 
+              ${announcement.details}\n\n
+  
+              Event Date:
+              ${formattedDate}\n\n
+              `,
+              go_to: "Events",
+            },
+            target: {
+              user_id: null,
+              area: null,
+            },
+            type: getType(brgy),
+            banner: response.data.collections.banner,
+            logo: response.data.collections.logo,
+          };
+
+          const result = await axios.post(`${API_LINK}/notification/`, notify, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          if (result.status === 200) {
+            clearForm();
+            setSubmitClicked(false);
+            setCreationStatus("success");
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
+          }
+        }
       }
     } catch (err) {
       console.error(err);
@@ -121,17 +183,17 @@ function CreateAnnouncementModal({ brgy }) {
     }
   };
 
-  const checkEmptyFieldsForAnnouncement = () => {
-    let arr = [];
-    const keysToCheck = ["title", "details", "date"];
-    for (const key of keysToCheck) {
-      if (announcement[key] === "") {
-        arr.push(key);
-      }
-    }
-    setEmptyFields(arr);
-    return arr;
-  };
+  // const checkEmptyFieldsForAnnouncement = () => {
+  //   let arr = [];
+  //   const keysToCheck = ["title", "details", "date"];
+  //   for (const key of keysToCheck) {
+  //     if (announcement[key] === "") {
+  //       arr.push(key);
+  //     }
+  //   }
+  //   setEmptyFields(arr);
+  //   return arr;
+  // };
 
   return (
     <div>
@@ -148,11 +210,37 @@ function CreateAnnouncementModal({ brgy }) {
                 className="font-bold text-white mx-auto md:text-xl text-center"
                 style={{ letterSpacing: "0.3em" }}
               >
-                CREATE BARANGAY EVENT
+                CREATE MUNICIPALITY EVENT
               </h3>
             </div>
 
             <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb flex flex-col mx-auto w-full py-5 px-5 overflow-y-auto relative h-[470px]">
+              {error && (
+                <div
+                  className="max-w-full border-2 mb-4 border-[#bd4444] rounded-xl shadow-lg bg-red-300"
+                  role="alert"
+                >
+                  <div className="flex p-4">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="flex-shrink-0 h-4 w-4 text-red-600 mt-0.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={16}
+                        height={16}
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                      </svg>
+                    </div>
+                    <div className="ms-3">
+                      <p className="text-sm text-gray-700 font-medium ">
+                        {error}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="flex mb-4 w-full flex-col md:flex-row sm:space-x-0 md:space-x-2 sm:space-y-2 md:space-y-0">
                 <div className="w-full">
                   <label
@@ -167,7 +255,7 @@ function CreateAnnouncementModal({ brgy }) {
                         className={`${
                           logo ? "" : "hidden"
                         } w-[200px] md:w-[250px]  lg:w-full md:h-[140px] lg:h-[250px] object-cover`}
-                        id="logo"
+                        id="add_logo"
                         alt="Current profile photo"
                       />{" "}
                       <CiImageOn
@@ -175,7 +263,11 @@ function CreateAnnouncementModal({ brgy }) {
                         className={`${!logo ? "" : "hidden"} mx-auto`}
                       />
                     </div>
-                    <label className="w-full bg-white border border-gray-300">
+                    <label
+                      className={`w-full bg-white border   ${
+                        error && !logo ? " border-red-500" : "border-gray-300"
+                      }`}
+                    >
                       <span className="sr-only">Choose logo photo</span>
                       <input
                         type="file"
@@ -187,6 +279,11 @@ function CreateAnnouncementModal({ brgy }) {
                       />
                     </label>
                   </div>
+                  {error && !logo && (
+                    <p className="text-red-500 text-xs italic">
+                      Please select logo image.
+                    </p>
+                  )}
                 </div>
                 <div className="w-full">
                   <label
@@ -201,7 +298,7 @@ function CreateAnnouncementModal({ brgy }) {
                         className={`${
                           banner ? "" : "hidden"
                         } w-[200px] md:w-[250px]  lg:w-full md:h-[140px] lg:h-[250px] object-cover`}
-                        id="banner"
+                        id="add_banner"
                         alt="Current profile photo"
                       />{" "}
                       <CiImageOn
@@ -209,7 +306,11 @@ function CreateAnnouncementModal({ brgy }) {
                         className={`${!banner ? "" : "hidden"} mx-auto`}
                       />
                     </div>
-                    <label className="w-full bg-white border border-gray-300">
+                    <label
+                      className={`w-full bg-white border   ${
+                        error && !banner ? " border-red-500" : "border-gray-300"
+                      }`}
+                    >
                       <span className="sr-only">Choose banner photo</span>
                       <input
                         type="file"
@@ -221,9 +322,15 @@ function CreateAnnouncementModal({ brgy }) {
                       />
                     </label>
                   </div>
+                  {error && !banner && (
+                    <p className="text-red-500 text-xs italic">
+                      Please select banner image.
+                    </p>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center justify-between mb-2">
+
+              {/* <div className="flex items-center justify-between mb-2">
                 <label className="block sm:text-xs lg:text-sm text-gray-700 font-bold">
                   OPEN FOR ALL?
                 </label>
@@ -234,24 +341,25 @@ function CreateAnnouncementModal({ brgy }) {
                     onChange={handleChange}
                     defaultChecked={announcement.isOpen}
                     className="sr-only peer"
+                    disabled
                   />
                   <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-400 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-800" />
                 </label>
-              </div>
+              </div> */}
               <div className="mb-4">
                 <label
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="title"
                 >
-                  Announcement Title
+                  Event Title
                 </label>
                 <input
                   id="title"
-                  className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
-                    emptyFields.includes("details")
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    error && !announcement.title
                       ? "border-red-500"
                       : "border-gray-300"
-                  } focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline`}
+                  }`}
                   name="title"
                   type="text"
                   value={announcement.title}
@@ -259,6 +367,11 @@ function CreateAnnouncementModal({ brgy }) {
                   placeholder="Announcement title"
                   required
                 />
+                {error && !announcement.title && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter a title.
+                  </p>
+                )}
               </div>
               <div className="mb-4">
                 <label
@@ -273,14 +386,19 @@ function CreateAnnouncementModal({ brgy }) {
                   name="details"
                   value={announcement.details}
                   onChange={handleChange}
-                  className={`block p-2.5 w-full text-sm text-gray-700 rounded-lg border ${
-                    emptyFields.includes("details")
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
+                    error && !announcement.details
                       ? "border-red-500"
                       : "border-gray-300"
-                  } focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline`}
+                  }`}
                   placeholder="Enter announcement details..."
                   required
                 />
+                {error && !announcement.details && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter a details.
+                  </p>
+                )}
               </div>
               <div className="mb-4">
                 <label
@@ -291,7 +409,9 @@ function CreateAnnouncementModal({ brgy }) {
                 </label>
                 <input
                   className={`shadow appearance-none border w-full p-1 text-sm text-black rounded-lg focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline ${
-                    emptyFields.includes("date") && "border-red-500"
+                    error && !announcement.date
+                      ? "border-red-500"
+                      : "border-gray-300"
                   }`}
                   id="date"
                   name="date"
@@ -300,12 +420,19 @@ function CreateAnnouncementModal({ brgy }) {
                   onChange={handleChange}
                   required
                 />
+                {error && !announcement.date && (
+                  <p className="text-red-500 text-xs italic">
+                    Please enter a date.
+                  </p>
+                )}
               </div>
               <Dropbox
                 files={files}
                 setFiles={setFiles}
                 handleFileChange={handleFileChange}
                 handleSubmit={handleSubmit}
+                error={error}
+                isEmpty={files.length === 0}
               />
             </div>
             <div className="flex justify-center items-center gap-x-2 py-3 px-6 dark:border-gray-700">
@@ -329,15 +456,13 @@ function CreateAnnouncementModal({ brgy }) {
             </div>
           </div>
         </div>
-        {empty && (
-        <ErrorPopup />
-        )}
-        {/* <AddLoader /> */}
-        {submitClicked && <AddLoader creationStatus="creating" />}
-        {creationStatus && (
-          <AddLoader creationStatus={creationStatus} error={error} />
-        )}
       </div>
+      {empty && <ErrorPopup />}
+      {/* <AddLoader /> */}
+      {submitClicked && <AddLoader creationStatus="creating" />}
+      {creationStatus && (
+        <AddLoader creationStatus={creationStatus} error={error} />
+      )}
     </div>
   );
 }

@@ -15,9 +15,11 @@ import {
 } from "react-router-dom";
 import axios from "axios";
 import API_LINK from "../../config/API";
+
 const Information = () => {
   const { id } = useParams();
   const [information, setInformation] = useState({});
+
   const [searchParams, setSearchParams] = useSearchParams();
   const brgy = searchParams.get("brgy");
   const [brgyInformation, setBrgyInformation] = useState({});
@@ -37,9 +39,7 @@ const Information = () => {
         const response = await axios.get(
           `${API_LINK}/brgyinfo/?brgy=${brgy}&archived=true`
         );
-
-        console.log("Response:", response);
-
+        console.log(response);
         if (response.status === 200) {
           setInformation(response.data[0]);
           var logoSrc = document.getElementById("edit_logo");
@@ -70,24 +70,28 @@ const Information = () => {
   const handleSaveChanges = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      if (logo) formData.append("files", logo);
-      if (banner) formData.append("files", banner);
-
-      formData.append("brgyinfo", JSON.stringify(information));
-
-      const result = await axios.patch(
-        `${API_LINK}/brgyinfo/${brgy}`,
-        formData
+      const response = await axios.get(
+        `${API_LINK}/folder/specific/?brgy=${brgy}`
       );
+      console.log("ede wiw", response.data[0]);
 
-      // if (!response.ok) {
-      //   throw new Error("Info is not updated");
-      // }
+      if (response.status === 200) {
+        const formData = new FormData();
+        if (logo) formData.append("files", logo);
+        if (banner) formData.append("files", banner);
 
-      console.log(result);
-      window.location.reload();
-      // setBrgyInformation({});
+        formData.append("brgyinfo", JSON.stringify(information));
+
+        const result = await axios.patch(
+          `${API_LINK}/brgyinfo/${brgy}/?folder_id=${response.data[0].info}`,
+          formData
+        );
+        console.log(result);
+        window.location.reload();
+        // setBrgyInformation({});
+      } else {
+        console.error("No Data Found");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -119,9 +123,19 @@ const Information = () => {
     };
   };
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     setInformation((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
+      theme: {
+        ...prev.theme,
+        [name]: value,
+        gradient: {
+          ...prev.theme.gradient,
+          [name]: value,
+        },
+      },
     }));
   };
 
@@ -134,45 +148,54 @@ const Information = () => {
     <>
       {/* Table */}
 
-      <div className="">
+      <div className="mx-4 overflow-y-auto lg:h-[calc(100vh_-_80px)]">
         <div>
-          <div className="bg-cover bg-center h-96 rounded-lg">
-            <div className="relative flex justify-end">
-              {isEditingMode && (
-                <label
-                  htmlFor="banner_input"
-                  className="absolute mt-7 transform -translate-x-1/2 -translate-y-1/2 block text-transparent font-medium rounded-full text-sm"
-                >
-                  <MdOutlineFileUpload size={40} style={{ color: "#ffffff" }} />
-                </label>
-              )}
-              {isEditingMode && (
-                <div>
-                  <input
-                    type="file"
-                    id="banner_input"
-                    onChange={handleBannerChange}
-                    name="banner"
-                    accept="image/*"
-                    value={!banner ? "" : banner.originalname}
-                    className="hidden"
-                  />
-                </div>
-              )}
-            </div>
-
-            <div>
-              <img
-                id="edit_banner"
-                className="w-full h-[150px] md:h-[300px] lg:h-[350px] xl:h-[470px] object-contain rounded-lg"
-              />
-            </div>
+          <div className="bg-cover bg-center h-96 rounded-lg relative">
+            {isEditingMode && (
+              <label
+                htmlFor="banner_input"
+                className="absolute lg:top-[50px] top-[10px]  w-full lg:h-[370px] md:h-[202px] h-[131px] flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-[#295141] bg-opacity-0 hover:bg-opacity-60 cursor-pointer"
+              >
+                <MdOutlineFileUpload
+                  size={40}
+                  style={{
+                    color: "#ffffff",
+                    padding: "10px",
+                    borderRadius: "50%",
+                    backgroundColor: "#295141",
+                    border: "none",
+                    top: 100,
+                    right: 0,
+                  }}
+                />
+                <input
+                  type="file"
+                  id="banner_input"
+                  onChange={handleBannerChange}
+                  name="banner"
+                  accept="image/*"
+                  value={!banner ? "" : banner.originalname}
+                  className="hidden"
+                />
+              </label>
+            )}
+            <img
+              id="edit_banner"
+              className="w-full h-[150px] md:h-[300px] lg:h-[350px] xl:h-[470px] object-contain rounded-lg"
+            />
           </div>
 
           <div className="flex justify-center sm:-mt-[260px] md:-mt-[220px] lg:-mt-[140px] xl:-mt-[60px]  h-auto md:mx-4 lg:mx-5">
-            <div className="w-full md:w-96 h-full lg:my-0 lg:mx-5 relative rounded-[28px] mx-auto bg-white shadow-2xl md:w-full flex flex-col">
+            <div
+              className={`w-full md:w-96 h-full lg:my-0 lg:mx-5 relative rounded-[28px] mx-auto bg-white shadow-2xl md:w-full flex flex-col `}
+            >
               <div className="h-auto rounded-lg">
-                <div className="bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] rounded-t-[28px]">
+                <div className="bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]"
+                  style={{
+                    background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+                    borderRadius: "28px 28px 0 0",
+                  }}
+                >
                   <div
                     className="relative h-32 md:h-60 mx-auto justify-center items-center rounded-t-lg"
                     style={{
@@ -181,7 +204,7 @@ const Information = () => {
                   >
                     <img
                       id="edit_logo"
-                      className="w-[120px] h-[120px] md:h-56 bg-cover md:w-56 rounded-full border-4 border-white mx-auto absolute left-0 right-0 -top-[65px] md:-top-[6rem]"
+                      className="w-[120px] h-[120px] md:h-56 object-contain md:w-56 rounded-full border-4 border-white mx-auto absolute left-0 right-0 -top-[65px] md:-top-[6rem]"
                     />
 
                     {isEditingMode && (
@@ -216,12 +239,171 @@ const Information = () => {
                     </div>
                   </div>
                 </div>
-
+                {isEditingMode && (
+                  <div className="grid lg:grid-cols-2 sm:grid-cols-1 gap-4">
+                    <div className=" mx-8 my-8 xxxl:mx-36 xxxl:my-10">
+                      <div className="hs-tooltip [--trigger:click] [--placement:bottom] flex justify-start items-center gap-2">
+                        <label
+                          className="block text-gray-700 text-sm font-bold mb-2"
+                          htmlFor="primary-color"
+                        >
+                          Primary Color
+                        </label>
+                        <button
+                          type="button"
+                          className="hs-tooltip-toggle w-4 h-4 mb-2 text-[12px] font-bold inline-flex justify-center items-center gap-2 rounded-full bg-gray-200 border border-gray-200 text-black"
+                          data-tip="This primary color as the main color of your User Interface"
+                        >
+                          ?
+                        </button>
+                        <span
+                          className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-slate-700"
+                          role="tooltip"
+                        >
+                          This primary color will serve as the <br></br>main
+                          color of your User Interface
+                        </span>
+                      </div>
+                      <input
+                        id="primary-color"
+                        className="shadow appearance-none border rounded w-full h-12 py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                        name="primary"
+                        type="color"
+                        value={information?.theme?.primary}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className=" mx-8 my-8 xxxl:mx-36 xxxl:my-10">
+                      <div className="hs-tooltip flex justify-start [--trigger:click] [--placement:bottom] items-center gap-2">
+                        <label
+                          className="block text-gray-700 text-sm font-bold mb-2"
+                          htmlFor="primary-color"
+                        >
+                          Secondary Color
+                        </label>
+                        <button
+                          type="button"
+                          className="hs-tooltip-toggle w-4 h-4 mb-2 text-[12px] font-bold inline-flex justify-center items-center gap-2 rounded-full bg-gray-200 border border-gray-200 text-black"
+                          data-tip="This primary color as the main color of your User Interface"
+                        >
+                          ?
+                        </button>
+                        <span
+                          className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-slate-700"
+                          role="tooltip"
+                        >
+                           This secondary color must be lighter <br></br>than the primary color 
+                        </span>
+                      </div>
+                      <input
+                        id="secondary-color"
+                        className="shadow appearance-none border rounded w-full h-12 py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                        name="secondary"
+                        type="color"
+                        value={information?.theme?.secondary}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className=" mx-8 my-0 xxxl:mx-36 xxxl:my-10">
+                      <div className="hs-tooltip flex justify-start [--trigger:click] [--placement:bottom] items-center gap-2">
+                        <label
+                          className="block text-gray-700 text-sm font-bold mb-2"
+                          htmlFor="primary-color"
+                        >
+                          Gradient 1
+                        </label>
+                        <button
+                          type="button"
+                          className="hs-tooltip-toggle w-4 h-4 mb-2 text-[12px] font-bold inline-flex justify-center items-center gap-2 rounded-full bg-gray-200 border border-gray-200 text-black"
+                          data-tip="This primary color as the main color of your User Interface"
+                        >
+                          ?
+                        </button>
+                        <span
+                          className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-slate-700"
+                          role="tooltip"
+                        >
+                           This gradient 1 color will be serve<br></br> as the start color of gradient
+                        </span>
+                      </div>
+                      <input
+                        id="gradient-color-1"
+                        className="shadow appearance-none border rounded w-full h-12 py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                        name="start"
+                        type="color"
+                        value={information?.theme?.gradient?.start}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className=" mx-8 my-0 xxxl:mx-36 xxxl:my-10">
+                      <div className="hs-tooltip flex justify-start [--trigger:click] [--placement:bottom] items-center gap-2">
+                        <label
+                          className="block text-gray-700 text-sm font-bold mb-2"
+                          htmlFor="primary-color"
+                        >
+                          Gradient 2
+                        </label>
+                        <button
+                          type="button"
+                          className="hs-tooltip-toggle w-4 h-4 mb-2 text-[12px] font-bold inline-flex justify-center items-center gap-2 rounded-full bg-gray-200 border border-gray-200 text-black"
+                          data-tip="This primary color as the main color of your User Interface"
+                        >
+                          ?
+                        </button>
+                        <span
+                          className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-slate-700"
+                          role="tooltip"
+                        >
+                         This gradient 1 color will be serve<br></br> as the end color of gradient
+                        </span>
+                      </div>
+                      <input
+                        id="gradient-color-2"
+                        className="shadow appearance-none border rounded w-full h-12 py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                        name="end"
+                        type="color"
+                        value={information?.theme?.gradient?.end}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className=" mx-8 my-8 xxxl:mx-36 xxxl:my-10">
+                      <div className="hs-tooltip flex justify-start [--trigger:click] [--placement:bottom] items-center gap-2">
+                        <label
+                          className="block text-gray-700 text-sm font-bold mb-2"
+                          htmlFor="primary-color"
+                        >
+                          Hover Color
+                        </label>
+                        <button
+                          type="button"
+                          className="hs-tooltip-toggle w-4 h-4 mb-2 text-[12px] font-bold inline-flex justify-center items-center gap-2 rounded-full bg-gray-200 border border-gray-200 text-black"
+                          data-tip="This primary color as the main color of your User Interface"
+                        >
+                          ?
+                        </button>
+                        <span
+                          className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-slate-700"
+                          role="tooltip"
+                        >
+                          This hover color will serve as the <br></br> color of your text
+                        </span>
+                      </div>
+                      <input
+                        id="text-color"
+                        className="shadow appearance-none border rounded w-full h-12 py-2 px-3 text-gray-700 leading-tight focus:border-green-500 focus:ring-green-500 focus:outline-none focus:shadow-outline"
+                        name="hover"
+                        type="color"
+                        value={information?.theme?.hover}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                )}
                 <div className="flex flex-col md:flex-row mx-8 my-8 xxxl:mx-36 xxxl:my-10">
-                  <div className="w-full md:w-1/3 py-5 md:py-0 flex items-center justify-center bg-gradient-to-r from-[#295141] to-[#408D51] rounded-t-[20px] md:rounded-t-[0px] md:rounded-tl-[20px] md:rounded-bl-[20px]">
+                  <div className="w-full md:w-1/3 py-5 md:py-0 flex items-center justify-center  rounded-t-[20px] md:rounded-t-[0px] md:rounded-tl-[20px] md:rounded-bl-[20px] bg-gradient-to-r from-[#295141] to-[#408D51]" style={{ background: `linear-gradient(to right, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,}}>
                     <h1
                       className="text-center text-white text-2xl font-bold"
-                      style={{ letterSpacing: "0.2em" }}
+                      style={{ letterSpacing: "0.2em", }}
                     >
                       STORY
                     </h1>
@@ -235,24 +417,11 @@ const Information = () => {
                       value={information.story}
                       onChange={handleChange}
                     />
-
-                    <div className="self-end">
-                      {/* <button
-                      type="button"
-                      className="text-white w-36 bg-custom-green-button3 font-medium rounded-full text-sm m-2 py-2 px-10 text-center"
-                      data-hs-overlay="#hs-edit-story-modal"
-                      onClick={() =>
-                        setBrgyInformation({ ...information, brgy: brgy })
-                      }
-                    >
-                      EDIT
-                    </button> */}
-                    </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row mx-8 my-8 xxxl:mx-36 xxxl:my-10">
-                  <div className="w-full md:w-1/3 py-5 md:py-0 flex items-center justify-center bg-gradient-to-r from-[#295141] to-[#408D51] rounded-t-[20px] md:rounded-t-[0px] md:rounded-tl-[20px] md:rounded-bl-[20px]">
+                  <div className="w-full md:w-1/3 py-5 md:py-0 flex items-center justify-center  rounded-t-[20px] md:rounded-t-[0px] md:rounded-tl-[20px] md:rounded-bl-[20px] bg-gradient-to-r from-[#295141] to-[#408D51]" style={{ background: `linear-gradient(to right, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,}}>
                     <h1
                       className="text-center text-white text-2xl font-bold"
                       style={{ letterSpacing: "0.2em" }}
@@ -269,22 +438,11 @@ const Information = () => {
                       name="mission"
                       onChange={handleChange}
                     />
-
-                    <div className="self-end">
-                      {/* <button
-                      type="button"
-                      className="text-white w-36 bg-custom-green-button3 font-medium rounded-full text-sm m-2 py-2 px-10 text-center"
-                      data-hs-overlay="#hs-edit-mission-modal"
-                      onClick={() => setBrgyInformation({ ...information })}
-                    >
-                      EDIT
-                    </button> */}
-                    </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row mx-8 my-8 xxxl:mx-36 xxxl:my-10">
-                  <div className="w-full md:w-1/3 py-5 md:py-0 flex items-center justify-center bg-gradient-to-r from-[#295141] to-[#408D51] rounded-t-[20px] md:rounded-t-[0px] md:rounded-tl-[20px] md:rounded-bl-[20px]">
+                  <div className="w-full md:w-1/3 py-5 md:py-0 flex items-center justify-center  rounded-t-[20px] md:rounded-t-[0px] md:rounded-tl-[20px] md:rounded-bl-[20px] bg-gradient-to-r from-[#295141] to-[#408D51]" style={{ background: `linear-gradient(to right, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,}}>
                     <h1
                       className="text-center text-white text-2xl font-bold"
                       style={{ letterSpacing: "0.2em" }}
@@ -303,28 +461,28 @@ const Information = () => {
                     />
                   </div>
                 </div>
-                <div className=" flex justify-center py-6 text-white">
-                  {isEditingMode ? (
+                <div className=" flex justify-center px-4 gap-4 py-6 text-white">
+                {isEditingMode ? (
                     <>
                       <button
                         onClick={handleSaveChanges}
-                        className="bg-[#295141] px-7 py-2 rounded-xl mr-2"
+                        className="bg-custom-green-button3 w-full xxl:w-1/2 text-sm lg:text-sm px-7 py-3 md:py-2.5 rounded-xl "
                       >
-                        Save changes
+                        SAVE CHANGES
                       </button>
                       <button
-                        className="bg-red-800 px-7 py-2 rounded-xl mr-2"
+                        className="bg-pink-700 w-full xxl:w-1/2 px-7 py-2 rounded-xl"
                         onClick={() => setisEditingMode(false)}
                       >
-                        Cancel
+                        CANCEL
                       </button>
                     </>
                   ) : (
                     <button
-                      className="text-white w-36 bg-[#295141] font-medium rounded-full text-sm m-2 py-2 px-10 text-center"
+                      className="text-white w-full lg:w-auto bg-custom-green-button3 font-medium rounded-full text-sm m-2 py-2 px-10 text-center"
                       onClick={() => setisEditingMode(true)}
                     >
-                      Edit
+                      EDIT
                     </button>
                   )}
                 </div>
@@ -332,7 +490,6 @@ const Information = () => {
             </div>
           </div>
         </div>
-      
       </div>
     </>
   );

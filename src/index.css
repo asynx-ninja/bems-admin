@@ -12,67 +12,85 @@
 
 }
 
-.hs-overlay-basic {
+/* .hs-overlay-basic {
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   width: 17rem;
   z-index: 60;
-}
+} */
 
 
 /* Default styles for larger screens */
 
-.flex-col-reverse {
+/* .flex-col-reverse {
   position: fixed;
   top: 0;
   right: 0;
   width: calc(100% - 17rem);
   z-index: 50;
-}
+} */
 
 /* Media query for smaller screens (e.g., smartphones) */
 
-@media (max-width: 1024px) {
-  /* Reposition the top header to stack above the sidebar */
+/* @media (max-width: 1024px) {
+  
   .flex-col-reverse {
-    top: 0px; /* Adjust top position to avoid overlapping with the sidebar */
+    top: 0px; 
     right: 0;
     width: 100%;
   }
-}
+} */
 
 
 
-/* Default styles for larger screens */
-.mx-4::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
-}
 
-.mx-4 {
+/* .mx-4::-webkit-scrollbar {
+  display: none; 
+} */
+
+/* .mx-4 {
   overflow-y: auto;
   overflow-x: hidden;
-  -ms-overflow-style: none; /* Hide scrollbar for IE and Firefox */
+  -ms-overflow-style: none; 
   position: relative;
-  height: 100vh; /* Adjust height as needed */
-  padding-top: 60px; /* Adjust padding to match top header height */
-  max-height: calc(100vh - 35px); /* Set max-height to limit content overflow */
-}
+  height: 100vh; 
+  padding-top: 60px;
+  max-height: calc(100vh - 35px);
+} */
 
 
 /* Media query for smaller screens (e.g., smartphones) */
-
+/* 
 @media (max-width: 768px) {
-  /* Remove padding to avoid overlapping with the top header */
+  
   .mx-4 {
     padding-top: 0;
     padding: 8px;
-    -ms-overflow-style: none; /* Hide scrollbar for IE and Firefox */
+    -ms-overflow-style: none; 
   }
+} */
+/* width */
+.scrollbarWidth::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
 }
 
+.scrollbarTrack::-webkit-scrollbar-track {
+  background: #ebeaea;
+}
 
+/* Handle */
+.scrollbarThumb::-webkit-scrollbar-thumb {
+  background: #efc586;
+}
+
+/* Handle on hover */
+.scrollbarHover::-webkit-scrollbar-thumb:hover {
+  background: #fdb242;
+}
+/* 
 /* width */
 ::-webkit-scrollbar {
   height: 5px; 
@@ -94,7 +112,7 @@
 ::-webkit-scrollbar-thumb{
   background: #EFC586;
   border-radius: 5px;
-}
+} */
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;

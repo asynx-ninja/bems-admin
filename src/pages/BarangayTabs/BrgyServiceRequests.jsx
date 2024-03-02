@@ -6,14 +6,14 @@ import { AiOutlineSend } from "react-icons/ai";
 import { FaArchive } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
-import RequestsReportsModal from "../../components/barangaytabs/brgyserviceRequests/RequestsReportsModal";
-import ReplyServiceModal from "../../components/barangaytabs/brgyserviceRequests/ReplyServiceModal"
+import ReplyServiceModal from "../../components/barangaytabs/brgyserviceRequests/ReplyServiceModal";
 import ViewRequestModal from "../../components/barangaytabs/brgyserviceRequests/ViewRequestModal";
 import { useSearchParams } from "react-router-dom";
 import API_LINK from "../../config/API";
 import axios from "axios";
 import moment from "moment";
 import noData from "../../assets/image/no-data.png";
+import GetBrgy from "../../components/GETBrgy/getbrgy";
 function ServiceRequests() {
   const [searchParams] = useSearchParams();
   const [requests, setRequests] = useState([]);
@@ -25,21 +25,49 @@ function ServiceRequests() {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedReqFilter, setSelectedReqFilter] = useState("all");
+  const information = GetBrgy(brgy);
   //status filter
   const [statusFilter, setStatusFilter] = useState("all");
   //request filter
-  const [requestFilter, setRequestFilter] = useState("all"); // Default is "all"
+  const [requestFilter, setRequestFilter] = useState([]); // Default is "all"
 
   //date filtering
   const [specifiedDate, setSpecifiedDate] = useState(new Date());
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [selected, setSelected] = useState("date");
+  const [officials, setOfficials] = useState([]);
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        let page = 0;
+        let arr = [];
+        while (true) {
+          const response = await axios.get(
+            `${API_LINK}/services/?brgy=${brgy}&archived=false&page=${page}`
+          );
+          if (response.status === 200 && response.data.result.length > 0) {
+            response.data.result.map((item) => {
+              arr.push(item.name);
+            });
+            page++;
+          } else {
+            break;
+          }
+        }
+        setRequestFilter(arr);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetch();
+  }, [brgy]);
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const response = await axios.get(
-          `${API_LINK}/requests/?brgy=${brgy}&archived=false&status=${statusFilter}&type=${requestFilter}&page=${currentPage}`
+          `${API_LINK}/requests/?brgy=${brgy}&archived=false&status=${statusFilter}&type=${selectedReqFilter}&page=${currentPage}`
         );
 
         if (response.status === 200) {
@@ -53,8 +81,35 @@ function ServiceRequests() {
     };
 
     fetch();
-  }, [brgy, statusFilter, requestFilter, currentPage]);
+  }, [brgy, statusFilter, selectedReqFilter, currentPage]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${API_LINK}/brgyofficial/?brgy=${brgy}&archived=false`
+        );
 
+        if (response.status === 200) {
+          const officialsData = response.data.result || [];
+
+          if (officialsData.length > 0) {
+            setOfficials(officialsData);
+          } else {
+            setOfficials([]);
+            console.log(`No officials found for Barangay ${brgy}`);
+          }
+        } else {
+          setOfficials([]);
+          console.error("Failed to fetch officials:", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setOfficials([]);
+      }
+    };
+
+    fetchData();
+  }, [currentPage, brgy]); // Add positionFilter dependency
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -66,61 +121,32 @@ function ServiceRequests() {
   const handleStatusFilter = (selectedStatus) => {
     setStatusFilter(selectedStatus);
   };
-  const handleRequestFilter = (selectedStatus) => {
-    setRequestFilter(selectedStatus);
+  const handleRequestFilter = (selectedType) => {
+    setSelectedReqFilter(selectedType);
   };
   const handleResetFilter = () => {
     setStatusFilter("all");
     setRequestFilter("all");
+    setSearchQuery("");
   };
-
 
   const handleView = (item) => {
     setRequest(item);
   };
   const tableHeader = [
+    "Control #",
     "SERVICE NAME",
-    "TYPE OF SERVICE",
+    "REQUESTOR",
     "DATE",
     "STATUS",
     "ACTIONS",
   ];
 
-  const Requests = requests.filter((item) =>
-  item.service_name.toLowerCase().includes(searchQuery.toLowerCase())
-);
-
-  const handleSort = (sortBy) => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    setSortColumn(sortBy);
-
-    const sortedData = requests.slice().sort((a, b) => {
-      if (sortBy === "request_id") {
-        return newSortOrder === "asc"
-          ? a.request_id.localeCompare(b.request_id)
-          : b.request_id.localeCompare(a.request_id);
-      } else if (sortBy === "service_name") {
-        return newSortOrder === "asc"
-          ? a.service_name.localeCompare(b.service_name)
-          : b.service_name.localeCompare(a.service_name);
-      } else if (sortBy === "status") {
-        const order = { Completed: 1, " Not Responded": 2, Pending: 3, Paid: 4, Processing: 5, Cancelled: 6, Rejected: 7 };
-        return newSortOrder === "asc"
-          ? order[a.status] - order[b.status]
-          : order[b.status] - order[a.status];
-      }
-
-      return 0;
-    });
-
-    setRequests(sortedData);
-  };
-
-  const DateFormat = (date) => {
-    const dateFormat = date === undefined ? "" : date.substr(0, 10);
-    return dateFormat;
-  };
+  const Requests = requests.filter(
+    (item) =>
+      item.service_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.req_id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const filters = (choice, selectedDate) => {
     switch (choice) {
@@ -129,7 +155,7 @@ function ServiceRequests() {
           console.log(typeof new Date(item.createdAt), selectedDate);
           return (
             new Date(item.createdAt).getFullYear() ===
-            selectedDate.getFullYear() &&
+              selectedDate.getFullYear() &&
             new Date(item.createdAt).getMonth() === selectedDate.getMonth() &&
             new Date(item.createdAt).getDate() === selectedDate.getDate()
           );
@@ -144,7 +170,7 @@ function ServiceRequests() {
         return requests.filter(
           (item) =>
             new Date(item.createdAt).getFullYear() ===
-            startDate.getFullYear() &&
+              startDate.getFullYear() &&
             new Date(item.createdAt).getMonth() === startDate.getMonth() &&
             new Date(item.createdAt).getDate() >= startDate.getDate() &&
             new Date(item.createdAt).getDate() <= endDate.getDate()
@@ -153,7 +179,7 @@ function ServiceRequests() {
         return requests.filter(
           (item) =>
             new Date(item.createdAt).getFullYear() ===
-            selectedDate.getFullYear() &&
+              selectedDate.getFullYear() &&
             new Date(item.createdAt).getMonth() === selectedDate.getMonth()
         );
       case "year":
@@ -202,16 +228,24 @@ function ServiceRequests() {
       setFilteredRequests(filters(selected, date));
     }
   };
+  const TimeFormat = (date) => {
+    if (!date) return "";
 
+    const formattedTime = moment(date).format("hh:mm A");
+    return formattedTime;
+  };
   return (
     <div className="">
-      {/* Body */}
-      <div>
-        {/* Header */}
-        <div className="flex flex-row  sm:flex-col-reverse lg:flex-row w-full">
-          <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-3/5 xxl:h-[4rem] xxxl:h-[5rem]">
-            <h1
-              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[1.5rem] xxl:text-2xl xxxl:text-3xl xxxl:mt-1 text-white"
+      <div className="flex flex-col ">
+        <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
+          <div
+            className="sm:mt-5 md:mt-4 lg:mt-0  py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem] bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]"
+            style={{
+              background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+            }}
+          >
+               <h1
+              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[15px] xl:text-xl xxl:text-2xl xxxl:text-4xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
               SERVICE REQUESTS
@@ -224,8 +258,10 @@ function ServiceRequests() {
                   <div className="hs-tooltip inline-block w-full">
                     <button
                       type="button"
-                      data-hs-overlay="#hs-modal-add"
-                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] w-full text-white font-medium text-sm text-center inline-flex items-center"
+                      className="hs-tooltip-toggle justify-center sm:px-2 sm:p-2 md:px-5 md:p-3 rounded-lg  w-full text-white font-medium text-sm text-center inline-flex items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141]"
+                      style={{
+                        background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+                      }}
                     >
                       <FaArchive size={24} style={{ color: "#ffffff" }} />
                       <span className="sm:block md:hidden sm:pl-5">
@@ -247,18 +283,20 @@ function ServiceRequests() {
 
         <div className="py-2 px-2 bg-gray-400 border-0 border-t-2 border-white">
           <div className="sm:flex-col-reverse md:flex-row flex justify-between w-full">
-            <div className="flex flex-col lg:flex-row lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
+            <div className="flex flex-col lg:flex-row md:flex-row items-center justify-center gap-4 lg:space-x-2 md:mt-2 lg:mt-0 md:space-y-2 lg:space-y-0">
               {/* Status Sort */}
-              <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
+              <div className="hs-dropdown relative  inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
                 <button
                   id="hs-dropdown"
                   type="button"
-                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-2 lg:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                  style={{ backgroundColor: information?.theme?.primary }}
                 >
                   STATUS
                   <svg
-                    className={`hs-dropdown-open:rotate-${sortOrder === "asc" ? "180" : "0"
-                      } w-2.5 h-2.5 text-white`}
+                    className={`hs-dropdown-open:rotate-${
+                      sortOrder === "asc" ? "180" : "0"
+                    } w-2.5 h-2.5 text-white`}
                     width="16"
                     height="16"
                     viewBox="0 0 16 16"
@@ -335,6 +373,7 @@ function ServiceRequests() {
                   id="hs-dropdown"
                   type="button"
                   className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
+                  style={{ backgroundColor: information?.theme?.primary }}
                 >
                   DATE
                   <svg
@@ -425,16 +464,18 @@ function ServiceRequests() {
               </div>
 
               {/* Service Type Sort */}
+              {/* Service Type Sort */}
               <div className="hs-dropdown relative inline-flex sm:[--placement:bottom] md:[--placement:bottom-left]">
                 <button
                   id="hs-dropdown"
                   type="button"
-                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  "
-                >
+                  className="bg-[#295141] sm:w-full md:w-full sm:mt-2 md:mt-0 text-white hs-dropdown-toggle py-1 px-5 inline-flex justify-center items-center gap-2 rounded-md  font-medium shadow-sm align-middle transition-all text-sm  " style={{ backgroundColor: information?.theme?.primary }}
+                > 
                   SERVICE TYPE
                   <svg
-                    className={`hs-dropdown-open:rotate-${sortOrder === "asc" ? "180" : "0"
-                      } w-2.5 h-2.5 text-white`}
+                    className={`hs-dropdown-open:rotate-${
+                      sortOrder === "asc" ? "180" : "0"
+                    } w-2.5 h-2.5 text-white`}
                     width="16"
                     height="16"
                     viewBox="0 0 16 16"
@@ -461,68 +502,28 @@ function ServiceRequests() {
                     RESET FILTERS
                   </a>
                   <hr className="border-[#4e4e4e] my-1" />
-                  <a
-                    onClick={() => handleRequestFilter("Healthcare")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    HEALTHCARE
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Education")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    EDUCATION
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Social Welfare")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    SOCIAL WELFARE
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Security and Safety")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    SECURITY AND SAFETY
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Infrastructure")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    INFRASTRUCTURE
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Community")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    COMMUNITY
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Administrative")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    ADMINISTRATIVE
-                  </a>
-                  <a
-                    onClick={() => handleRequestFilter("Environmental")}
-                    class="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
-                    href="#"
-                  >
-                    ENVIRONMENTAL
-                  </a>
+                  <div className="flex flex-col scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll h-44">
+                  {requestFilter.map((service_name, index) => (
+                    <a
+                      key={index}
+                      onClick={() => handleRequestFilter(service_name)}
+                      className="flex items-center font-medium uppercase gap-x-3.5 py-2 px-3 rounded-xl text-sm text-black hover:bg-[#b3c5cc] hover:text-gray-800 focus:ring-2 focus:ring-blue-500"
+                      href="#"
+                    >
+                      {service_name}
+                    </a>
+                  ))}
+                       </div>
                 </ul>
+         
               </div>
             </div>
             <div className="sm:flex-col md:flex-row flex sm:w-full md:w-4/12">
               <div className="flex flex-row w-full md:mr-2">
-                <button className=" bg-[#295141] p-3 rounded-l-md">
+                <button
+                  className=" bg-[#295141] p-3 rounded-l-md"
+                  style={{ backgroundColor: information?.theme?.primary }}
+                >
                   <div className="w-full overflow-hidden">
                     <svg
                       className="h-3.5 w-3.5 text-white"
@@ -551,25 +552,32 @@ function ServiceRequests() {
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    const Requests = requests.filter((item) =>
-                      item.service_name
-                        .toLowerCase()
-                        .includes(e.target.value.toLowerCase())
-                    );
+                    const Requests = requests.filter((item) => {
+                      const fullName = `${item.form[0].firstName.value} ${item.form[0].lastName.value}`;
+                      const reqId = item.req_id.toString(); // Assuming service_id is a number, convert it to string for case-insensitive comparison
+                      return (
+                        fullName
+                          .toLowerCase()
+                          .includes(e.target.value.toLowerCase()) ||
+                        reqId.includes(e.target.value.toLowerCase())
+                      );
+                    });
 
                     setFilteredRequests(Requests);
                   }}
                 />
               </div>
-
             </div>
           </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-y-auto sm:overflow-x-auto h-[calc(100vh_-_270px)] xxxl:h-[calc(100vh_-_286px)]">
-          <table className="w-full ">
-            <thead className="bg-[#295141] sticky top-0">
+        <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll lg:overflow-x-hidden h-[calc(100vh_-_275px)] xxl:h-[calc(100vh_-_275px)] xxxl:h-[calc(100vh_-_300px)]">
+          <table className="relative table-auto w-full">
+            <thead
+              className="bg-[#295141] sticky top-0"
+              style={{ backgroundColor: information?.theme?.primary }}
+            >
               <tr className="">
                 {tableHeader.map((item, idx) => (
                   <th
@@ -585,65 +593,73 @@ function ServiceRequests() {
             <tbody className="odd:bg-slate-100">
               {filteredRequests.length === 0 ? (
                 <tr>
-                <td
-                  colSpan={tableHeader.length + 1}
-                  className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
-                >
-                  <img
-                    src={noData}
-                    alt=""
-                    className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
-                  />
-                  <strong className="text-[#535353]">NO DATA FOUND</strong>
-                </td>
-              </tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
+                  </td>
+                </tr>
               ) : (
                 filteredRequests.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
                     <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2">
+                      <span className="text-xs sm:text-sm text-black line-clamp-4">
+                        {item.req_id}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3">
+                      <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-2">
                         {item.service_name}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3">
+                      <span className="text-xs sm:text-sm text-black line-clamp-2">
+                        {item.form[0].lastName.value +
+                          ", " +
+                          item.form[0].firstName.value +
+                          " " +
+                          item.form[0].middleName.value}
                       </span>
                     </td>
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {item.type}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {new Date(item.createdAt).toISOString().split("T")[0]}
+                          {moment(item.createdAt).format("MMMM DD, YYYY")} -{" "}
+                          {TimeFormat(item.createdAt) || ""}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-3">
                       {item.status === "Transaction Completed" && (
                         <div className="flex items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-white font-bold p-3 mx-5">
                             TRANSACTION COMPLETED
                           </span>
                         </div>
                       )}
                       {item.status === "Rejected" && (
                         <div className="flex items-center justify-center bg-custom-red-button m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-white font-bold p-3 mx-5">
                             REJECTED
                           </span>
                         </div>
                       )}
                       {item.status === "Pending" && (
                         <div className="flex items-center justify-center bg-custom-amber m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-white font-bold p-3 mx-5">
                             PENDING
                           </span>
                         </div>
                       )}
                       {item.status === "Paid" && (
                         <div className="flex items-center justify-center bg-violet-800 m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-white font-bold p-3 mx-5">
                             PAID
                           </span>
                         </div>
@@ -651,7 +667,7 @@ function ServiceRequests() {
 
                       {item.status === "Processing" && (
                         <div className="flex items-center justify-center bg-blue-800 m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-white font-bold p-3 mx-5">
                             PROCESSING
                           </span>
                         </div>
@@ -659,7 +675,7 @@ function ServiceRequests() {
 
                       {item.status === "Cancelled" && (
                         <div className="flex items-center justify-center bg-gray-800 m-2 rounded-lg">
-                          <span className="text-xs sm:text-sm text-white font-bold p-3 mx-5">
+                          <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-white font-bold p-3 mx-5">
                             CANCELLED
                           </span>
                         </div>
@@ -713,7 +729,10 @@ function ServiceRequests() {
             </tbody>
           </table>
         </div>
-        <div className="md:py-4 md:px-4 bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3">
+        <div
+          className="md:py-4 md:px-4  bg-[#295141] flex items-center justify-between sm:flex-col-reverse md:flex-row sm:py-3"
+          style={{ backgroundColor: information?.theme?.primary }}
+        >
           <span className="font-medium text-white sm:text-xs text-sm">
             Showing 1 out of 15 pages
           </span>
@@ -746,8 +765,15 @@ function ServiceRequests() {
             renderOnZeroPageCount={null}
           />
         </div>
+        {Object.hasOwn(request, "service_id") ? (
+        <ViewRequestModal request={request} brgy={brgy} officials={officials} />
+      ) : null}
+        <ReplyServiceModal
+          request={request}
+          setRequest={setRequest}
+          brgy={brgy}
+        />
       </div>
-
     </div>
   );
 }

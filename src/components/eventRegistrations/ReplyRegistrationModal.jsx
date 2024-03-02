@@ -11,8 +11,8 @@ import ViewDropbox from "./ViewDropbox";
 import EditDropbox from "./EditDropbox";
 import { useSearchParams } from "react-router-dom";
 import ReplyLoader from "./loaders/ReplyLoader";
-
-function ReplyRegistrationModal({ application, setApplication }) {
+import moment from "moment";
+function ReplyRegistrationModal({ application, setApplication, brgy }) {
   const [reply, setReply] = useState(false);
   const [statusChanger, setStatusChanger] = useState(false);
   const [upload, setUpload] = useState(false);
@@ -30,7 +30,13 @@ function ReplyRegistrationModal({ application, setApplication }) {
   const [submitClicked, setSubmitClicked] = useState(false);
   const [replyingStatus, setReplyingStatus] = useState(null);
   const [error, setError] = useState(null);
-
+  const [event, setEvent] = useState({
+    collections: {
+      banner: {},
+      logo: {},
+    },
+  });
+  const [currentPage, setCurrentPage] = useState(0);
   useEffect(() => {
     setFiles(application.length === 0 ? [] : application.file);
   }, [application]);
@@ -49,6 +55,31 @@ function ReplyRegistrationModal({ application, setApplication }) {
     };
     fetch();
   }, [id]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!application.event_id) {
+          // If there is no event_id in the application, do not fetch events
+          return;
+        }
+        const eventsResponse = await axios.get(
+          `${API_LINK}/announcement/?brgy=${brgy}&event_id=${application.event_id}&archived=false`
+        );
+
+        if (eventsResponse.status === 200) {
+          setEvent(eventsResponse.data.result[0]);
+        } else {
+          setEventWithCounts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        console.error("Error response data:", error.response?.data);
+        console.error("Error response status:", error.response?.status);
+      }
+    };
+
+    fetchData();
+  }, [currentPage, brgy, application.event_id]);
 
   useEffect(() => {
     if (application && application.response.length !== 0) {
@@ -94,19 +125,26 @@ function ReplyRegistrationModal({ application, setApplication }) {
   // };
 
   const handleChange = (e) => {
-    e.preventDefault();
-  
     const inputValue = e.target.value;
   
-    if (statusChanger && (!newMessage.message || newMessage.message.trim() === "")) {
+    if (e.target.name === "isRepliable") {
+      // If isRepliable checkbox is changed, update isRepliable accordingly
+      setNewMessage((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.checked,
+      }));
+    } else if (statusChanger && (!newMessage.message || newMessage.message.trim() === "")) {
+      // If statusChanger is true and message is not set, update message with status
       setNewMessage((prev) => ({
         ...prev,
         message: `The status of your event application is ${inputValue}`,
+        [e.target.name]: inputValue,
       }));
     } else {
+      // Otherwise, update the input value normally
       setNewMessage((prev) => ({
         ...prev,
-        [e.target.name]: e.target.name === "isRepliable" ? e.target.checked : inputValue,
+        [e.target.name]: inputValue,
       }));
     }
   };
@@ -175,14 +213,70 @@ function ReplyRegistrationModal({ application, setApplication }) {
         formData
       );
 
-      setTimeout(() => {
-        setSubmitClicked(false);
-        setReplyingStatus("success");
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      }, 1000);
+      if (response.status === 200) {
+       
+        const notify = {
+          category: "One",
+          compose: {
+            subject: `APPLICATION - ${application.event_name}`,
+            message: `A municipalit staff has updated your event application form for the event of ${
+              application.event_name
+            }.\n\n
+      
+            Application Details:\n
+            - Name: ${
+              application.form && application.form[0]
+                ? application.form[0].lastName.value
+                : ""
+            }, ${
+              application.form && application.form[0]
+                ? application.form[0].firstName.value
+                : ""
+            } ${
+              application.form && application.form[0]
+                ? application.form[0].middleName.value
+                : ""
+            }
+            - Event Applied: ${application.event_name}\n
+            - Application ID: ${application.application_id}\n
+            - Date Created: ${moment(application.createdAt).format(
+              "MMM. DD, YYYY h:mm a"
+            )}\n
+            - Status: ${application.status}\n
+            - Staff Handled: ${userData.lastName}, ${userData.firstName} ${
+              userData.middleName
+            }\n\n
+            Please update this application as you've seen this notification!\n\n
+            Thank you!!,`,
+            go_to: "Application",
+          },
+          target: {
+            user_id: application.form[0].user_id.value,
+            area: application.brgy,
+          },
+          type: "Resident",
+          banner: event.collections.banner,
+          logo: event.collections.logo,
+        };
 
+        console.log("Notify: ", notify);
+
+        const result = await axios.post(`${API_LINK}/notification/`, notify, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (result.status === 200) {
+          setTimeout(() => {
+            setSubmitClicked(false);
+            setReplyingStatus("success");
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
+          }, 1000);
+        }
+      }
       // window.location.reload();
     } catch (error) {
       console.log(error);
@@ -207,7 +301,7 @@ function ReplyRegistrationModal({ application, setApplication }) {
                 className="font-bold text-white mx-auto md:text-xl text-center"
                 style={{ letterSpacing: "0.3em" }}
               >
-                REPLY TO EVENT REGISTRATION
+                REPLY TO EVENT APPLICATION
               </h3>
             </div>
 
@@ -572,17 +666,23 @@ function ReplyRegistrationModal({ application, setApplication }) {
                                                       if (
                                                         statusChanger &&
                                                         (!newMessage.message ||
-                                                          newMessage.message.trim() === "")
+                                                          newMessage.message.trim() ===
+                                                            "")
                                                       ) {
-                                                        setNewMessage((prev) => ({
-                                                          ...prev,
-                                                          message: `The status of your event application is ${e.target.value}`,
-                                                        }));
+                                                        setNewMessage(
+                                                          (prev) => ({
+                                                            ...prev,
+                                                            message: `The status of your event application is ${e.target.value}`,
+                                                          })
+                                                        );
                                                       }
-                                                      setApplication((prev) => ({
-                                                        ...prev,
-                                                        status: e.target.value,
-                                                      }));
+                                                      setApplication(
+                                                        (prev) => ({
+                                                          ...prev,
+                                                          status:
+                                                            e.target.value,
+                                                        })
+                                                      );
                                                     }}
                                                     className="shadow ml-4 border w-5/6 py-2 px-4 text-sm text-black rounded-lg focus:border-blue-500 focus:ring-blue-500 focus:outline-none focus:shadow-outline"
                                                     value={application.status}
@@ -684,12 +784,11 @@ function ReplyRegistrationModal({ application, setApplication }) {
             </div>
           </div>
         </div>
-     
       </div>
       {submitClicked && <ReplyLoader replyingStatus="replying" />}
-        {replyingStatus && (
-          <ReplyLoader replyingStatus={replyingStatus} error={error} />
-        )}
+      {replyingStatus && (
+        <ReplyLoader replyingStatus={replyingStatus} error={error} />
+      )}
     </div>
   );
 }

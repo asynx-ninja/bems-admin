@@ -31,7 +31,7 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    try {
     // Check if any field is empty
     if (!aboutusInfo.title || !aboutusInfo.details || !banner) {
       setError("Please fill out all required fields.");
@@ -40,13 +40,20 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
 
     // If all fields are filled, proceed with form submission
     setSubmitClicked(true);
+    setError(null)
+
+    const response = await axios.get(
+      `${API_LINK}/folder/specific/?brgy=${brgy}`
+    );
+    
+   if (response.status === 200){
     const formData = new FormData();
     formData.append("file", banner);
     formData.append("aboutusInfo", JSON.stringify(aboutusInfo));
 
-    try {
+  
       const result = await axios.patch(
-        `${API_LINK}/aboutus/manage/?doc_id=${aboutusInfo._id}`,
+        `${API_LINK}/aboutus/manage/?doc_id=${aboutusInfo._id}&folder_id=${response.data[0].about_us}`,
         formData
       );
       if (result.status === 200) {
@@ -59,6 +66,7 @@ function ManageAboutus({ brgy, aboutusInfo, setAboutusinfo }) {
           }, 3000);
         }, 1000);
       }
+   }
     } catch (err) {
       // Handle errors
       console.error(err);

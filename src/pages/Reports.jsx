@@ -46,27 +46,38 @@ const Reports = () => {
 
   const [chartDatas, setChartDatas] = useState({
     options: {
-        chart: {
-            type: 'bar',
+      chart: {
+        type: "bar",
+      },
+      xaxis: {
+        categories: [
+          "Balite",
+          "Burgos",
+          "Geronimo",
+          "Macabud",
+          "Manggahan",
+          "Mascap",
+          "Puray",
+          "Rosario",
+          "San Isidro",
+          "San Jose",
+          "San Rafael",
+        ],
+        title: { text: "Barangays" },
+      },
+      yaxis: {
+        title: {
+          text: "No. Registered Residents",
         },
-        xaxis: {
-            categories: [
-                "Balite", "Burgos", "Geronimo", "Macabud", "Manggahan", 
-                "Mascap", "Puray", "Rosario", "San Isidro", "San Jose", "San Rafael"
-            ],
-            title: { text: "Barangays" },
-        },
-        yaxis: {
-            title: {
-              text: "No. Registered Residents",
-            },
-          },
+      },
     },
-    series: [{
-        name: 'Residents',
-        data: []
-    }]
-});
+    series: [
+      {
+        name: "Residents",
+        data: [],
+      },
+    ],
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,15 +115,19 @@ const Reports = () => {
         // Calculate the sum of totalUsers
         const sum = data.reduce((acc, item) => acc + item.totalUsers, 0);
         setTotalUsersSum(sum);
-        const updateSeriesData = chartData.options.xaxis.categories.map(brgy => {
-          const match = data.find(d => d._id.toUpperCase() === brgy.toUpperCase());
-          return match ? match.totalUsers : 0;
-      });
+        const updateSeriesData = chartData.options.xaxis.categories.map(
+          (brgy) => {
+            const match = data.find(
+              (d) => d._id.toUpperCase() === brgy.toUpperCase()
+            );
+            return match ? match.totalUsers : 0;
+          }
+        );
 
-      setChartDatas(prevState => ({
+        setChartDatas((prevState) => ({
           ...prevState,
-          series: [{ ...prevState.series[0], data: updateSeriesData }]
-      }));
+          series: [{ ...prevState.series[0], data: updateSeriesData }],
+        }));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -128,7 +143,15 @@ const Reports = () => {
     xaxis: { categories: [] },
     yaxis: {
       title: {
-        text: "Total Revenue",
+        text: "Total Revenue (₱)", // Add Peso sign to y-axis label
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: function (value) {
+          // Add Peso sign to tooltip
+          return `₱${value}.00`;
+        },
       },
     },
   });
@@ -225,11 +248,24 @@ const Reports = () => {
       xaxis: {
         categories: barangays,
       },
+      yaxis: {
+        title: {
+          text: "Est. Total Revenue (₱)", // Add Peso sign to y-axis label
+        },
+      },
+      tooltip: {
+        y: {
+          formatter: function (value) {
+            // Add Peso sign to tooltip
+            return `₱${value}.00`;
+          },
+        },
+      },
     },
     series: [
       {
         name: "Total Fee",
-        data: new Array(barangays.length).fill(0), // Initialize with 0s
+        data: new Array(barangays.length).fill(0),
       },
     ],
   });
@@ -338,87 +374,84 @@ const Reports = () => {
   };
 
   return (
-    <div className="mx-4 mt-[10rem] md:mt-[2rem] p-2 lg:mt-6 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
-      <div className="flex flex-col scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb  h-[calc(100vh_-_95px)]">
-        <div className="flex flex-col lg:flex-col justify-start items-start w-full mb-3">
-          {/* <h2 className="text-lg lg:text-4xl font-bold mb-3 lg:mb-0 uppercase">
-            Analytic Reports
-          </h2> */}
-          <div className="flex lg:justify-end mb-3 w-full lg:w-auto">
+    <div className="mx-4 mt-4 ">
+      <div className="flex flex-col scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb lg:overflow-y-scroll lg:overflow-x-hidden lg:h-[calc(100vh_-_95px)]">
+          <div className="flex lg:justify-end mb-3 w-full lg:w-auto ">
             <div className="flex flex-col w-full lg:w-auto">
-              <div className="flex flex-col justify-start  w-full">
-                <div
-                  id="toggle-count"
-                  className="flex gap-2 p-2 rounded-lg bg-gray-500 w-full lg:w-auto justify-start items-start overflow-x-auto lg:overflow-x-hidden"
+              <div
+                id="toggle-count"
+                className="flex gap-2 p-2 rounded-lg bg-gray-500 w-full lg:w-auto justify-start items-start overflow-x-auto lg:overflow-x-hidden"
+              >
+                <button
+                  className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
+                    timeRange === "specific"
+                      ? "bg-green-700 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                  onClick={() => handleTimeRangeChange("specific")}
                 >
-                  <button
-                    className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
-                      timeRange === "specific"
-                        ? "bg-green-700 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                    onClick={() => handleTimeRangeChange("specific")}
-                  >
-                    Specific
-                  </button>
-                  <button
-                    className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
-                      timeRange === "today"
-                        ? "bg-green-700 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                    onClick={() => handleTimeRangeChange("today")}
-                  >
-                    Today
-                  </button>
-                  <button
-                    className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
-                      timeRange === "weekly"
-                        ? "bg-green-700 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                    onClick={() => handleTimeRangeChange("weekly")}
-                  >
-                    Weekly
-                  </button>
-                  <button
-                    className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
-                      timeRange === "monthly"
-                        ? "bg-green-700 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                    onClick={() => handleTimeRangeChange("monthly")}
-                  >
-                    Monthly
-                  </button>
-                  <button
-                    className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
-                      timeRange === "annual"
-                        ? "bg-green-700 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                    onClick={() => handleTimeRangeChange("annual")}
-                  >
-                    Annual
-                  </button>
-                </div>
+                  Specific
+                </button>
+                <button
+                  className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
+                    timeRange === "today"
+                      ? "bg-green-700 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                  onClick={() => handleTimeRangeChange("today")}
+                >
+                  Today
+                </button>
+                <button
+                  className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
+                    timeRange === "weekly"
+                      ? "bg-green-700 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                  onClick={() => handleTimeRangeChange("weekly")}
+                >
+                  Weekly
+                </button>
+                <button
+                  className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
+                    timeRange === "monthly"
+                      ? "bg-green-700 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                  onClick={() => handleTimeRangeChange("monthly")}
+                >
+                  Monthly
+                </button>
+                <button
+                  className={`px-3 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium text-sm lg:text-base focus:outline-none focus:ring focus:border-blue-300 ${
+                    timeRange === "annual"
+                      ? "bg-green-700 text-white"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                  onClick={() => handleTimeRangeChange("annual")}
+                >
+                  Annual
+                </button>
+              </div>
+
+              <div className="w-full mt-2">
                 {timeRange === "specific" && (
-                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-2 mt-4">
-                    <label className="mr-4 text-lg font-medium text-gray-700">
+                  <div className="flex flex-col md:flex-row md:justify-center md:items-center bg-gray-200 shadow-sm rounded-lg p-2 ">
+                    <label className="mr-4 text-sm font-medium text-gray-700">
                       Select Specific Date:
                     </label>
                     <input
                       type="date"
                       value={specificDate}
                       onChange={(e) => setSpecificDate(e.target.value)}
-                      className="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg text-gray-700"
+                      className="px-2 py-1 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm text-gray-700"
                     />
                   </div>
                 )}
 
                 {timeRange === "weekly" && (
-                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-4 mt-4">
-                    <label className="mr-4 text-lg font-medium text-gray-700">
+                  <div className="flex flex-col md:flex-row md:justify-center md:items-center bg-gray-200 shadow-sm rounded-lg p-2 ">
+                    <label className="mr-4 text-sm font-medium text-gray-700">
                       Select Specific Week:
                     </label>
                     <div className="relative">
@@ -426,19 +459,19 @@ const Reports = () => {
                         type="week"
                         value={specificWeek}
                         onChange={(e) => setSpecificWeek(e.target.value)}
-                        className="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg text-gray-700"
+                        className="px-2 py-1 border-2 border-gray-300 w-full rounded-md focus:outline-none focus:border-blue-500 text-sm text-gray-700"
                       />
                     </div>
                   </div>
                 )}
 
                 {timeRange === "monthly" && (
-                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-4 mt-4">
-                    <label className="mr-4 text-lg font-medium text-gray-700">
+                  <div className="flex flex-col md:flex-row md:justify-center md:items-center bg-gray-200 shadow-sm rounded-lg p-2 ">
+                    <label className="mr-4 text-sm font-medium text-gray-700">
                       Select Month:
                     </label>
                     <input
-                      className="text-gray-400 py-1 px-3 rounded-md font-medium shadow-sm text-sm border border-black"
+                      className="text-gray-400 px-2 py-1 rounded-md font-medium shadow-sm text-sm border border-black"
                       type="month"
                       id="month"
                       name="month"
@@ -449,8 +482,8 @@ const Reports = () => {
                 )}
 
                 {timeRange === "annual" && (
-                  <div className="flex justify-center items-center bg-gray-200 shadow-sm rounded-lg p-4 mt-4">
-                    <label className="mr-4 text-lg font-medium text-gray-700">
+                  <div className="flex flex-col md:flex-row md:justify-center md:items-center bg-gray-200 shadow-sm rounded-lg p-2">
+                    <label className="mr-4 text-sm font-medium text-gray-700">
                       Select Year:
                     </label>
                     <input
@@ -461,89 +494,91 @@ const Reports = () => {
                       onChange={(e) =>
                         setSpecificYear(parseInt(e.target.value))
                       }
-                      className="p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg text-gray-700"
+                      className="px-2 py-1 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm text-gray-700"
                     />
                   </div>
                 )}
-
-                {/* END OF DATE INPUTS */}
               </div>
+
+              {/* END OF DATE INPUTS */}
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-          <div className="bg-gray-200 rounded-lg shadow-lg p-6">
-            <h4 className="text-lg  font-bold mb-3">
-              TOTAL APPROVED BARANGAYS SERVICES
-            </h4>
-            <p className="text-xl text-[#408D51] font-bold">{totalServices}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+            <div className="bg-gray-200 rounded-lg shadow-lg p-6">
+              <h4 className="text-lg  font-bold mb-3">
+                TOTAL APPROVED BARANGAYS SERVICES
+              </h4>
+              <p className="text-xl text-[#408D51] font-bold">
+                {totalServices}
+              </p>
+            </div>
+
+            <div className="bg-gray-200 rounded-lg shadow-lg p-6">
+              <h4 className="text-lg font-bold mb-3">
+                TOTAL NUMBER OF REGISTERED RESIDENTS
+              </h4>
+              <p className="text-xl text-[#408D51] font-bold">
+                {totalUsersSum}
+              </p>
+            </div>
           </div>
 
-          <div className="bg-gray-200 rounded-lg shadow-lg p-6">
-            <h4 className="text-lg font-bold mb-3">
-              TOTAL NUMBER OF REGISTERED RESIDENTS
-            </h4>
-            <p className="text-xl text-[#408D51] font-bold">{totalUsersSum}</p>
-          </div>
-        </div>
-
-        {/* CHARTS */}
-        <div className="flex flex-col lg:flex-row lg:space-x-2 w-full ">
-          <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5 justify-center items-center">
-            <h1 className="mt-5 ml-5 font-medium text-black">
-              Total Service Revenue per Barangay
-            </h1>
-            <div className="flex rounded-xl">
-              {series.length > 0 && (
+          {/* CHARTS */}
+          <div className="flex flex-col lg:flex-row lg:space-x-2 w-full ">
+            <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5 justify-center items-center">
+              <h1 className="mt-5 ml-5 font-medium text-black">
+                Total Service Revenue per Barangay
+              </h1>
+              <div className="flex rounded-xl">
+                {series.length > 0 && (
+                  <Chart
+                    options={options}
+                    series={series}
+                    type="bar"
+                    className="flex w-11/12 rounded-xl"
+                  />
+                )}
+              </div>
+            </div>
+            <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5 justify-center items-center">
+              <h1 className="mt-5 ml-5 font-medium text-black">
+                Est. Service Revenue per Barangay
+              </h1>
+              <div className="flex rounded-xl">
                 <Chart
-                  options={options}
-                  series={series}
+                  options={chartData.options}
+                  series={chartData.series}
                   type="bar"
                   className="flex w-11/12 rounded-xl"
                 />
-              )}
+              </div>
             </div>
           </div>
-          <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5 justify-center items-center">
-            <h1 className="mt-5 ml-5 font-medium text-black">
-              Est. Service Revenue per Barangay
-            </h1>
-            <div className="flex rounded-xl">
-              <Chart
-                options={chartData.options}
-                series={chartData.series}
-                type="bar"
-                className="flex w-11/12 rounded-xl"
-              />
+          <div className="flex flex-col lg:flex-row lg:space-x-2 w-full ">
+            <RRM />
+            <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5 justify-center items-center">
+              <h1 className="mt-5 ml-5 font-medium text-black">
+                Registered Residents per Barangay
+              </h1>
+              <div className="flex rounded-xl">
+                <Chart
+                  className="flex w-11/12 rounded-xl "
+                  options={chartDatas.options}
+                  series={chartDatas.series}
+                  type="bar"
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex flex-col lg:flex-row lg:space-x-2 w-full ">
-          <RRM />
-          <div className="bg-[#e9e9e9] w-full lg:w-1/2 rounded-xl mt-5 justify-center items-center">
-        <h1 className="mt-5 ml-5 font-medium text-black">
-          Registered Residents per Barangay
-        </h1>
-        <div className="flex rounded-xl">
-       
-            <Chart
-              className="flex w-11/12 rounded-xl "
-              options={chartDatas.options}
-              series={chartDatas.series}
-              type="bar"
-            />
-        
-        </div>
-      </div>
-        </div>
 
-        <div className="flex flex-col lg:flex-row lg:space-x-2 w-full ">
-          <SRT />
-        </div>
-        <div className="flex flex-col lg:flex-row lg:space-x-2 w-full ">
-          <RIB />
-        </div>
+          <div className="flex flex-col lg:flex-row lg:space-x-2 w-full ">
+            <SRT />
+          </div>
+          <div className="flex flex-col lg:flex-row lg:space-x-2 w-full ">
+            <RIB />
+          </div>
+   
       </div>
     </div>
   );

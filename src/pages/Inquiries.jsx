@@ -18,7 +18,7 @@ const Inquiries = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const brgy = searchParams.get("brgy");
+  const brgy = "MUNISIPYO";
   const [inquiries, setInquiries] = useState([]);
   const [inquiry, setInquiry] = useState({
     compose: { file: [] },
@@ -98,8 +98,8 @@ const Inquiries = () => {
   };
 
   const tableHeader = [
+    "inq id",
     "name",
-    "e-mail",
     "message",
     "date",
     "status",
@@ -110,7 +110,12 @@ const Inquiries = () => {
     const dateFormat = date === undefined ? "" : date.substr(0, 10);
     return dateFormat;
   };
+  const TimeFormat = (date) => {
+    if (!date) return "";
 
+    const formattedTime = moment(date).format("hh:mm A");
+    return formattedTime;
+  };
   const handleView = (item) => {
     setInquiry(item);
   };
@@ -206,14 +211,32 @@ const Inquiries = () => {
       setFilteredInquiries(filters(selected, date));
     }
   };
+  const [showTooltip, setShowTooltip] = useState(false);
+  const isLatestResponseResident = (inquiry) => {
+    const { response, isApproved } = inquiry;
+    if (response && response.length > 0) {
+      const latestResponse = response[response.length - 1];
+      return (
+        latestResponse.type === "Resident" &&
+        !["Completed"].includes(isApproved)
+      );
+    }
+    return false;
+  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowTooltip((prev) => !prev);
+    }, 5000);
 
+    return () => clearInterval(interval);
+  }, []);
   return (
-    <div className="mx-4 mt-[10rem] lg:mt-4 lg:w-[calc(100vw_-_305px)] xxl:w-[calc(100vw_-_440px)] xxl:w-[calc(100vw_-_310px)]">
-    <div className="flex flex-col">
-        <div className="flex flex-row mt-5 sm:flex-col-reverse lg:flex-row w-full">
+    <div className="mx-4 mt-4">
+      <div className="flex flex-col ">
+        <div className="flex flex-row sm:flex-col-reverse lg:flex-row w-full ">
           <div className="sm:mt-5 md:mt-4 lg:mt-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] py-2 lg:py-4 px-5 md:px-10 lg:px-0 xl:px-10 sm:rounded-t-lg lg:rounded-t-[1.75rem]  w-full lg:w-2/5 xxl:h-[4rem] xxxl:h-[5rem]">
-            <h1
-              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[1.2rem] xl:text-[26px] xxxl:text-4xl xxxl:mt-1 text-white"
+          <h1
+              className="text-center sm:text-[15px] mx-auto font-bold md:text-xl lg:text-[15px] xl:text-xl xxl:text-2xl xxxl:text-4xl xxxl:mt-1 text-white"
               style={{ letterSpacing: "0.2em" }}
             >
               INQUIRIES
@@ -471,8 +494,8 @@ const Inquiries = () => {
           </div>
         </div>
 
-        <div className="overflow-auto sm:overflow-x-auto h-[calc(100vh_-_300px)] xxxl:h-[calc(100vh_-_326px)]">
-          <table className="w-full ">
+        <div className="scrollbarWidth scrollbarTrack scrollbarHover scrollbarThumb overflow-y-scroll lg:overflow-x-hidden h-[calc(100vh_-_275px)] xxl:h-[calc(100vh_-_275px)] xxxl:h-[calc(100vh_-_300px)]">
+          <table className="relative table-auto w-full">
             <thead className="bg-[#295141] sticky top-0">
               <tr className="">
                 <th scope="col" className="px-6 py-4">
@@ -497,7 +520,7 @@ const Inquiries = () => {
               </tr>
             </thead>
             <tbody className="odd:bg-slate-100">
-            {filteredInquiries.length > 0 ? (
+              {filteredInquiries.length > 0 ? (
                 filteredInquiries.map((item, index) => (
                   <tr key={index} className="odd:bg-slate-100 text-center">
                     <td className="px-6 py-3">
@@ -513,27 +536,28 @@ const Inquiries = () => {
                     </td>
                     <td className="px-6 py-3">
                       <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black  line-clamp-2 ">
+                          {item.inq_id}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center items-center">
+                        <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black  line-clamp-2 ">
                           {item.name}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-3">
-                      <div className="flex justify-center items-center">
-                        <span className="text-xs sm:text-sm text-black  line-clamp-2 ">
-                          {item.email}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className="text-xs sm:text-sm text-black line-clamp-2 ">
+                      <span className="text-xs sm:text-sm lg:text-xs xl:text-sm text-black line-clamp-1 w-[100px] ">
                         {item.compose.message}
                       </span>
                     </td>
-                    <td className="px-6 py-3">
+                    <td className="px-6 py-3 xxl:w-3/12">
                       <div className="flex justify-center items-center">
                         <span className="text-xs sm:text-sm text-black line-clamp-2">
-                          {DateFormat(item.compose.date) || ""}
+                          {moment(item.compose.date).format("MMMM DD, YYYY")} -{" "}
+                          {TimeFormat(item.compose.date) || ""}
                         </span>
                       </div>
                     </td>
@@ -542,21 +566,21 @@ const Inquiries = () => {
                       <div className="flex justify-center items-center">
                         {item.isApproved === "Completed" && (
                           <div className="flex w-full items-center justify-center bg-custom-green-button3 m-2 rounded-lg">
-                            <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                               COMPLETED
                             </span>
                           </div>
                         )}
                         {item.isApproved === "Pending" && (
                           <div className="flex w-full items-center justify-center bg-custom-red-button m-2 rounded-lg">
-                            <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                               PENDING
                             </span>
                           </div>
                         )}
                         {item.isApproved === "In Progress" && (
                           <div className="flex w-full items-center justify-center bg-custom-amber m-2 rounded-lg">
-                            <span className="text-xs sm:text-sm font-bold text-white p-3 mx-5">
+                            <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-bold text-white p-3 mx-5">
                               IN PROGRESS
                             </span>
                           </div>
@@ -566,12 +590,28 @@ const Inquiries = () => {
 
                     <td className="px-6 py-3">
                       <div className="flex justify-center space-x-1 sm:space-x-none">
-                        <div className="hs-tooltip inline-block">
+                        <div className="hs-tooltip inline-block ">
+                          {isLatestResponseResident(item) && (
+                            <span className="tooltip   inline-block relative -top-9 left-8 z-10">
+                              <span className="absolute inline-flex rounded-full bg-red-500 text-white h-3 w-3"></span>
+                              <span className="absolute animate-ping inline-flex rounded-full bg-red-500 text-white h-3 w-3"></span>
+                              {showTooltip && (
+                                <span className="tooltiptext bg-red-500 text-white text-xs py-1 px-2 rounded absolute -left-full top-1/2 transform -translate-y-1/2 -translate-x-full whitespace-nowrap">
+                                  You have a new reply
+                                </span>
+                              )}
+                            </span>
+                          )}
                           <button
                             type="button"
                             data-hs-overlay="#hs-modal-viewInquiries"
                             onClick={() => handleView({ ...item })}
-                            className="hs-tooltip-toggle text-white bg-teal-800  font-medium text-xs px-2 py-2 inline-flex items-center rounded-lg"
+                            className={`hs-tooltip-toggle text-white bg-teal-800 font-medium text-xs px-2 py-2 items-center rounded-lg ${
+                              item.isApproved === "Completed"
+                                ? " cursor-not-allowed "
+                                : ""
+                            }`}
+                            disabled={item.isApproved === "Completed"}
                           >
                             <AiOutlineEye
                               size={24}
@@ -579,10 +619,12 @@ const Inquiries = () => {
                             />
                           </button>
                           <span
-                            className="sm:hidden md:block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-20 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
+                            className="sm:hidden md:block [--trigger:hover] inline-block hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity  absolute invisible py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                             role="tooltip"
                           >
-                            View Inquiry
+                            {item.isApproved === "Completed"
+                              ? "Inquiries already completed"
+                              : "View Inquiry"}
                           </span>
                         </div>
                       </div>
@@ -591,18 +633,18 @@ const Inquiries = () => {
                 ))
               ) : (
                 <tr>
-                <td
-                  colSpan={tableHeader.length + 1}
-                  className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
-                >
-                  <img
-                    src={noData}
-                    alt=""
-                    className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
-                  />
-                  <strong className="text-[#535353]">NO DATA FOUND</strong>
-                </td>
-              </tr>
+                  <td
+                    colSpan={tableHeader.length + 1}
+                    className="text-center  overflow-y-hidden h-[calc(100vh_-_400px)] xxxl:h-[calc(100vh_-_326px)]"
+                  >
+                    <img
+                      src={noData}
+                      alt=""
+                      className="w-[150px] h-[100px] md:w-[270px] md:h-[200px] lg:w-[250px] lg:h-[180px] xl:h-72 xl:w-96 mx-auto"
+                    />
+                    <strong className="text-[#535353]">NO DATA FOUND</strong>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -641,7 +683,11 @@ const Inquiries = () => {
           />
         </div>
         <ArchiveModal selectedItems={selectedItems} />
-        <ViewInquiriesModal inquiry={inquiry} setInquiry={setInquiry} />
+        <ViewInquiriesModal
+          inquiry={inquiry}
+          setInquiry={setInquiry}
+          brgy={brgy}
+        />
         <Status status={status} setStatus={setStatus} />
       </div>
     </div>

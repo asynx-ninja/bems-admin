@@ -55,7 +55,7 @@ const RIB = () => {
                       item.barangay.toUpperCase() === barangay.toUpperCase() &&
                       item.status.toUpperCase() === "PENDING"
                   );
-                  return record ? record.count : null;
+                  return record ? record.count : 0;
                 }),
               },
               {
@@ -66,7 +66,7 @@ const RIB = () => {
                       item.barangay.toUpperCase() === barangay.toUpperCase() &&
                       item.status.toUpperCase() === "IN PROGRESS"
                   );
-                  return record ? record.count : null;
+                  return record ? record.count : 0;
                 }),
               },
               {
@@ -77,7 +77,7 @@ const RIB = () => {
                       item.barangay.toUpperCase() === barangay.toUpperCase() &&
                       item.status.toUpperCase() === "COMPLETED"
                   );
-                  return record ? record.count : null;
+                  return record ? record.count : 0;
                 }),
               },
             ];

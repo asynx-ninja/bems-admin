@@ -1,28 +1,36 @@
 import React from "react";
-import { GrFormNext } from "react-icons/gr";
-import { BsPeopleFill } from "react-icons/bs";
-import { useSearchParams } from "react-router-dom";
-
-const Breadcrumbs = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const brgy = searchParams.get("brgy");
-  const id = searchParams.get("id");
+import { FaArchive, FaHome } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+const Breadcrumb = ({ id, brgy }) => {
+  const navigate = useNavigate();
   return (
     <nav className="flex ">
-      <ol className="flex items-center space-x-2 text-gray-500">
-        <BsPeopleFill size={22} />
-        <li>
-          <a href={`/municipalityofficials/?id=${id}`} className="text-gray-600 font-bold hover:underline text-sm md:text-lg">
-            BARANGAY OFFICIALS
-          </a>
+      <ol className="flex items-center space-x-2 text-gray-500 mt-[-1rem]">
+        <li className="flex items-center">
+          <FaHome className="mr-2 text-gray-900" />
+          <Link
+            //  href={`/barangayinformation/?id=${id}&brgy=${brgy}`}
+            to={".."}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(-1);
+            }}
+            className="text-gray-900 font-bold hover:underline uppercase"
+          >
+            municipality officials
+          </Link>
         </li>
         <li>
-          <GrFormNext size={24} style={{ color: "#ffffff" }} />
+          <span>/</span>
         </li>
-        <li className="text-sm md:text-lg text-[#295141] font-bold">ARCHIVED OFFICIALS</li>
+        <li className="flex items-center font-bold text-teal-600 uppercase">
+          <FaArchive className="mr-2" />
+          Archived municipality officials
+        </li>
       </ol>
     </nav>
   );
 };
 
-export default Breadcrumbs;
+export default Breadcrumb;

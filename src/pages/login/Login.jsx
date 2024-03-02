@@ -18,10 +18,10 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
 
-    // Clear any existing timer
-    clearTimeout(timerId);
+    // // Clear any existing timer
+    // clearTimeout(timerId);
     const obj = {
       username: data.username,
       password: data.password,
@@ -68,15 +68,7 @@ const Login = () => {
 
   return (
     <div className='bg-[url("/imgs/login-bg.jpg")] bg-cover bg-center bg-no-repeat md:px-[3rem] md:py-[3rem] lg:px-[7rem] lg:py-[4rem] h-screen flex sm:flex-col md:flex-row sm:space-y-5 md:space-y-0'>
-    {isLoading && (
-      <div className="fixed inset-0 bg-white z-50 flex justify-center items-center">
-        <div className="loaders">
-          <div className="loader"></div>
-          <div className="loader"></div>
-          <div className="loader"></div>
-        </div>
-      </div>
-    )}
+   
 
       <div className="sm:block md:hidden h-[320px] border-[5px] border-t-0 border-[#1C8058] bg-[url('/imgs/login.png)] flex flex-col w-full rounded-b-full overflow-hidden shadow-[0px_4px_4px_rgba(0,0,0,0.51)]">
         <img
@@ -244,18 +236,19 @@ const Login = () => {
             </div>
           </div>
           <div className="hs-tooltip sm:hidden md:inline-block">
-            <button
+          <Link
+            to="/tooltip"
               type="button"
-              class="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#295141] to-[#408D51]  inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
+              class="hs-tooltip-toggle w-10 h-10 absolute md:bottom-3 right-[1rem] bg-gradient-to-r from-[#408D51] to-[#295141] inline-flex justify-center items-center gap-2 rounded-full border border-gray-200 text-white font-bold "
             >
               ?
               <span
                 class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-sm "
                 role="tooltip"
               >
-                Tooltip on top
+                Bagong Montalban Barangay Application
               </span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -25,7 +25,7 @@ function EditFormLoader({ updatingStatus, error }) {
   }, [updatingStatus]);
 
   return (
-    <div className="absolute top-0 lg:top-0 lg:end-0 mb-20 lg:mr-5 z-[80]">
+    <div className="absolute top-0 lg:top-10 lg:end-0 mb-20 lg:mr-5 z-[80]">
     {updatingStatus === "error" ? (
       <div   className="w-screen md:w-auto bg-[#295141] border border-gray-200 rounded-xl shadow-lg" role="alert"  style={{ animation: "slideIn 0.3s ease-out" }}>
           <div className="flex flex-row bg-[#e05353]  items-center p-3 rounded-xl space-x-3">

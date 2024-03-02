@@ -1,11 +1,11 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import EditDropbox from "./EditDropbox";
-
-function ViewArchivedAnnouncementModal({ announcement, setAnnouncement }) {
+import GetBrgy from "../../GETBrgy/getbrgy";
+function ViewArchivedAnnouncementModal({ announcement, setAnnouncement, brgy }) {
   const [files, setFiles] = useState([]);
   const [edit, setEdit] = useState(false);
-
+  const information = GetBrgy(brgy);
   useEffect(() => {
     setFiles(announcement.length === 0 ? [] : announcement.collections.file);
   }, [announcement]);
@@ -32,12 +32,14 @@ function ViewArchivedAnnouncementModal({ announcement, setAnnouncement }) {
           <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 px-3 py-5 md:px-5 opacity-0 transition-all w-full h-auto">
             <div className="flex flex-col bg-white shadow-sm rounded-t-3xl rounded-b-3xl w-full h-full md:max-w-xl lg:max-w-2xl xxl:max-w-3xl mx-auto max-h-screen">
               {/* Header */}
-              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#396288] to-[#013D74] overflow-hidden rounded-t-2xl">
+              <div className="py-5 px-3 flex justify-between items-center bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#408D51] to-[#295141] overflow-hidden rounded-t-2xl"   style={{
+              background: `radial-gradient(ellipse at bottom, ${information?.theme?.gradient?.start}, ${information?.theme?.gradient?.end})`,
+            }}>
                 <h3
                   className="font-bold text-white mx-auto md:text-xl text-center"
                   style={{ letterSpacing: "0.3em" }}
                 >
-                  VIEW ARCHIVED ANNOUNCEMENT
+                  VIEW EVENTS DETAILS
                 </h3>
               </div>
 
